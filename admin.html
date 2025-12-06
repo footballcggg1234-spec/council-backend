@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔒 Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS เดิม */
+        :root { --primary: #a31818; --secondary: #e6b800; --dark: #4a0d0d; --bg: #f5f5f5; --white: #ffffff; --success: #28a745; --warning: #ffc107; --danger: #dc3545; }
+        body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); color: #333; line-height: 1.6; display: none; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .admin-header { background: var(--primary); color: white; padding: 30px 0; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; padding-left: 20px; padding-right: 20px;}
+        .admin-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; padding-bottom: 50px; }
+        .card { background: var(--white); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 5px solid var(--secondary); }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+        .data-table th { background: var(--primary); color: white; }
+        .status-tag { padding: 4px 8px; border-radius: 4px; color: white; font-size: 0.8rem; }
+        .status-pending { background: #6c757d; } .status-acknowledged { background: var(--warning); color: #333; } .status-resolved { background: var(--success); }
+        .btn-action { background: var(--primary); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .btn-delete { background: var(--danger); }
+        .btn-logout { background: white; color: var(--primary); border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        input, textarea, select { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn-publish { width: 100%; background: var(--secondary); padding: 10px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        @media (max-width: 900px) { .admin-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <header class="admin-header">
+        <div>
+            <h1 style="margin:0;">🔒 Admin Dashboard</h1>
+            <p style="margin:0; opacity:0.8;">จัดการระบบสภานักเรียน</p>
+        </div>
+        <button class="btn-logout" onclick="logout()">ออกจากระบบ</button>
+    </header>
+
+    <main class="container">
+        <div class="admin-grid">
+            
+            <div class="card">
+                <h2>🗳️ จัดการความคิดเห็น</h2>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead><tr><th>เรื่อง</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+                        <tbody id="suggestion-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div>
+                <div class="card" style="margin-bottom: 20px;">
+                    <h2>📝 โพสต์ข่าว</h2>
+                    <form onsubmit="postNews(event)">
+                        <input type="text" id="news-title" placeholder="หัวข้อข่าว" required>
+                        <textarea id="news-content" rows="3" placeholder="เนื้อหา" required></textarea>
+                        <input type="text" id="news-image" placeholder="URL รูปภาพ">
+                        <button type="submit" class="btn-publish">โพสต์เลย</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>📰 รายการข่าว</h2>
+                    <table class="data-table">
+                        <tbody id="news-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // ✅ 1. กำหนดลิงก์หลักให้ถูกต้อง (ชี้ไปที่ Port 5000)
+        const API_BASE = 'http://localhost:5000/api';
+
+        // ✅ 2. ตรวจสอบ Login (แก้จาก '/api/...' เป็น `${API_BASE}/...`)
+        async function checkAuth() {
+            try {
+                const res = await fetch(`${API_BASE}/check-auth`, { credentials: 'include' });
+                const data = await res.json();
+                
+                if (!data.authenticated) {
+                    window.location.href = 'login.html'; // ถ้าไม่ผ่าน ดีดกลับ
+                } else {
+                    document.body.style.display = 'block'; // ถ้าผ่าน โชว์หน้าเว็บ
+                    loadData();
+                }
+            } catch (err) {
+                console.error("Auth Error:", err);
+                window.location.href = 'login.html';
+            }
+        }
+        checkAuth();
+
+        async function logout() {
+            await fetch(`${API_BASE}/logout`, { method: 'POST', credentials: 'include' });
+            window.location.href = 'login.html';
+        }
+
+        async function loadData() {
+            loadSuggestions();
+            loadNews();
+        }
+
+        async function loadSuggestions() {
+            // ✅ แก้ลิงก์เป็น API_BASE
+            const res = await fetch(`${API_BASE}/suggestions`, { credentials: 'include' });
+            const data = await res.json();
+            const tbody = document.getElementById('suggestion-tbody');
+            tbody.innerHTML = '';
+            
+            data.forEach(item => {
+                const statusMap = { pending: 'รอ', acknowledged: 'รับเรื่อง', resolved: 'เสร็จสิ้น' };
+                const classMap = { pending: 'status-pending', acknowledged: 'status-acknowledged', resolved: 'status-resolved' };
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.topic}</td>
+                        <td><span class="status-tag ${classMap[item.status]}">${statusMap[item.status]}</span></td>
+                        <td>
+                            <button class="btn-action" onclick="updateStatus('${item._id}', 'acknowledged')">รับ</button>
+                            <button class="btn-action" style="background:#28a745" onclick="updateStatus('${item._id}', 'resolved')">จบ</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function loadNews() {
+            // ✅ แก้ลิงก์เป็น API_BASE
+            const res = await fetch(`${API_BASE}/news`, { credentials: 'include' });
+            const data = await res.json();
+            const tbody = document.getElementById('news-tbody');
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.title}</td>
+                        <td><button class="btn-action btn-delete" onclick="deleteNews('${item._id}')">ลบ</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function postNews(e) {
+            e.preventDefault();
+            const body = {
+                title: document.getElementById('news-title').value,
+                content: document.getElementById('news-content').value,
+                image: document.getElementById('news-image').value,
+                author: 'Admin'
+            };
+            // ✅ แก้ลิงก์เป็น API_BASE
+            await fetch(`${API_BASE}/news`, {
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(body),
+                credentials: 'include'
+            });
+            alert('โพสต์แล้ว!'); loadNews(); e.target.reset();
+        }
+
+        async function deleteNews(id) {
+            if(confirm('ลบข่าวนี้?')) {
+                // ✅ แก้ลิงก์เป็น API_BASE
+                await fetch(`${API_BASE}/news/${id}`, { method: 'DELETE', credentials: 'include' });
+                loadNews();
+            }
+        }
+
+        async function updateStatus(id, status) {
+            // ✅ แก้ลิงก์เป็น API_BASE
+            await fetch(`${API_BASE}/suggestions/${id}`, {
+                method: 'PUT', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ status }),
+                credentials: 'include'
+            });
+            loadSuggestions();
+        }
+    </script>
+</body>
+</html>

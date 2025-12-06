@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คณะกรรมการ - สภานักเรียน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* ใช้ CSS ธีมเดียวกับหน้าแรก แต่เพิ่ม .page-header */
+        :root { --primary: #a31818; --secondary: #e6b800; --secondary-light: #fff5cc; --dark: #4a0d0d; --bg: #fdfbf7; --white: #ffffff; --shadow: 0 4px 20px rgba(163, 24, 24, 0.08); }
+        body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); color: #333; }
+        a { text-decoration: none; transition: 0.3s; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+        
+        nav { background: var(--white); box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); position: sticky; top: 0; z-index: 100; }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; }
+        .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); display: flex; gap: 10px; }
+        .logo span { color: var(--secondary); }
+        .menu { list-style: none; display: flex; gap: 20px; }
+        .menu a { color: var(--dark); font-weight: 500; padding: 8px 16px; border-radius: 50px; }
+        .menu a:hover, .menu a.active { background: var(--secondary-light); color: var(--primary); }
+
+        /* หัวเว็บแบบมีรูป */
+        .page-header {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1');
+            background-size: cover; background-position: center;
+            padding: 80px 0; text-align: center; color: white; margin-bottom: 50px;
+            border-bottom: 5px solid var(--secondary);
+        }
+        .page-header h1 { margin: 0 0 10px; font-size: 2.5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .page-header p { color: var(--secondary); font-size: 1.1rem; font-weight: 500; }
+
+        .president-card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 10px 40px rgba(230, 184, 0, 0.2); border: 1px solid var(--secondary); max-width: 350px; margin: 0 auto 50px; text-align: center; position: relative; }
+        .badge { background: var(--secondary); color: white; padding: 5px 15px; border-radius: 20px; font-weight: 700; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); }
+        .team-grid { display: flex; justify-content: center; flex-wrap: wrap; gap: 30px; padding-bottom: 80px; }
+        .member-card { background: white; width: 240px; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); text-align: center; }
+        img { width: 100%; object-fit: cover; border-radius: 8px; }
+        .president-img { height: 320px; margin-bottom: 15px; }
+        .member-img { height: 220px; margin-bottom: 15px; filter: grayscale(100%); transition: 0.3s; }
+        .member-card:hover .member-img { filter: grayscale(0%); }
+        .info { padding: 0 15px 20px; }
+        .info h3 { color: var(--primary); font-size: 1.1rem; margin: 0 0 5px; }
+        .info p { color: #666; font-size: 0.9rem; }
+        footer { background: var(--primary); color: white; text-align: center; padding: 40px 0; margin-top: auto; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container nav-content">
+            <div class="logo">🏫 สภา<span>นักเรียน</span></div>
+            <ul class="menu">
+                <li><a href="index.html">หน้าแรก</a></li>
+                <li><a href="suggestion.html">กล่องความคิดเห็น</a></li>
+                <li><a href="team.html" class="active">คณะกรรมการ</a></li>
+                <li><a href="register.html">สมัครสมาชิก</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="page-header">
+        <h1>คณะกรรมการสภานักเรียน</h1>
+        <p>ผู้นำกิจกรรม พัฒนาวิชาการ สานสัมพันธ์น้องพี่</p>
+    </div>
+    <div class="container">
+        <div class="president-card">
+            <div class="badge">PRESIDENT</div>
+            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?fit=crop&w=500&h=600" class="president-img">
+            <div class="info"><h3>นายสมชาย รักเรียน</h3><p>นักเรียนชั้น ม.5/1</p></div>
+        </div>
+        <div class="team-grid">
+            <div class="member-card"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?fit=crop&w=400&h=400" class="member-img"><div class="info"><h3>น.ส.ใจดี มีสุข</h3><p>รองประธานฝ่ายกิจกรรม</p></div></div>
+            <div class="member-card"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?fit=crop&w=400&h=400" class="member-img"><div class="info"><h3>นายวิชาการ แม่นยำ</h3><p>รองประธานฝ่ายวิชาการ</p></div></div>
+            <div class="member-card"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?fit=crop&w=400&h=400" class="member-img"><div class="info"><h3>น.ส.เก็บตังค์ เก่งมาก</h3><p>เหรัญญิก</p></div></div>
+        </div>
+    </div>
+    <footer><div class="container"><p>© 2025 Student Council</p></div></footer>
+</body>
+</html>
