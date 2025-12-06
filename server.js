@@ -21,7 +21,7 @@ app.use(session({
 }));
 
 // ✅ เชื่อมต่อ Database (รองรับทั้ง Cloud และ Local)
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/councilDB';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://footballcggg1234_db_user:rungradit@cluster1.rhemrut.mongodb.net/?appName=Cluster1';
 mongoose.connect(MONGO_URI)
 .then(() => console.log('✅ MongoDB Connected'))
 .catch(err => console.error('❌ MongoDB Error:', err));
