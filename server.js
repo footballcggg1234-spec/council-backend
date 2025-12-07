@@ -52,10 +52,5 @@ app.get('/api/suggestions', async (req, res) => { const data = await Suggestion.
 app.post('/api/suggestions', async (req, res) => { await new Suggestion(req.body).save(); res.json({ success: true }); });
 app.put('/api/suggestions/:id', async (req, res) => { await Suggestion.findByIdAndUpdate(req.params.id, req.body); res.json({ success: true }); });
 
-// ✅ ถ้าเข้าลิงก์อื่น ให้เด้งไปหน้าแรก
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
