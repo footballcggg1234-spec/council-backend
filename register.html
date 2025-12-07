@@ -6,38 +6,87 @@
     <title>รับสมัครสมาชิก - สภานักเรียน</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS ธีมแดง-ทอง */
-        :root { --primary: #a31818; --secondary: #e6b800; --secondary-light: #fff5cc; --dark: #4a0d0d; --bg: #fdfbf7; --white: #ffffff; --shadow: 0 4px 20px rgba(163, 24, 24, 0.08); }
-        body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); color: #333; }
+        /* --- 🎨 ธีมหลัก (เหมือนหน้าอื่นๆ) --- */
+        :root {
+            --primary: #a31818;      /* แดง */
+            --secondary: #e6b800;    /* เหลืองทอง */
+            --secondary-light: #fff5cc;
+            --dark: #4a0d0d;         
+            --bg: #fdfbf7;           
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); color: #333; line-height: 1.6; }
         a { text-decoration: none; transition: 0.3s; }
-        .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
-
+        
+        /* Navbar (เมนู) */
         nav { background: var(--white); box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); position: sticky; top: 0; z-index: 100; }
-        .nav-content { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; max-width: 1100px; margin: 0 auto; padding: 15px 20px; }
-        .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); display: flex; gap: 10px; }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; max-width: 1100px; margin: 0 auto; }
+        .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; }
         .logo span { color: var(--secondary); }
-        .menu { list-style: none; display: flex; gap: 20px; }
-        .menu a { color: var(--dark); font-weight: 500; padding: 8px 16px; border-radius: 50px; }
+        .menu { list-style: none; display: flex; gap: 15px; margin: 0; padding: 0; align-items: center; }
+        .menu a { color: var(--dark); font-weight: 500; padding: 8px 12px; border-radius: 50px; font-size: 0.9rem; }
         .menu a:hover, .menu a.active { background: var(--secondary-light); color: var(--primary); }
+        .btn-admin-nav { border: 1px solid var(--primary); color: var(--primary) !important; padding: 6px 15px !important; font-size: 0.85rem !important; }
+        .btn-admin-nav:hover { background: var(--primary) !important; color: white !important; }
 
-        /* หัวเว็บแบบมีรูป */
+        /* --- 🖥️ ส่วนหัว (แก้ให้เหมือนหน้ากล่องความคิดเห็น) --- */
         .page-header {
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1');
+            /* ⚠️ ตรงนี้คือจุดสำคัญ! ถ้าอยากได้พื้นหลังสีเหลือง/เขียวแบบนั้น */
+            /* ให้เปลี่ยน 'bg.jpg' เป็นรูปเดียวกับที่ใช้ในหน้ากล่องความคิดเห็นครับ */
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('bg.jpg'); 
             background-size: cover; background-position: center;
-            padding: 80px 0; text-align: center; color: white; margin-bottom: 50px;
+            padding: 100px 0 120px; /* เพิ่มพื้นที่ด้านล่างให้กล่องฟอร์มทับสวยๆ */
+            text-align: center; color: white;
             border-bottom: 5px solid var(--secondary);
         }
-        .page-header h1 { margin: 0 0 10px; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        .page-header p { color: var(--secondary); font-size: 1.1rem; }
+        .page-header h1 { font-size: 2.8rem; margin: 0 0 10px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+        .page-header p { font-size: 1.2rem; color: var(--secondary); font-weight: 500; text-shadow: 1px 1px 5px rgba(0,0,0,0.8); }
 
-        .form-card { background: white; padding: 40px; border-radius: 16px; box-shadow: var(--shadow); border-top: 5px solid var(--secondary); margin-bottom: 60px; }
-        .form-group { margin-bottom: 25px; }
-        .form-group label { display: block; font-weight: 600; color: var(--dark); margin-bottom: 8px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Sarabun'; font-size: 1rem; box-sizing: border-box; background: #fafafa; }
-        .form-group input:focus { outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(163, 24, 24, 0.1); }
-        .btn-submit { background: var(--primary); color: white; border: none; width: 100%; padding: 15px; font-size: 1.1rem; font-weight: 700; border-radius: 50px; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(163, 24, 24, 0.2); }
-        .btn-submit:hover { background: var(--dark); transform: translateY(-2px); }
-        footer { background: var(--primary); color: white; text-align: center; padding: 40px 0; margin-top: auto; }
+        /* --- 📝 กล่องฟอร์ม (ปรับให้กระทัดรัดเหมือนรูปที่ 2) --- */
+        .form-card {
+            background: white;
+            max-width: 600px; /* 👈 ปรับความกว้างให้พอดี ไม่กว้างเกินไป */
+            margin: -60px auto 50px; /* ดึงขึ้นไปทับ Header มากขึ้น (-60px) */
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border-top: 5px solid var(--primary); /* เปลี่ยนเป็นสีแดงตามธีม หรือใช้ var(--secondary) สีเหลืองก็ได้ */
+            position: relative;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 700; margin-bottom: 8px; color: var(--dark); }
+        input, select, textarea {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;
+            font-family: 'Sarabun'; font-size: 1rem; box-sizing: border-box;
+            transition: 0.3s;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--secondary); outline: none; }
+        
+        .btn-submit {
+            width: 100%; padding: 15px; background: var(--secondary); color: var(--dark);
+            border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 800;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(230, 184, 0, 0.4); transition: 0.3s; margin-top: 10px;
+        }
+        .btn-submit:hover { transform: translateY(-3px); background: #ffd700; }
+
+        footer { background: var(--primary); color: white; text-align: center; padding: 30px 0; margin-top: auto; }
+
+        /* 📱 มือถือ (Mobile) - ให้แสดงผลแบบเต็มจอ ใช้งานง่าย */
+        @media (max-width: 768px) {
+            .nav-content { flex-direction: column; gap: 15px; }
+            .menu { flex-wrap: wrap; justify-content: center; gap: 8px; }
+            
+            .page-header { padding: 60px 0 80px; }
+            .page-header h1 { font-size: 2rem; }
+            
+            .form-card {
+                margin: -40px 15px 40px; /* ขอบซ้ายขวา 15px */
+                padding: 25px;
+            }
+        }
     </style>
 </head>
 <body>
