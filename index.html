@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>หน้าแรก - สภานักเรียน</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <style>
+<style>
         /* --- 🎨 PALETTE: แดง-ทอง --- */
         :root {
             --primary: #a31818;      /* แดงเลือดหมู */
@@ -19,18 +19,22 @@
 
         body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); color: #333; line-height: 1.6; }
         a { text-decoration: none; transition: 0.3s; }
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; overflow-x: hidden; /* ป้องกันจอล้น */ }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; overflow-x: hidden; }
 
         /* Navbar */
         nav { background: var(--white); box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); position: sticky; top: 0; z-index: 100; }
         .nav-content { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; }
-        .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        
+        /* ปรับโลโก้ */
+        .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; white-space: nowrap; }
         .logo span { color: var(--secondary); }
         
-        .menu { list-style: none; display: flex; gap: 15px; margin: 0; padding: 0; align-items: center; flex-wrap: wrap; }
+        /* ปรับเมนู */
+        .menu { list-style: none; display: flex; gap: 15px; margin: 0; padding: 0; align-items: center; }
         .menu a { color: var(--dark); font-weight: 500; padding: 8px 12px; border-radius: 50px; font-size: 0.9rem; white-space: nowrap; }
         .menu a:hover, .menu a.active { background: var(--secondary-light); color: var(--primary); }
 
+        /* ปุ่ม Admin */
         .btn-admin-nav {
             border: 1px solid var(--primary);
             color: var(--primary) !important;
@@ -39,23 +43,18 @@
         }
         .btn-admin-nav:hover { background: var(--primary) !important; color: white !important; }
 
-        /* --- HERO SECTION --- */
+        /* Hero Section */
         .hero {
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('bg.jpg'); /* อย่าลืมใส่รูป bg.jpg ในโฟลเดอร์นะ */
-            background-size: cover; 
-            background-position: center;
-            padding: 100px 0; 
-            text-align: center;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('bg.jpg');
+            background-size: cover; background-position: center;
+            padding: 100px 0; text-align: center;
             border-bottom: 5px solid var(--secondary);
         }
-        
-        .hero h1 { font-size: 3rem; color: var(--white); margin-bottom: 10px; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); line-height: 1.2; }
-        .hero p { font-size: 1.2rem; color: var(--secondary); font-weight: 500; text-shadow: 1px 1px 5px rgba(0,0,0,0.8); }
-        
+        .hero h1 { font-size: 3rem; color: var(--white); margin-bottom: 10px; line-height: 1.2; }
+        .hero p { font-size: 1.2rem; color: var(--secondary); font-weight: 500; }
         .btn-main {
             background: var(--secondary); color: var(--dark); padding: 12px 30px; 
-            border-radius: 50px; font-weight: 700; font-size: 1rem;
-            box-shadow: 0 4px 15px rgba(230, 184, 0, 0.4); display: inline-block; margin-top: 25px;
+            border-radius: 50px; font-weight: 700; margin-top: 25px; display: inline-block;
         }
 
         /* Content */
@@ -69,23 +68,24 @@
 
         footer { background: var(--primary); color: white; text-align: center; padding: 30px 0; margin-top: auto; }
 
-        /* 📱 MOBILE RESPONSIVE (แก้ตรงนี้ให้แสดงผลบนมือถือสวยขึ้น) */
+        /* 📱 MOBILE RESPONSIVE (แก้ตรงนี้!) */
         @media (max-width: 768px) {
             .nav-content {
-                flex-direction: column; /* เรียงแนวตั้ง */
+                flex-direction: column; /* เรียงแนวตั้ง: โลโก้อยู่บน เมนูอยู่ล่าง */
                 gap: 15px;
+                padding-bottom: 15px;
             }
             .menu {
+                flex-wrap: wrap;       /* ถ้าเมนูเยอะ ให้ปัดตกบรรทัดใหม่ได้ */
                 justify-content: center; /* จัดกึ่งกลาง */
-                gap: 10px;
+                gap: 8px;              /* ลดช่องว่างระหว่างปุ่ม */
             }
-            .menu li { margin-bottom: 5px; }
-            
-            .hero { padding: 80px 0; }
-            .hero h1 { font-size: 2.2rem; /* ลดขนาดตัวหนังสือ */ }
-            .hero p { font-size: 1rem; padding: 0 10px; }
-            
-            .btn-main { width: 80%; } /* ปุ่มเต็มจอ */
+            .menu a {
+                font-size: 0.85rem;    /* ลดขนาดตัวหนังสือเมนูนิดนึง */
+                padding: 6px 10px;
+                background: #f5f5f5;   /* ใส่สีพื้นหลังจางๆ ให้ดูเป็นปุ่มกดง่ายขึ้น */
+            }
+            .hero h1 { font-size: 2rem; } /* ลดขนาดหัวข้อ */
         }
     </style>
 </head>
