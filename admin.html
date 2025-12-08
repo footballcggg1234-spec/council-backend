@@ -18,17 +18,25 @@
         .sidebar-link:hover { background-color: #eff6ff; color: #2563eb; }
         .sidebar-link.active { background-color: #2563eb; color: #ffffff; box-shadow: 0 10px 15px -3px rgba(37,99,235,0.12); }
         .card { background-color: #ffffff; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #f3f4f6; }
-
-        /* Animation สำหรับซ่อนเมนู */
         #sidebar { transition: all 0.3s ease-in-out; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
     <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 flex flex-col p-6 z-20 flex-shrink-0 relative">
-        <div class="flex items-center gap-2 mb-10 px-2 text-blue-800">
-            <i class="fas fa-shapes text-2xl"></i>
-            <span class="text-xl font-bold tracking-wide">SC.ADMIN</span>
+        
+        <div class="flex flex-col items-center justify-center mb-8 pb-6 border-b border-gray-100">
+            <div class="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center mb-3 overflow-hidden border-4 border-blue-50 relative group cursor-pointer">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/School_in_Thailand.jpg/1200px-School_in_Thailand.jpg" 
+                     alt="System Logo" 
+                     class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                
+                <div class="absolute inset-0 bg-black/30 hidden group-hover:flex items-center justify-center text-white text-xs">
+                    แก้ไข
+                </div>
+            </div>
+            <h1 class="text-xl font-extrabold text-blue-800 tracking-wide">RPK.26</h1>
+            <p class="text-xs text-gray-400 font-medium bg-gray-100 px-2 py-1 rounded-full mt-1">System Admin</p>
         </div>
 
         <nav class="flex-1 space-y-2">
@@ -46,7 +54,7 @@
             </a>
         </nav>
 
-        <button onclick="logout()" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl mt-auto transition">
+        <button onclick="logout()" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl mt-auto transition font-bold text-sm">
             <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
         </button>
     </aside>
@@ -55,18 +63,24 @@
         
         <header class="bg-white border-b h-16 flex items-center justify-between px-6 shadow-sm z-10">
             <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar()" class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition" title="ย่อ/ขยาย เมนู">
+                <button onclick="toggleSidebar()" class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
                 <h2 class="text-lg font-bold text-gray-700 hidden md:block">แผงควบคุมหลัก</h2>
             </div>
 
             <div class="flex items-center gap-3">
-                <button onclick="toggleFullScreen()" class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition" title="เต็มจอ">
+                <button onclick="toggleFullScreen()" class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition">
                     <i id="fullscreen-icon" class="fas fa-expand text-xl"></i>
                 </button>
-                <div class="flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-bold text-sm border border-blue-100">
-                    <i class="fas fa-user-shield"></i> Admin
+                <div class="flex items-center gap-3 pl-4 border-l">
+                    <div class="text-right hidden md:block">
+                        <p class="text-sm font-bold text-gray-700">Admin User</p>
+                        <p class="text-xs text-green-500">● Online</p>
+                    </div>
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow-sm">
+                        AD
+                    </div>
                 </div>
             </div>
         </header>
@@ -100,16 +114,14 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="card col-span-1 lg:col-span-2">
                         <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <i class="fas fa-trophy text-yellow-500"></i> 5 อันดับหอพักคะแนนสูงสุด
+                            <i class="fas fa-trophy text-yellow-500"></i> 5 อันดับหอพักสูงสุด
                         </h3>
                         <div class="relative h-72 w-full"><canvas id="barChart"></canvas></div>
                     </div>
-
                     <div class="card col-span-1 flex flex-col items-center justify-center">
                         <h3 class="text-lg font-bold text-gray-800 mb-4 self-start">องค์ประกอบคะแนน</h3>
                         <div class="relative h-56 w-56"><canvas id="donutChart"></canvas></div>
                     </div>
-
                     <div class="card col-span-1 lg:col-span-3">
                         <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                             <i class="fas fa-graduation-cap text-blue-500"></i> อันดับคะแนนห้องเรียน (Top 7)
@@ -126,15 +138,10 @@
                         <button onclick="loadScoreInputs('dorm')" id="btn-mode-dorm" class="px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-purple-100 text-purple-700 font-bold transition flex items-center gap-2"><i class="fas fa-bed"></i> ตรวจหอนอน</button>
                         <button onclick="loadScoreInputs('classroom')" id="btn-mode-classroom" class="px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-green-100 text-green-700 font-bold transition flex items-center gap-2"><i class="fas fa-chalkboard"></i> ตรวจห้องเรียน</button>
                     </div>
-
                     <h3 id="score-title" class="text-xl font-bold text-gray-700 mb-4">กรุณาเลือกหมวดหมู่ด้านบน</h3>
-                    
                     <form onsubmit="saveScores(event)">
-                        <div id="admin-score-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-[60vh] overflow-y-auto p-1">
-                            </div>
-                        <button id="btn-save-score" type="submit" class="hidden mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition">
-                            <i class="fas fa-save mr-2"></i> บันทึกคะแนนทั้งหมด
-                        </button>
+                        <div id="admin-score-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-[60vh] overflow-y-auto p-1"></div>
+                        <button id="btn-save-score" type="submit" class="hidden mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition"><i class="fas fa-save mr-2"></i> บันทึกคะแนนทั้งหมด</button>
                     </form>
                 </div>
             </div>
@@ -172,45 +179,20 @@
         let allScoreData = [];
         let currentAdminMode = '';
 
-        // --- 🟢 Toggle Sidebar & Fullscreen ---
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            if (sidebar.classList.contains('hidden')) {
-                sidebar.classList.remove('hidden'); // แสดงเมนู
-            } else {
-                sidebar.classList.add('hidden'); // ซ่อนเมนู (ขยายจอ)
-            }
-        }
-
+        function toggleSidebar() { const s = document.getElementById('sidebar'); s.classList.toggle('hidden'); }
         function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-                document.getElementById('fullscreen-icon').classList.replace('fa-expand', 'fa-compress');
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                    document.getElementById('fullscreen-icon').classList.replace('fa-compress', 'fa-expand');
-                }
-            }
+            if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); document.getElementById('fullscreen-icon').classList.replace('fa-expand', 'fa-compress'); } 
+            else { if (document.exitFullscreen) document.exitFullscreen(); document.getElementById('fullscreen-icon').classList.replace('fa-compress', 'fa-expand'); }
         }
 
-        // --- AUTH & INIT ---
-        async function checkAuth() { 
-            try { 
-                const res = await fetch(`${API_BASE}/check-auth`); 
-                const data = await res.json(); 
-                if (!data.authenticated) location.href='login.html'; else initDashboard(); 
-            } catch { location.href='login.html'; } 
-        }
+        async function checkAuth() { try { const res = await fetch(`${API_BASE}/check-auth`); const data = await res.json(); if (!data.authenticated) location.href='login.html'; else initDashboard(); } catch { location.href='login.html'; } }
         checkAuth();
 
         async function initDashboard() {
-            // โหลดข้อมูล 3 อย่างพร้อมกัน
             const [scRes, sgRes, nwRes] = await Promise.all([fetch(`${API_BASE}/scores`), fetch(`${API_BASE}/suggestions`), fetch(`${API_BASE}/news`)]);
             allScoreData = await scRes.json();
             const suggestions = await sgRes.json();
             const news = await nwRes.json();
-
             updateStats(allScoreData, suggestions, news);
             renderCharts(allScoreData);
             renderSuggestions(suggestions);
@@ -218,15 +200,11 @@
         }
 
         function switchTab(t) {
-            document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden')); 
-            document.getElementById(`tab-${t}`).classList.remove('hidden');
-            document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active')); 
-            document.getElementById(`nav-${t}`).classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden')); document.getElementById(`tab-${t}`).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active')); document.getElementById(`nav-${t}`).classList.add('active');
         }
-
         async function logout() { await fetch(`${API_BASE}/logout`, {method:'POST'}); location.href='login.html'; }
 
-        // --- CHARTS ---
         function updateStats(scores, sugs, news) {
             const tDorm = scores.filter(s=>s.type==='dorm').reduce((a,b)=>a+(b.points_exercise||0)+(b.points_dorm||0),0);
             const tClass = scores.filter(s=>s.type==='classroom').reduce((a,b)=>a+(b.points_class||0),0);
@@ -237,78 +215,29 @@
         }
 
         function renderCharts(data) {
-            // 1. Bar Chart (Top 5 Dorms)
             const dorms = data.filter(d=>d.type==='dorm').sort((a,b)=>(b.points_exercise+b.points_dorm)-(a.points_exercise+a.points_dorm)).slice(0,5);
-            new Chart(document.getElementById('barChart'), { 
-                type:'bar', 
-                data:{labels:dorms.map(d=>d.name), datasets:[{label:'คะแนน', data:dorms.map(d=>(d.points_exercise||0)+(d.points_dorm||0)), backgroundColor:'#3b82f6', borderRadius:6}]}, 
-                options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}} 
-            });
-
-            // 2. Donut Chart (Proportion)
+            new Chart(document.getElementById('barChart'), { type:'bar', data:{labels:dorms.map(d=>d.name), datasets:[{label:'คะแนน', data:dorms.map(d=>(d.points_exercise||0)+(d.points_dorm||0)), backgroundColor:'#3b82f6', borderRadius:6}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}} });
             const tEx = data.filter(d=>d.type==='dorm').reduce((a,b)=>a+(b.points_exercise||0),0);
             const tDo = data.filter(d=>d.type==='dorm').reduce((a,b)=>a+(b.points_dorm||0),0);
             const tCl = data.filter(d=>d.type==='classroom').reduce((a,b)=>a+(b.points_class||0),0);
-            new Chart(document.getElementById('donutChart'), { 
-                type:'doughnut', 
-                data:{labels:['ออกกาย','หอนอน','ห้องเรียน'], datasets:[{data:[tEx,tDo,tCl], backgroundColor:['#3b82f6','#a855f7','#f59e0b'], borderWidth:0, hoverOffset:5}]}, 
-                options:{cutout:'75%', plugins:{legend:{display:false}}} 
-            });
-
-            // 3. Line Chart (Top 7 Classrooms)
+            new Chart(document.getElementById('donutChart'), { type:'doughnut', data:{labels:['ออกกาย','หอนอน','ห้องเรียน'], datasets:[{data:[tEx,tDo,tCl], backgroundColor:['#3b82f6','#a855f7','#f59e0b'], borderWidth:0, hoverOffset:5}]}, options:{cutout:'75%', plugins:{legend:{display:false}}} });
             const cls = data.filter(d=>d.type==='classroom').sort((a,b)=>b.points_class-a.points_class).slice(0,7);
-            new Chart(document.getElementById('lineChart'), { 
-                type:'line', 
-                data:{labels:cls.map(c=>c.name), datasets:[{label:'คะแนน', data:cls.map(c=>c.points_class), borderColor:'#10b981', backgroundColor:'rgba(16, 185, 129, 0.1)', fill:true, tension:0.4, pointRadius:4}]}, 
-                options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}} 
-            });
+            new Chart(document.getElementById('lineChart'), { type:'line', data:{labels:cls.map(c=>c.name), datasets:[{label:'คะแนน', data:cls.map(c=>c.points_class), borderColor:'#10b981', backgroundColor:'rgba(16, 185, 129, 0.1)', fill:true, tension:0.4, pointRadius:4}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}} });
         }
 
-        // --- SCORE INPUTS ---
         function loadScoreInputs(m) {
-            currentAdminMode=m; 
-            const con=document.getElementById('admin-score-container'); 
-            const btn=document.getElementById('btn-save-score'); 
-            const tit=document.getElementById('score-title');
-            
-            // Highlight Button
+            currentAdminMode=m; const con=document.getElementById('admin-score-container'); const tit=document.getElementById('score-title');
             document.querySelectorAll('#tab-scores button').forEach(b=>b.classList.remove('ring-2','ring-offset-2','bg-white','shadow-md'));
-            const activeBtn = document.getElementById(`btn-mode-${m}`);
-            activeBtn.classList.add('ring-2','ring-offset-2','bg-white','shadow-md');
-
+            document.getElementById(`btn-mode-${m}`).classList.add('ring-2','ring-offset-2','bg-white','shadow-md');
             let fil=[], fld=''; 
             if(m==='classroom'){ fil=allScoreData.filter(d=>d.type==='classroom'); fld='points_class'; tit.innerHTML='<i class="fas fa-chalkboard text-green-600"></i> กรอกคะแนนห้องเรียน'; }
-            else { 
-                fil=allScoreData.filter(d=>d.type==='dorm'); 
-                fld=m==='exercise'?'points_exercise':'points_dorm'; 
-                tit.innerHTML=m==='exercise'?'<i class="fas fa-running text-blue-600"></i> กรอกคะแนนตรวจออกกาย (หอพัก)':'<i class="fas fa-bed text-purple-600"></i> กรอกคะแนนตรวจหอนอน'; 
-            }
+            else { fil=allScoreData.filter(d=>d.type==='dorm'); fld=m==='exercise'?'points_exercise':'points_dorm'; tit.innerHTML=m==='exercise'?'<i class="fas fa-running text-blue-600"></i> กรอกคะแนนตรวจออกกาย':'<i class="fas fa-bed text-purple-600"></i> กรอกคะแนนตรวจหอนอน'; }
             fil.sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
-
-            con.innerHTML=''; 
-            fil.forEach(i=>{ 
-                con.innerHTML+=`
-                <div class="bg-gray-50 p-3 rounded-xl border hover:border-blue-400 transition">
-                    <label class="text-xs font-bold text-gray-500 block mb-1 uppercase">${i.name}</label>
-                    <input type="number" class="score-input w-full bg-white border border-gray-200 rounded-lg p-2 text-center font-bold text-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" 
-                        data-id="${i._id}" value="${i[fld]||0}">
-                </div>`; 
-            });
-            btn.classList.remove('hidden');
+            con.innerHTML=''; fil.forEach(i=>{ con.innerHTML+=`<div class="bg-gray-50 p-3 rounded-xl border hover:border-blue-400 transition"><label class="text-xs font-bold text-gray-500 block mb-1 uppercase">${i.name}</label><input type="number" class="score-input w-full bg-white border border-gray-200 rounded-lg p-2 text-center font-bold text-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" data-id="${i._id}" value="${i[fld]||0}"></div>`; });
+            document.getElementById('btn-save-score').classList.remove('hidden');
         }
 
-        async function saveScores(e) { 
-            e.preventDefault(); 
-            const inps=document.querySelectorAll('.score-input'); 
-            const upds=[]; 
-            let fld=currentAdminMode==='classroom'?'points_class':(currentAdminMode==='exercise'?'points_exercise':'points_dorm'); 
-            inps.forEach(i=>upds.push({_id:i.dataset.id, field:fld, value:i.value})); 
-            await fetch(`${API_BASE}/scores`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(upds)}); 
-            alert('บันทึกเรียบร้อย ✅'); 
-            initDashboard(); // Refresh graphs
-        }
-
-        // --- OTHERS ---
+        async function saveScores(e) { e.preventDefault(); const inps=document.querySelectorAll('.score-input'); const upds=[]; let fld=currentAdminMode==='classroom'?'points_class':(currentAdminMode==='exercise'?'points_exercise':'points_dorm'); inps.forEach(i=>upds.push({_id:i.dataset.id, field:fld, value:i.value})); await fetch(`${API_BASE}/scores`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(upds)}); alert('บันทึกเรียบร้อย ✅'); initDashboard(); }
         function renderSuggestions(d) { document.getElementById('suggestion-tbody').innerHTML=d.map(s=>`<tr class="border-b hover:bg-gray-50"><td class="p-4 font-bold text-gray-700">${s.topic}</td><td class="p-4 text-sm text-gray-500">${s.category}</td><td class="p-4"><span class="px-2 py-1 rounded-md text-xs font-bold ${s.status==='resolved'?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'}">${s.status}</span></td><td class="p-4">${s.status!=='resolved'?`<button onclick="updSug('${s._id}','resolved')" class="text-green-600 hover:bg-green-50 px-3 py-1 rounded font-bold text-sm transition">จบงาน</button>`:'<i class="fas fa-check-circle text-green-500 text-lg"></i>'}</td></tr>`).join(''); }
         async function updSug(id,st) { await fetch(`${API_BASE}/suggestions/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:st})}); initDashboard(); }
         function renderNews(d) { document.getElementById('news-grid-admin').innerHTML=d.map(n=>`<div class="bg-white p-4 rounded-xl border shadow-sm relative group hover:shadow-md transition"><button onclick="delNews('${n._id}')" class="absolute top-2 right-2 bg-red-50 text-red-500 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"><i class="fas fa-trash"></i></button><h4 class="font-bold text-gray-800 mb-2">${n.title}</h4><p class="text-sm text-gray-500 truncate">${n.content}</p></div>`).join(''); }
