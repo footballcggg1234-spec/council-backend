@@ -6,23 +6,23 @@
     <title>Admin Dashboard | Student Council</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
-        .sidebar-link { @apply flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all cursor-pointer font-medium; }
-        .sidebar-link.active { @apply bg-blue-600 text-white shadow-lg shadow-blue-200; }
-        .card { @apply bg-white rounded-2xl p-6 shadow-sm border border-gray-100; }
-        /* Smooth Transition สำหรับการซ่อนเมนู */
-        #sidebar { transition: all 0.3s ease-in-out; }
-        .sidebar-hidden { margin-left: -16rem; } /* ซ่อน Sidebar ขนาด w-64 (16rem) */
+        .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: #4b5563; border-radius: 0.75rem; transition: all 200ms ease; cursor: pointer; font-weight: 500; text-decoration: none; }
+        .sidebar-link:hover { background-color: #eff6ff; color: #2563eb; }
+        .sidebar-link.active { background-color: #2563eb; color: #ffffff; box-shadow: 0 10px 15px -3px rgba(37,99,235,0.12); }
+        .card { background-color: #ffffff; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #f3f4f6; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 flex flex-col p-6 z-20 flex-shrink-0">
+    <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col p-6 z-10">
         <div class="flex items-center gap-2 mb-10 px-2 text-blue-800">
             <i class="fas fa-shapes text-2xl"></i>
             <span class="text-xl font-bold tracking-wide">SC.DASHBOARD</span>
@@ -30,16 +30,16 @@
 
         <nav class="flex-1 space-y-2">
             <a onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-link active">
-                <i class="fas fa-home w-6 text-center"></i> Dashboard
+                <i class="fas fa-home"></i> Dashboard
             </a>
             <a onclick="switchTab('scores')" id="nav-scores" class="sidebar-link">
-                <i class="fas fa-trophy w-6 text-center"></i> จัดการคะแนน
+                <i class="fas fa-trophy"></i> จัดการคะแนน
             </a>
             <a onclick="switchTab('suggestions')" id="nav-suggestions" class="sidebar-link">
-                <i class="fas fa-envelope w-6 text-center"></i> ความคิดเห็น
+                <i class="fas fa-envelope"></i> ความคิดเห็น
             </a>
             <a onclick="switchTab('news')" id="nav-news" class="sidebar-link">
-                <i class="fas fa-newspaper w-6 text-center"></i> ข่าวสาร
+                <i class="fas fa-newspaper"></i> ข่าวสาร
             </a>
         </nav>
 
@@ -48,89 +48,166 @@
         </button>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50 relative w-full">
-        
-        <header class="bg-white border-b h-16 flex items-center justify-between px-6 shadow-sm z-10">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar()" class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-                <h2 class="text-lg font-bold text-gray-700 hidden md:block">แผงควบคุมหลัก</h2>
-            </div>
-
-            <div class="flex items-center gap-3">
-                <button onclick="toggleFullScreen()" class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition" title="เต็มจอ">
-                    <i id="fullscreen-icon" class="fas fa-expand text-xl"></i>
-                </button>
-                <div class="flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-bold text-sm">
-                    <i class="fas fa-user-circle"></i> Admin
-                </div>
-            </div>
+    <main class="flex-1 overflow-y-auto relative">
+        <header class="bg-white/80 backdrop-blur-md sticky top-0 z-20 px-8 py-4 flex justify-between items-center md:hidden border-b">
+            <div class="font-bold text-blue-800">SC.ADMIN</div>
+            <button onclick="logout()" class="text-red-500"><i class="fas fa-sign-out-alt"></i></button>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 relative">
+        <div class="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
             
             <div id="tab-dashboard" class="tab-content block space-y-8">
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="card flex flex-col justify-between hover:shadow-md transition">
-                        <div><p class="text-gray-500 text-xs font-bold uppercase">คะแนนรวม (หอ)</p><h3 class="text-3xl font-bold text-gray-800 mt-2" id="stat-dorm-score">0</h3></div>
-                        <div class="mt-4 flex items-center text-sm text-green-500 font-bold"><i class="fas fa-arrow-up mr-1"></i> ตรวจแล้ว</div>
+                    <div class="card flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm font-semibold">คะแนนรวม (หอ)</p>
+                                <h3 class="text-3xl font-bold text-gray-800 mt-2" id="stat-dorm-score">0</h3>
+                            </div>
+                            <div class="p-3 bg-blue-50 rounded-xl text-blue-600"><i class="fas fa-bed text-xl"></i></div>
+                        </div>
+                        <div class="mt-4 flex items-center text-sm text-green-500 font-bold">
+                            <i class="fas fa-arrow-up mr-1"></i> <span>ตรวจแล้ว</span>
+                        </div>
                     </div>
-                    <div class="card flex flex-col justify-between hover:shadow-md transition">
-                        <div><p class="text-gray-500 text-xs font-bold uppercase">คะแนนรวม (ห้อง)</p><h3 class="text-3xl font-bold text-gray-800 mt-2" id="stat-class-score">0</h3></div>
-                        <div class="mt-4 flex items-center text-sm text-blue-500 font-bold">Active</div>
+
+                    <div class="card flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm font-semibold">คะแนนรวม (ห้องเรียน)</p>
+                                <h3 class="text-3xl font-bold text-gray-800 mt-2" id="stat-class-score">0</h3>
+                            </div>
+                            <div class="p-3 bg-green-50 rounded-xl text-green-600"><i class="fas fa-chalkboard text-xl"></i></div>
+                        </div>
+                        <div class="mt-4 flex items-center text-sm text-blue-500 font-bold">
+                            <span>Active</span>
+                        </div>
                     </div>
-                    <div class="card flex flex-col justify-between hover:shadow-md transition cursor-pointer" onclick="switchTab('suggestions')">
-                        <div><p class="text-gray-500 text-xs font-bold uppercase">เรื่องร้องเรียน</p><h3 class="text-3xl font-bold text-gray-800 mt-2" id="stat-sug-count">0</h3></div>
-                        <div class="mt-4 text-xs text-gray-400">คลิกเพื่อดู ></div>
+
+                    <div class="card flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm font-semibold">เรื่องร้องเรียน</p>
+                                <h3 class="text-3xl font-bold text-gray-800 mt-2" id="stat-sug-count">0</h3>
+                            </div>
+                            <div class="p-3 bg-purple-50 rounded-xl text-purple-600"><i class="fas fa-inbox text-xl"></i></div>
+                        </div>
+                        <div class="mt-4 text-sm text-gray-400 cursor-pointer hover:text-blue-500" onclick="switchTab('suggestions')">
+                            ดูข้อมูล >
+                        </div>
                     </div>
-                    <div class="card flex flex-col justify-between hover:shadow-md transition cursor-pointer" onclick="switchTab('news')">
-                        <div><p class="text-gray-500 text-xs font-bold uppercase">ข่าวประชาสัมพันธ์</p><h3 class="text-3xl font-bold text-gray-800 mt-2" id="stat-news-count">0</h3></div>
-                        <div class="mt-4 text-xs text-gray-400">คลิกเพื่อดู ></div>
+
+                    <div class="card flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm font-semibold">ข่าวประชาสัมพันธ์</p>
+                                <h3 class="text-3xl font-bold text-gray-800 mt-2" id="stat-news-count">0</h3>
+                            </div>
+                            <div class="p-3 bg-orange-50 rounded-xl text-orange-600"><i class="fas fa-newspaper text-xl"></i></div>
+                        </div>
+                        <div class="mt-4 text-sm text-gray-400 cursor-pointer hover:text-blue-500" onclick="switchTab('news')">
+                            ดูข้อมูล >
+                        </div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
                     <div class="card col-span-1 lg:col-span-2">
                         <h3 class="text-lg font-bold text-gray-800 mb-6">🏆 5 อันดับหอพักคะแนนสูงสุด</h3>
-                        <div class="relative h-72 w-full"><canvas id="barChart"></canvas></div>
+                        <div class="relative h-64 w-full">
+                            <canvas id="barChart"></canvas>
+                        </div>
                     </div>
+
                     <div class="card col-span-1 flex flex-col items-center justify-center">
                         <h3 class="text-lg font-bold text-gray-800 mb-4 self-start">องค์ประกอบคะแนน</h3>
-                        <div class="relative h-48 w-48"><canvas id="donutChart"></canvas></div>
+                        <div class="relative h-48 w-48">
+                            <canvas id="donutChart"></canvas>
+                            <div class="absolute inset-0 flex items-center justify-center flex-col pointer-events-none">
+                                <span class="text-3xl font-bold text-purple-600" id="total-score-label">100%</span>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-between w-full px-4 text-sm">
+                            <div class="text-center">
+                                <p class="text-gray-400">หอพัก</p>
+                                <p class="font-bold text-gray-700" id="percent-dorm">0%</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-gray-400">ห้องเรียน</p>
+                                <p class="font-bold text-gray-700" id="percent-class">0%</p>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="card col-span-1 lg:col-span-3">
                         <h3 class="text-lg font-bold text-gray-800 mb-6">📈 แนวโน้มคะแนนห้องเรียน (Top 5)</h3>
-                        <div class="relative h-64 w-full"><canvas id="lineChart"></canvas></div>
+                        <div class="relative h-64 w-full">
+                            <canvas id="lineChart"></canvas>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
             <div id="tab-scores" class="tab-content hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">จัดการคะแนน</h2>
+                </div>
+                
                 <div class="card">
-                    <div class="border-b pb-4 mb-4 flex flex-wrap gap-4">
-                        <button onclick="loadScoreInputs('exercise')" id="btn-mode-exercise" class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-blue-100 text-blue-700 font-bold transition">🏃 ตรวจออกกาย</button>
-                        <button onclick="loadScoreInputs('dorm')" id="btn-mode-dorm" class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-purple-100 text-purple-700 font-bold transition">🛏️ ตรวจหอนอน</button>
-                        <button onclick="loadScoreInputs('classroom')" id="btn-mode-classroom" class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-green-100 text-green-700 font-bold transition">🏫 ตรวจห้องเรียน</button>
+                    <div class="flex gap-4 mb-6 border-b pb-4 overflow-x-auto">
+                        <button onclick="loadScoreInputs('exercise')" id="btn-mode-exercise" class="px-4 py-2 rounded-lg bg-blue-100 text-blue-700 font-bold hover:bg-blue-200 transition">🏃 ตรวจออกกาย</button>
+                        <button onclick="loadScoreInputs('dorm')" id="btn-mode-dorm" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-bold hover:bg-purple-100 hover:text-purple-700 transition">🛏️ ตรวจหอนอน</button>
+                        <button onclick="loadScoreInputs('classroom')" id="btn-mode-classroom" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-bold hover:bg-green-100 hover:text-green-700 transition">🏫 ตรวจห้องเรียน</button>
                     </div>
-                    <h3 id="score-title" class="text-lg font-bold text-gray-700 mb-4">เลือกหมวดหมู่เพื่อเริ่มกรอกคะแนน</h3>
+
+                    <h3 id="score-title" class="text-lg font-semibold text-gray-700 mb-4">เลือกหมวดหมู่เพื่อเริ่มกรอกคะแนน</h3>
+                    
                     <form onsubmit="saveScores(event)">
-                        <div id="admin-score-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
-                        <button id="btn-save-score" type="submit" class="hidden mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition">💾 บันทึกคะแนน</button>
+                        <div id="admin-score-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                            </div>
+                        <button id="btn-save-score" type="submit" class="hidden mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition">
+                            💾 บันทึกคะแนน
+                        </button>
                     </form>
                 </div>
             </div>
 
-            <div id="tab-suggestions" class="tab-content hidden">
-                <div class="card"><div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-gray-50 border-b"><th class="p-4">หัวข้อ</th><th class="p-4">สถานะ</th><th class="p-4">จัดการ</th></tr></thead><tbody id="suggestion-tbody" class="divide-y divide-gray-100"></tbody></table></div></div>
+            <div id="tab-suggestions" class="tab-content hidden space-y-6">
+                <h2 class="text-2xl font-bold text-gray-800">กล่องความคิดเห็น</h2>
+                <div class="card overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 border-b">
+                                    <th class="p-4 font-semibold text-gray-600">หัวข้อ</th>
+                                    <th class="p-4 font-semibold text-gray-600">สถานะ</th>
+                                    <th class="p-4 font-semibold text-gray-600">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="suggestion-tbody" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <div id="tab-news" class="tab-content hidden space-y-6">
+                <h2 class="text-2xl font-bold text-gray-800">จัดการข่าวสาร</h2>
+                
                 <div class="card">
                     <h3 class="text-lg font-bold mb-4">โพสต์ข่าวใหม่</h3>
-                    <form onsubmit="postNews(event)" class="space-y-4"><input id="news-title" class="w-full p-3 bg-gray-50 border rounded-xl" placeholder="หัวข้อข่าว" required><textarea id="news-content" rows="3" class="w-full p-3 bg-gray-50 border rounded-xl" placeholder="รายละเอียด..." required></textarea><input id="news-image" class="w-full p-3 bg-gray-50 border rounded-xl" placeholder="URL รูปภาพ (ถ้ามี)"><button class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold">โพสต์</button></form>
+                    <form onsubmit="postNews(event)" class="space-y-4">
+                        <input id="news-title" class="w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-200" placeholder="หัวข้อข่าว" required>
+                        <textarea id="news-content" rows="3" class="w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-200" placeholder="รายละเอียด..." required></textarea>
+                        <input id="news-image" class="w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-200" placeholder="URL รูปภาพ (ถ้ามี)">
+                        <button class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700">โพสต์</button>
+                    </form>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="news-grid-admin"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="news-grid-admin">
+                    </div>
             </div>
 
         </div>
@@ -141,94 +218,260 @@
         let allScoreData = [];
         let currentAdminMode = '';
         
-        // --- 🟢 ฟีเจอร์ขยายหน้าจอ ---
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            // ใช้ Tailwind class สำหรับซ่อนแบบ Responsive
-            if (sidebar.classList.contains('hidden')) {
-                sidebar.classList.remove('hidden');
-                sidebar.classList.remove('-ml-64'); // ดึงกลับมา
-            } else {
-                sidebar.classList.add('hidden'); // ซ่อนไปเลย
-            }
+        // --- 1. SYSTEM INIT ---
+        async function checkAuth() {
+            try {
+                const res = await fetch(`${API_BASE}/check-auth`, { credentials: 'include' });
+                const data = await res.json();
+                if (!data.authenticated) window.location.href = 'login.html';
+                else initDashboard();
+            } catch { window.location.href = 'login.html'; }
         }
-        
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-                document.getElementById('fullscreen-icon').classList.replace('fa-expand', 'fa-compress');
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                    document.getElementById('fullscreen-icon').classList.replace('fa-compress', 'fa-expand');
-                }
-            }
-        }
-
-        // --- AUTH & INIT ---
-        async function checkAuth() { try { const res = await fetch(`${API_BASE}/check-auth`); const data = await res.json(); if (!data.authenticated) location.href='login.html'; else initDashboard(); } catch { location.href='login.html'; } }
         checkAuth();
 
         async function initDashboard() {
-            const [scRes, sgRes, nwRes] = await Promise.all([fetch(`${API_BASE}/scores`), fetch(`${API_BASE}/suggestions`), fetch(`${API_BASE}/news`)]);
-            allScoreData = await scRes.json();
-            const suggestions = await sgRes.json();
-            const news = await nwRes.json();
+            // โหลดข้อมูลทั้งหมด
+            const [scoresRes, sugRes, newsRes] = await Promise.all([
+                fetch(`${API_BASE}/scores`),
+                fetch(`${API_BASE}/suggestions`),
+                fetch(`${API_BASE}/news`)
+            ]);
+
+            allScoreData = await scoresRes.json();
+            const suggestions = await sugRes.json();
+            const news = await newsRes.json();
+
+            // อัปเดตตัวเลข Stats Cards
             updateStats(allScoreData, suggestions, news);
+            
+            // วาดกราฟ
             renderCharts(allScoreData);
+
+            // เตรียมหน้าอื่นๆ
             renderSuggestions(suggestions);
             renderNews(news);
         }
 
-        function switchTab(t) {
-            document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden')); document.getElementById(`tab-${t}`).classList.remove('hidden');
-            document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active')); document.getElementById(`nav-${t}`).classList.add('active');
-        }
-        async function logout() { await fetch(`${API_BASE}/logout`, {method:'POST'}); location.href='login.html'; }
+        function switchTab(tabName) {
+            // ซ่อนทุก Tab
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
 
-        // --- CHARTS & STATS ---
-        function updateStats(scores, sugs, news) {
-            const tDorm = scores.filter(s=>s.type==='dorm').reduce((a,b)=>a+(b.points_exercise||0)+(b.points_dorm||0),0);
-            const tClass = scores.filter(s=>s.type==='classroom').reduce((a,b)=>a+(b.points_class||0),0);
-            document.getElementById('stat-dorm-score').innerText = tDorm.toLocaleString();
-            document.getElementById('stat-class-score').innerText = tClass.toLocaleString();
-            document.getElementById('stat-sug-count').innerText = sugs.length;
+            // เปลี่ยนสีเมนู
+            document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active', 'bg-blue-600', 'text-white', 'shadow-lg'));
+            const activeLink = document.getElementById(`nav-${tabName}`);
+            activeLink.classList.add('active');
+        }
+
+        async function logout() {
+            await fetch(`${API_BASE}/logout`, { method: 'POST', credentials: 'include' });
+            window.location.href = 'login.html';
+        }
+
+        // --- 2. DASHBOARD LOGIC (Charts) ---
+        function updateStats(scores, suggestions, news) {
+            // คำนวณคะแนนรวม
+            const totalDorm = scores.filter(s => s.type === 'dorm').reduce((a, b) => a + (b.points_exercise || 0) + (b.points_dorm || 0), 0);
+            const totalClass = scores.filter(s => s.type === 'classroom').reduce((a, b) => a + (b.points_class || 0), 0);
+            
+            document.getElementById('stat-dorm-score').innerText = totalDorm.toLocaleString();
+            document.getElementById('stat-class-score').innerText = totalClass.toLocaleString();
+            document.getElementById('stat-sug-count').innerText = suggestions.length;
             document.getElementById('stat-news-count').innerText = news.length;
+
+            // Update Percent labels
+            const totalAll = totalDorm + totalClass;
+            const pDorm = totalAll ? Math.round((totalDorm/totalAll)*100) : 0;
+            const pClass = totalAll ? Math.round((totalClass/totalAll)*100) : 0;
+            
+            document.getElementById('percent-dorm').innerText = pDorm + '%';
+            document.getElementById('percent-class').innerText = pClass + '%';
         }
 
         function renderCharts(data) {
-            const dorms = data.filter(d=>d.type==='dorm').sort((a,b)=>(b.points_exercise+b.points_dorm)-(a.points_exercise+a.points_dorm)).slice(0,5);
-            new Chart(document.getElementById('barChart'), { type:'bar', data:{labels:dorms.map(d=>d.name), datasets:[{label:'คะแนน', data:dorms.map(d=>(d.points_exercise||0)+(d.points_dorm||0)), backgroundColor:'#10b981', borderRadius:5}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}} });
+            // A. Bar Chart: Top 5 Dorms
+            const dorms = data.filter(d => d.type === 'dorm');
+            dorms.sort((a, b) => (b.points_exercise + b.points_dorm) - (a.points_exercise + a.points_dorm));
+            const top5Dorms = dorms.slice(0, 5);
 
-            const tEx = data.filter(d=>d.type==='dorm').reduce((a,b)=>a+(b.points_exercise||0),0);
-            const tDo = data.filter(d=>d.type==='dorm').reduce((a,b)=>a+(b.points_dorm||0),0);
-            const tCl = data.filter(d=>d.type==='classroom').reduce((a,b)=>a+(b.points_class||0),0);
-            new Chart(document.getElementById('donutChart'), { type:'doughnut', data:{labels:['ออกกาย','หอนอน','ห้องเรียน'], datasets:[{data:[tEx,tDo,tCl], backgroundColor:['#3b82f6','#8b5cf6','#f59e0b'], borderWidth:0}]}, options:{cutout:'70%', plugins:{legend:{display:false}}} });
+            new Chart(document.getElementById('barChart'), {
+                type: 'bar',
+                data: {
+                    labels: top5Dorms.map(d => d.name),
+                    datasets: [{
+                        label: 'คะแนนรวม',
+                        data: top5Dorms.map(d => (d.points_exercise || 0) + (d.points_dorm || 0)),
+                        backgroundColor: '#10b981', // Tailwind Emerald-500
+                        borderRadius: 6,
+                        barThickness: 20
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
+                }
+            });
 
-            const cls = data.filter(d=>d.type==='classroom').sort((a,b)=>b.points_class-a.points_class).slice(0,7);
-            new Chart(document.getElementById('lineChart'), { type:'line', data:{labels:cls.map(c=>c.name), datasets:[{label:'คะแนน', data:cls.map(c=>c.points_class), borderColor:'#ef4444', backgroundColor:'rgba(239,68,68,0.1)', fill:true, tension:0.4}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}} });
+            // B. Donut Chart: Composition
+            const totalExercise = dorms.reduce((a,b)=>a+(b.points_exercise||0),0);
+            const totalInspect = dorms.reduce((a,b)=>a+(b.points_dorm||0),0);
+            const classrooms = data.filter(d => d.type === 'classroom');
+            const totalClass = classrooms.reduce((a,b)=>a+(b.points_class||0),0);
+
+            new Chart(document.getElementById('donutChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['ออกกาย', 'ตรวจหอ', 'ห้องเรียน'],
+                    datasets: [{
+                        data: [totalExercise, totalInspect, totalClass],
+                        backgroundColor: ['#3b82f6', '#8b5cf6', '#f59e0b'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    cutout: '75%',
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // C. Line Chart: Classroom Trends (Fake Trend using Top classrooms data points)
+            const topClasses = classrooms.sort((a,b) => b.points_class - a.points_class).slice(0, 7);
+            
+            new Chart(document.getElementById('lineChart'), {
+                type: 'line',
+                data: {
+                    labels: topClasses.map(c => c.name),
+                    datasets: [{
+                        label: 'คะแนนห้องเรียน',
+                        data: topClasses.map(c => c.points_class),
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        fill: true,
+                        tension: 0.4, // Smooth curve
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
         }
 
-        // --- SCORE INPUTS ---
-        function loadScoreInputs(m) {
-            currentAdminMode=m; const con=document.getElementById('admin-score-container'); const btn=document.getElementById('btn-save-score'); const tit=document.getElementById('score-title');
-            document.querySelectorAll('#tab-scores button').forEach(b=>b.classList.replace('ring-2','transition'));
-            document.getElementById(`btn-mode-${m}`).classList.add('ring-2','ring-offset-2');
-            let fil=[], fld=''; 
-            if(m==='classroom'){ fil=allScoreData.filter(d=>d.type==='classroom'); fld='points_class'; tit.innerText='🏫 กรอกคะแนน: ห้องเรียน'; }
-            else { fil=allScoreData.filter(d=>d.type==='dorm'); fld=m==='exercise'?'points_exercise':'points_dorm'; tit.innerText=m==='exercise'?'🏃 กรอกคะแนน: ออกกาย':'🛏️ กรอกคะแนน: หอนอน'; }
-            fil.sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
-            con.innerHTML=''; fil.forEach(i=>{ con.innerHTML+=`<div class="bg-gray-50 p-3 rounded-lg border"><label class="text-xs font-bold text-gray-500 block mb-1">${i.name}</label><input type="number" class="score-input w-full bg-white border border-gray-200 rounded p-1 text-center font-bold text-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" data-id="${i._id}" value="${i[fld]||0}"></div>`; });
+        // --- 3. SCORE MANAGEMENT ---
+        function loadScoreInputs(mode) {
+            currentAdminMode = mode;
+            const container = document.getElementById('admin-score-container');
+            const btn = document.getElementById('btn-save-score');
+            const title = document.getElementById('score-title');
+            
+            // Set Active Button Style
+            document.querySelectorAll('#tab-scores button').forEach(b => {
+                b.className = "px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-bold hover:bg-gray-200 transition";
+            });
+            const activeBtn = document.getElementById(`btn-mode-${mode}`);
+            let activeColor = mode === 'exercise' ? 'bg-blue-100 text-blue-700' : (mode === 'dorm' ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700');
+            activeBtn.className = `px-4 py-2 rounded-lg ${activeColor} font-bold shadow-sm ring-2 ring-offset-2 ring-gray-200`;
+
+            // Filter Data
+            let filtered = [];
+            let field = '';
+            if (mode === 'classroom') {
+                filtered = allScoreData.filter(d => d.type === 'classroom');
+                field = 'points_class';
+                title.innerText = '🏫 กำลังกรอกคะแนน: ห้องเรียน';
+            } else {
+                filtered = allScoreData.filter(d => d.type === 'dorm');
+                field = mode === 'exercise' ? 'points_exercise' : 'points_dorm';
+                title.innerText = mode === 'exercise' ? '🏃 กำลังกรอกคะแนน: ตรวจออกกาย' : '🛏️ กำลังกรอกคะแนน: ตรวจหอนอน';
+            }
+
+            filtered.sort((a,b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
+
+            // Render Inputs
+            container.innerHTML = '';
+            filtered.forEach(item => {
+                container.innerHTML += `
+                    <div class="bg-gray-50 p-3 rounded-lg border hover:border-blue-400 transition">
+                        <label class="text-xs font-bold text-gray-500 block mb-1">${item.name}</label>
+                        <input type="number" class="score-input w-full bg-white border border-gray-200 rounded p-1 text-center font-bold text-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                               data-id="${item._id}" 
+                               value="${item[field] || 0}">
+                    </div>
+                `;
+            });
             btn.classList.remove('hidden');
         }
-        async function saveScores(e) { e.preventDefault(); const inps=document.querySelectorAll('.score-input'); const upds=[]; let fld=currentAdminMode==='classroom'?'points_class':(currentAdminMode==='exercise'?'points_exercise':'points_dorm'); inps.forEach(i=>upds.push({_id:i.dataset.id, field:fld, value:i.value})); await fetch(`${API_BASE}/scores`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(upds)}); alert('บันทึกแล้ว'); initDashboard(); }
 
-        // --- OTHERS ---
-        function renderSuggestions(d) { document.getElementById('suggestion-tbody').innerHTML=d.map(s=>`<tr class="border-b hover:bg-gray-50"><td class="p-4"><div class="font-bold">${s.topic}</div><div class="text-sm text-gray-500">${s.category}</div></td><td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${s.status==='resolved'?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'}">${s.status}</span></td><td class="p-4">${s.status!=='resolved'?`<button onclick="updSug('${s._id}','resolved')" class="text-green-600 font-bold text-sm">จบงาน</button>`:'✔'}</td></tr>`).join(''); }
-        async function updSug(id,st) { await fetch(`${API_BASE}/suggestions/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:st})}); initDashboard(); }
-        function renderNews(d) { document.getElementById('news-grid-admin').innerHTML=d.map(n=>`<div class="bg-white p-4 rounded-xl border relative group"><button onclick="delNews('${n._id}')" class="absolute top-2 right-2 text-red-500 opacity-0 group-hover:opacity-100"><i class="fas fa-trash"></i></button><h4 class="font-bold">${n.title}</h4><p class="text-sm text-gray-500 truncate">${n.content}</p></div>`).join(''); }
-        async function postNews(e) { e.preventDefault(); await fetch(`${API_BASE}/news`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({title:document.getElementById('news-title').value, content:document.getElementById('news-content').value, image:document.getElementById('news-image').value})}); alert('โพสต์แล้ว'); initDashboard(); }
-        async function delNews(id) { if(confirm('ลบ?')) { await fetch(`${API_BASE}/news/${id}`, {method:'DELETE'}); initDashboard(); } }
+        async function saveScores(e) {
+            e.preventDefault();
+            const inputs = document.querySelectorAll('.score-input');
+            const updates = [];
+            let targetField = currentAdminMode === 'classroom' ? 'points_class' : (currentAdminMode === 'exercise' ? 'points_exercise' : 'points_dorm');
+
+            inputs.forEach(inp => {
+                updates.push({ _id: inp.dataset.id, field: targetField, value: inp.value });
+            });
+
+            await fetch(`${API_BASE}/scores`, {
+                method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(updates), credentials: 'include'
+            });
+            alert('บันทึกเรียบร้อย!');
+            location.reload(); // Reload to update charts
+        }
+
+        // --- 4. SUGGESTIONS & NEWS ---
+        function renderSuggestions(data) {
+            const tbody = document.getElementById('suggestion-tbody');
+            tbody.innerHTML = data.map(s => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-4">
+                        <div class="font-bold text-gray-800">${s.topic}</div>
+                        <div class="text-sm text-gray-500">${s.category}</div>
+                    </td>
+                    <td class="p-4">
+                        <span class="px-2 py-1 rounded text-xs font-bold ${s.status==='resolved'?'bg-green-100 text-green-700':(s.status==='acknowledged'?'bg-yellow-100 text-yellow-700':'bg-gray-200 text-gray-600')}">
+                            ${s.status}
+                        </span>
+                    </td>
+                    <td class="p-4">
+                        ${s.status !== 'resolved' ? `<button onclick="updateStatus('${s._id}', 'resolved')" class="text-green-600 hover:text-green-800 font-bold text-sm">จบงาน</button>` : '<i class="fas fa-check text-green-500"></i>'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function updateStatus(id, status) {
+            await fetch(`${API_BASE}/suggestions/${id}`, { method: 'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status}) });
+            initDashboard(); // Reload data
+        }
+
+        function renderNews(data) {
+            const grid = document.getElementById('news-grid-admin');
+            grid.innerHTML = data.map(n => `
+                <div class="bg-white p-4 rounded-xl border shadow-sm relative group">
+                    <button onclick="delNews('${n._id}')" class="absolute top-2 right-2 bg-red-100 text-red-500 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"><i class="fas fa-trash"></i></button>
+                    <h4 class="font-bold text-gray-800">${n.title}</h4>
+                    <p class="text-sm text-gray-500 mt-2 truncate">${n.content}</p>
+                </div>
+            `).join('');
+        }
+
+        async function postNews(e) {
+            e.preventDefault();
+            const body = { title: document.getElementById('news-title').value, content: document.getElementById('news-content').value, image: document.getElementById('news-image').value };
+            await fetch(`${API_BASE}/news`, { method: 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+            alert('โพสต์แล้ว'); initDashboard();
+        }
+        
+        async function delNews(id) {
+            if(confirm('ลบ?')) { await fetch(`${API_BASE}/news/${id}`, {method:'DELETE'}); initDashboard(); }
+        }
     </script>
 </body>
 </html>
