@@ -1,58 +1,83 @@
+const path = require('path');
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const session = require('express-session');
-const path = require('path');
-require('dotenv').config();
+const session = require('express-session'); // ต้องมี session สำหรับ Login
 
 const app = express();
-app.use(express.json());
-app.use(cors({ origin: true, credentials: true }));
-app.use(express.static(__dirname));
 
+// --- 1. Middleware ---
+app.use(cors({ origin: true, credentials: true })); // อนุญาต Cookie ข้ามโดเมน
+app.use(express.json());
+app.use(express.static(path.join(__dirname, '/'))); // ให้เข้าถึงไฟล์ html ได้
+
+// ตั้งค่า Session (สำหรับการ Login)
 app.use(session({
-    secret: 'school_secret_key',
+    secret: 'school_council_secret_key_2025',
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 }
+    cookie: { maxAge: 24 * 60 * 60 * 1000 } // อยู่ได้ 1 วัน
 }));
 
-// Connect Database
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://footballcggg1234_db_user:rungradit@cluster1.rhemrut.mongodb.net/?appName=Cluster1';
-mongoose.connect(MONGO_URI)
-    .then(() => console.log('✅ MongoDB Connected'))
-    .catch(err => console.error(err));
+// --- 2. Database Connection ---
+mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://admin:rungradit@cluster0.8counxn.mongodb.net/?appName=Cluster0')
+.then(() => console.log('✅ Connected to MongoDB'))
+.catch(err => console.error('❌ MongoDB Error:', err));
 
-// Import Models
-const News = require('./models/News');
-const Suggestion = require('./models/Suggestion');
-const Score = require('./models/Score'); // ตัวใหม่
+// --- 3. Import Models ---
+// (ถ้าไฟล์อยู่คนละที่ แก้ path ให้ถูกนะครับ แต่นี่คือ path มาตรฐาน)
+let News, Score, Suggestion;
+try {
+    News = require('./models/News');
+    Score = require('./models/Score');
+    Suggestion = require('./models/Suggestion');
+} catch (e) {
+    console.log('⚠️ Warning: Models not found, creating temporary schemas...');
+    // สร้าง Schema สำรองกัน Error ถ้าหาไฟล์ไม่เจอ
+    const anySchema = new mongoose.Schema({}, { strict: false });
+    News = mongoose.models.News || mongoose.model('News', anySchema);
+    Score = mongoose.models.Score || mongoose.model('Score', anySchema);
+    Suggestion = mongoose.models.Suggestion || mongoose.model('Suggestion', anySchema);
+}
 
-// --- API: Scores (ระบบคะแนนใหม่) ---
+// ==========================================
+// 🚀 4. API ROUTES (ส่วนที่หายไป ผมเติมให้แล้ว)
+// ==========================================
 
+// --- A. ระบบ Login (สำคัญมาก!) ---
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    // ตั้งรหัสผ่านตรงนี้ (admin / 123456)
+    if (username === 'admin' && password === '123456') {
+        req.session.user = { username: 'admin', role: 'admin' };
+        req.session.save(); // บันทึก session
+        return res.json({ success: true });
+    }
+    res.status(401).json({ success: false, message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
+});
+
+app.post('/api/logout', (req, res) => {
+    req.session.destroy();
+    res.json({ success: true });
+});
+
+app.get('/api/check-auth', (req, res) => {
+    res.json({ authenticated: !!req.session.user });
+});
+
+// --- B. ระบบคะแนน (Scores) ---
 app.get('/api/scores', async (req, res) => {
     try {
         let scores = await Score.find();
-
-        // 🛠️ ถ้ายังไม่มีข้อมูล ให้สร้างชุดเริ่มต้น (หอ + ห้องเรียน)
         if (scores.length === 0) {
+            // สร้างข้อมูลเริ่มต้นถ้ายังไม่มี
             const initialData = [];
-
-            // 1. สร้างหอชาย (1-8)
-            for (let i = 1; i <= 8; i++) {
-                initialData.push({ name: `หอพักชายที่ ${i}`, type: 'dorm', gender: 'male' });
-            }
-            // 2. สร้างหอหญิง (9-17)
-            for (let i = 9; i <= 17; i++) {
-                initialData.push({ name: `หอพักหญิงที่ ${i}`, type: 'dorm', gender: 'female' });
-            }
-            // 3. สร้างห้องเรียน (ตัวอย่าง ม.1 - ม.6 อย่างละ 3 ห้อง)
-            ['ม.1', 'ม.2', 'ม.3', 'ม.4', 'ม.5', 'ม.6'].forEach(level => {
-                for (let r = 1; r <= 3; r++) {
-                    initialData.push({ name: `${level}/${r}`, type: 'classroom', gender: 'none' });
-                }
+            for(let i=1; i<=8; i++) initialData.push({ name: `หอพักชายที่ ${i}`, type: 'dorm', gender: 'male' });
+            for(let i=9; i<=17; i++) initialData.push({ name: `หอพักหญิงที่ ${i}`, type: 'dorm', gender: 'female' });
+            ['ม.1','ม.2','ม.3','ม.4','ม.5','ม.6'].forEach(l => {
+                for(let r=1; r<=3; r++) initialData.push({ name: `${l}/${r}`, type: 'classroom' });
             });
-
             scores = await Score.insertMany(initialData);
         }
         res.json(scores);
@@ -60,21 +85,42 @@ app.get('/api/scores', async (req, res) => {
 });
 
 app.put('/api/scores', async (req, res) => {
-    // รับข้อมูลเป็น Array เพื่ออัปเดตหลายรายการพร้อมกัน
-    const updates = req.body; // [{ _id: '...', field: 'points_exercise', value: 10 }]
     try {
+        const updates = req.body; // รับเป็น Array
         for (const item of updates) {
-            // อัปเดตเฉพาะ field ที่ส่งมา (Dynamic Update)
             const updateObj = {};
-            updateObj[item.field] = item.value; 
+            updateObj[item.field] = item.value;
             await Score.findByIdAndUpdate(item._id, updateObj);
         }
         res.json({ success: true });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ... (Routes อื่นๆ ของ News, Suggestion, Login คงเดิม) ...
-// Login, Logout, Check-Auth, News, Suggestions ใส่ไว้เหมือนไฟล์เดิมได้เลย
+// --- C. ข่าวสาร (News) ---
+app.get('/api/news', async (req, res) => {
+    const news = await News.find().sort({ date: -1 });
+    res.json(news);
+});
+app.post('/api/news', async (req, res) => {
+    await new News(req.body).save();
+    res.json({ success: true });
+});
+app.delete('/api/news/:id', async (req, res) => {
+    await News.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+});
+
+// --- D. ความคิดเห็น (Suggestions) ---
+app.get('/api/suggestions', async (req, res) => {
+    const data = await Suggestion.find().sort({ createdAt: -1 });
+    res.json(data);
+});
+app.put('/api/suggestions/:id', async (req, res) => {
+    await Suggestion.findByIdAndUpdate(req.params.id, req.body);
+    res.json({ success: true });
+});
+
+// ==========================================
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
