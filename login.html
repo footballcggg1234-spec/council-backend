@@ -54,7 +54,7 @@
                 const data = await res.json();
 
                 if (data.success) {
-                    window.location.href = 'admin.html'; // ถ้าผ่าน ให้ไปหน้า Admin
+                    window.location.href = 'admin.html';
                 } else {
                     errorDiv.innerText = '❌ ' + data.message;
                     errorDiv.style.display = 'block';
