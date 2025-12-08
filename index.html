@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>หน้าแรก - สภานักเรียน</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
-<style>
-        /* --- 🎨 PALETTE: แดง-ทอง --- */
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* --- 🎨 PALETTE & THEME --- */
         :root {
             --primary: #a31818;      
-            --secondary: #e6b800;    /* เหลืองทอง */
+            --secondary: #e6b800;    
             --secondary-light: #fff5cc;
             --dark: #4a0d0d;         
             --bg: #fdfbf7;           
@@ -19,73 +20,88 @@
 
         body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); color: #333; line-height: 1.6; }
         a { text-decoration: none; transition: 0.3s; }
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; overflow-x: hidden; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
 
         /* Navbar */
         nav { background: var(--white); box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); position: sticky; top: 0; z-index: 100; }
         .nav-content { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; }
-        
-        /* ปรับโลโก้ */
-        .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+        .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; }
         .logo span { color: var(--secondary); }
-        
-        /* ปรับเมนู */
         .menu { list-style: none; display: flex; gap: 15px; margin: 0; padding: 0; align-items: center; }
-        .menu a { color: var(--dark); font-weight: 500; padding: 8px 12px; border-radius: 50px; font-size: 0.9rem; white-space: nowrap; }
+        .menu a { color: var(--dark); font-weight: 500; padding: 8px 12px; border-radius: 50px; font-size: 0.9rem; }
         .menu a:hover, .menu a.active { background: var(--secondary-light); color: var(--primary); }
-
-        /* ปุ่ม Admin */
-        .btn-admin-nav {
-            border: 1px solid var(--primary);
-            color: var(--primary) !important;
-            padding: 6px 15px !important;
-            font-size: 0.85rem !important;
-        }
+        .btn-admin-nav { border: 1px solid var(--primary); color: var(--primary) !important; padding: 6px 15px !important; }
         .btn-admin-nav:hover { background: var(--primary) !important; color: white !important; }
 
         /* Hero Section */
         .hero {
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('bg.jpg');
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80');
             background-size: cover; background-position: center;
-            padding: 100px 0; text-align: center;
+            padding: 100px 0 150px; text-align: center; color: white;
             border-bottom: 5px solid var(--secondary);
+            margin-bottom: -80px; /* ดึงเนื้อหาด้านล่างขึ้นมาทับ */
         }
-        .hero h1 { font-size: 3rem; color: var(--white); margin-bottom: 10px; line-height: 1.2; }
-        .hero p { font-size: 1.2rem; color: var(--secondary); font-weight: 500; }
+        .hero h1 { font-size: 3rem; margin: 0 0 10px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
         .btn-main {
             background: var(--secondary); color: var(--dark); padding: 12px 30px; 
             border-radius: 50px; font-weight: 700; margin-top: 25px; display: inline-block;
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
         }
+        .btn-main:hover { transform: translateY(-3px); background: #ffca2c; }
 
-        /* Content */
-        .section-title { text-align: center; margin: 50px 0 30px; font-size: 1.8rem; color: var(--dark); }
-        .section-title span { color: var(--secondary); } 
+        /* --- 🏆 SCOREBOARD WIDGET (ส่วนใหม่) --- */
+        .score-section {
+            background: white; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            padding: 30px; position: relative; z-index: 10; margin-bottom: 50px;
+        }
+        .score-header { text-align: center; margin-bottom: 20px; }
+        .score-header h2 { color: var(--primary); font-size: 1.8rem; margin: 0; font-weight: 800; }
+        
+        .score-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        .tab-btn {
+            background: #f0f0f0; border: none; padding: 8px 20px; border-radius: 50px; 
+            font-family: 'Sarabun'; font-weight: bold; color: #666; cursor: pointer; transition: 0.3s;
+        }
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(163, 24, 24, 0.3); }
+        
+        /* Podium Style */
+        .podium-container { display: flex; justify-content: center; align-items: flex-end; gap: 15px; min-height: 220px; margin-bottom: 30px; }
+        .podium-item { text-align: center; width: 100px; position: relative; }
+        .podium-bar {
+            width: 100%; border-radius: 10px 10px 0 0; position: relative; 
+            display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px;
+            color: var(--dark); font-weight: 800; font-size: 1.2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: height 0.5s ease;
+        }
+        .rank-1 .podium-bar { height: 160px; background: linear-gradient(to bottom, #ffd700, #ffca28); }
+        .rank-2 .podium-bar { height: 120px; background: linear-gradient(to bottom, #e0e0e0, #bdbdbd); }
+        .rank-3 .podium-bar { height: 100px; background: linear-gradient(to bottom, #cd7f32, #a16b34); }
+        
+        .crown-icon { position: absolute; top: -35px; left: 50%; transform: translateX(-50%); color: #ffd700; font-size: 1.5rem; text-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .podium-name { font-size: 0.9rem; font-weight: bold; margin-top: 10px; color: #333; line-height: 1.2; }
+        .score-badge { background: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; margin-bottom: 5px; }
+
+        /* List Style (4-10) */
+        .score-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+        .list-item { background: #f9f9f9; padding: 10px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid transparent; }
+        .list-item:hover { background: #fff5cc; border-left-color: var(--secondary); }
+        .rank-num { font-weight: bold; color: #aaa; margin-right: 10px; width: 20px; }
+        .list-score { font-weight: bold; color: var(--primary); }
+
+        /* News Section */
+        .section-title { text-align: center; margin: 40px 0 30px; font-size: 1.8rem; color: var(--dark); font-weight: 700; }
         .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding-bottom: 60px; }
         .news-card { background: var(--white); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid #eee; }
         .news-card img { width: 100%; height: 200px; object-fit: cover; }
         .news-content { padding: 20px; }
         .date { font-size: 0.8rem; color: var(--secondary); font-weight: 700; margin-bottom: 5px; }
 
-        footer { background: var(--primary); color: white; text-align: center; padding: 30px 0; margin-top: auto; }
-
-        /* 📱 MOBILE RESPONSIVE (แก้ตรงนี้!) */
         @media (max-width: 768px) {
-            .nav-content {
-                flex-direction: column; /* เรียงแนวตั้ง: โลโก้อยู่บน เมนูอยู่ล่าง */
-                gap: 15px;
-                padding-bottom: 15px;
-            }
-            .menu {
-                flex-wrap: wrap;       /* ถ้าเมนูเยอะ ให้ปัดตกบรรทัดใหม่ได้ */
-                justify-content: center; /* จัดกึ่งกลาง */
-                gap: 8px;              /* ลดช่องว่างระหว่างปุ่ม */
-            }
-            .menu a {
-                font-size: 0.85rem;    /* ลดขนาดตัวหนังสือเมนูนิดนึง */
-                padding: 6px 10px;
-                background: #f5f5f5;   /* ใส่สีพื้นหลังจางๆ ให้ดูเป็นปุ่มกดง่ายขึ้น */
-            }
-            .hero h1 { font-size: 2rem; } /* ลดขนาดหัวข้อ */
+            .nav-content { flex-direction: column; gap: 10px; }
+            .menu { flex-wrap: wrap; justify-content: center; }
+            .hero h1 { font-size: 2rem; }
+            .podium-container { gap: 5px; }
+            .podium-item { width: 30%; }
         }
     </style>
 </head>
@@ -107,29 +123,130 @@
         <div class="container">
             <h1>สภานักเรียน รุ่นที่ 26</h1>
             <p>โรงเรียนประชาราชสงเคราะห์ 26<br>ร่วมคิด ร่วมทำ สร้างสรรค์สังคมโรงเรียนให้น่าอยู่</p>
-            <a href="suggestion.html" class="btn-main">🗳️ ส่งเรื่องร้องเรียน / เสนอแนะ</a>
+            <a href="suggestion.html" class="btn-main">🗳️ ส่งเรื่องร้องเรียน</a>
         </div>
     </header>
 
     <div class="container">
+        
+        <div class="score-section">
+            <div class="score-header">
+                <h2>🏆 อันดับคะแนนความประพฤติ</h2>
+                <p style="font-size:0.9rem; color:#777;">อัปเดตสถานะคะแนนล่าสุดแบบ Realtime</p>
+            </div>
+
+            <div class="score-tabs">
+                <button onclick="loadScores('exercise')" id="tab-exercise" class="tab-btn active">🏃 ตรวจออกกาย</button>
+                <button onclick="loadScores('dorm')" id="tab-dorm" class="tab-btn">🛏️ ตรวจหอนอน</button>
+                <button onclick="loadScores('classroom')" id="tab-classroom" class="tab-btn">🏫 ห้องเรียน</button>
+            </div>
+
+            <div id="podium-area" class="podium-container">
+                <div style="width:100%; text-align:center;">กำลังโหลด...</div>
+            </div>
+
+            <div id="list-area" class="score-list"></div>
+        </div>
+
         <h2 class="section-title">ข่าวสาร <span>ประชาสัมพันธ์</span></h2>
         <div id="news-container" class="news-grid"><p style="text-align:center; width:100%;">กำลังโหลดข้อมูล...</p></div>
     </div>
 
-    <footer>
-        <div class="container">
-            <p>© 2025 สภานักเรียนโรงเรียนประชาราชสงเคราะห์ 26</p>
-            <p style="font-size: 0.9rem; opacity: 0.8;">พัฒนาโดย ทีมงานสารสนเทศโรงเรียน</p>
-        </div>
-    </footer>
-
     <script>
-        const API_URL = '/api/news';
-        document.addEventListener('DOMContentLoaded', async () => {
-            const container = document.getElementById('news-container');
+        // --- 🏆 Script สำหรับตารางคะแนน ---
+        let allScores = [];
+
+        async function initScores() {
             try {
-                const res = await fetch(API_URL);
+                const res = await fetch('/api/scores');
+                allScores = await res.json();
+                loadScores('exercise'); // โหลดค่าเริ่มต้น
+            } catch (err) {
+                console.error("Score Error:", err);
+                document.getElementById('podium-area').innerHTML = '<p style="color:red; width:100%; text-align:center;">โหลดคะแนนไม่สำเร็จ</p>';
+            }
+        }
+
+        function loadScores(mode) {
+            // 1. เปลี่ยนสีปุ่ม Tab
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${mode}`).classList.add('active');
+
+            // 2. กรองข้อมูลตามหมวด
+            let filtered = [];
+            let key = '';
+
+            if (mode === 'classroom') {
+                filtered = allScores.filter(d => d.type === 'classroom');
+                key = 'points_class';
+            } else {
+                // สำหรับหอพัก (รวมชายหญิงมาแข่งกัน หรือจะกรองก็ได้)
+                // ในที่นี้ขอรวมชายหญิงโชว์ในกระดานเดียวเพื่อให้เห็นภาพรวม
+                filtered = allScores.filter(d => d.type === 'dorm');
+                key = mode === 'exercise' ? 'points_exercise' : 'points_dorm';
+            }
+
+            // 3. เรียงลำดับ มาก -> น้อย
+            filtered.sort((a, b) => b[key] - a[key]);
+
+            // 4. แสดงผล Top 3 (Podium)
+            const podiumDiv = document.getElementById('podium-area');
+            const listDiv = document.getElementById('list-area');
+            podiumDiv.innerHTML = '';
+            listDiv.innerHTML = '';
+
+            if (filtered.length === 0) {
+                podiumDiv.innerHTML = '<p style="text-align:center; width:100%;">ยังไม่มีข้อมูล</p>';
+                return;
+            }
+
+            // ฟังก์ชันสร้างแท่งรางวัล
+            const createPodiumItem = (item, rank) => {
+                if (!item) return '';
+                const crown = rank === 1 ? '<i class="fas fa-crown crown-icon"></i>' : '';
+                return `
+                    <div class="podium-item rank-${rank}">
+                        ${crown}
+                        <div class="podium-bar">
+                            <span class="score-badge">${item[key]}</span>
+                        </div>
+                        <div class="podium-name">${item.name}</div>
+                    </div>
+                `;
+            };
+
+            // แสดงผลตามลำดับแท่น (2, 1, 3) เพื่อให้ที่ 1 อยู่ตรงกลาง
+            let podiumHTML = '';
+            if (filtered[1]) podiumHTML += createPodiumItem(filtered[1], 2); // ที่ 2 (ซ้าย)
+            if (filtered[0]) podiumHTML += createPodiumItem(filtered[0], 1); // ที่ 1 (กลาง)
+            if (filtered[2]) podiumHTML += createPodiumItem(filtered[2], 3); // ที่ 3 (ขวา)
+            podiumDiv.innerHTML = podiumHTML;
+
+            // 5. แสดงผลอันดับที่เหลือ (4 เป็นต้นไป)
+            const rest = filtered.slice(3);
+            if (rest.length > 0) {
+                rest.forEach((item, idx) => {
+                    listDiv.innerHTML += `
+                        <div class="list-item">
+                            <div style="display:flex; align-items:center;">
+                                <span class="rank-num">#${idx + 4}</span>
+                                <span>${item.name}</span>
+                            </div>
+                            <span class="list-score">${item[key]}</span>
+                        </div>
+                    `;
+                });
+            } else {
+                listDiv.innerHTML = '<p style="text-align:center; width:100%; color:#999; font-size:0.9rem;">- จบรายการ -</p>';
+            }
+        }
+
+        // --- 📰 Script สำหรับข่าว ---
+        async function loadNews() {
+            try {
+                const res = await fetch('/api/news');
                 const data = await res.json();
+                const container = document.getElementById('news-container');
                 container.innerHTML = '';
                 if(data.length === 0) return container.innerHTML = '<p style="text-align:center; width:100%;">ยังไม่มีข่าวประกาศ</p>';
                 data.forEach(news => {
@@ -144,7 +261,13 @@
                             </div>
                         </div>`;
                 });
-            } catch { container.innerHTML = '<p style="color:red; text-align:center;">เชื่อมต่อ Server ไม่ได้</p>'; }
+            } catch { }
+        }
+
+        // เริ่มทำงาน
+        document.addEventListener('DOMContentLoaded', () => {
+            initScores();
+            loadNews();
         });
     </script>
 </body>

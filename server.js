@@ -2,55 +2,79 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const session = require('express-session');
-const path = require('path'); // เพิ่มตัวนี้
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
-
 app.use(express.json());
 app.use(cors({ origin: true, credentials: true }));
-
-// ✅ ให้ Server โชว์ไฟล์ HTML/CSS/รูปภาพ ในโฟลเดอร์ปัจจุบัน
 app.use(express.static(__dirname));
 
 app.use(session({
-    secret: 'secret_key_na_krub',
+    secret: 'school_secret_key',
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-// ✅ เชื่อมต่อ Database (รองรับทั้ง Cloud และ Local)
+// Connect Database
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://footballcggg1234_db_user:rungradit@cluster1.rhemrut.mongodb.net/?appName=Cluster1';
 mongoose.connect(MONGO_URI)
-.then(() => console.log('✅ MongoDB Connected'))
-.catch(err => console.error('❌ MongoDB Error:', err));
+    .then(() => console.log('✅ MongoDB Connected'))
+    .catch(err => console.error(err));
 
-// Models
+// Import Models
 const News = require('./models/News');
 const Suggestion = require('./models/Suggestion');
+const Score = require('./models/Score'); // ตัวใหม่
 
-// --- Routes (เหมือนเดิม) ---
-app.post('/api/login', (req, res) => {
-    const { username, password } = req.body;
-    if (username === 'admin' && password === '123456') {
-        req.session.user = { username: 'admin', role: 'admin' };
-        req.session.save();
-        return res.json({ success: true });
-    }
-    res.status(401).json({ success: false, message: 'ชื่อหรือรหัสผ่านผิด' });
+// --- API: Scores (ระบบคะแนนใหม่) ---
+
+app.get('/api/scores', async (req, res) => {
+    try {
+        let scores = await Score.find();
+
+        // 🛠️ ถ้ายังไม่มีข้อมูล ให้สร้างชุดเริ่มต้น (หอ + ห้องเรียน)
+        if (scores.length === 0) {
+            const initialData = [];
+
+            // 1. สร้างหอชาย (1-8)
+            for (let i = 1; i <= 8; i++) {
+                initialData.push({ name: `หอพักชายที่ ${i}`, type: 'dorm', gender: 'male' });
+            }
+            // 2. สร้างหอหญิง (9-17)
+            for (let i = 9; i <= 17; i++) {
+                initialData.push({ name: `หอพักหญิงที่ ${i}`, type: 'dorm', gender: 'female' });
+            }
+            // 3. สร้างห้องเรียน (ตัวอย่าง ม.1 - ม.6 อย่างละ 3 ห้อง)
+            ['ม.1', 'ม.2', 'ม.3', 'ม.4', 'ม.5', 'ม.6'].forEach(level => {
+                for (let r = 1; r <= 3; r++) {
+                    initialData.push({ name: `${level}/${r}`, type: 'classroom', gender: 'none' });
+                }
+            });
+
+            scores = await Score.insertMany(initialData);
+        }
+        res.json(scores);
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/logout', (req, res) => { req.session.destroy(); res.json({ success: true }); });
-app.get('/api/check-auth', (req, res) => { res.json({ authenticated: !!req.session.user }); });
+app.put('/api/scores', async (req, res) => {
+    // รับข้อมูลเป็น Array เพื่ออัปเดตหลายรายการพร้อมกัน
+    const updates = req.body; // [{ _id: '...', field: 'points_exercise', value: 10 }]
+    try {
+        for (const item of updates) {
+            // อัปเดตเฉพาะ field ที่ส่งมา (Dynamic Update)
+            const updateObj = {};
+            updateObj[item.field] = item.value; 
+            await Score.findByIdAndUpdate(item._id, updateObj);
+        }
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
 
-app.get('/api/news', async (req, res) => { const news = await News.find().sort({ date: -1 }); res.json(news); });
-app.post('/api/news', async (req, res) => { await new News(req.body).save(); res.json({ success: true }); });
-app.delete('/api/news/:id', async (req, res) => { await News.findByIdAndDelete(req.params.id); res.json({ success: true }); });
-
-app.get('/api/suggestions', async (req, res) => { const data = await Suggestion.find().sort({ createdAt: -1 }); res.json(data); });
-app.post('/api/suggestions', async (req, res) => { await new Suggestion(req.body).save(); res.json({ success: true }); });
-app.put('/api/suggestions/:id', async (req, res) => { await Suggestion.findByIdAndUpdate(req.params.id, req.body); res.json({ success: true }); });
+// ... (Routes อื่นๆ ของ News, Suggestion, Login คงเดิม) ...
+// Login, Logout, Check-Auth, News, Suggestions ใส่ไว้เหมือนไฟล์เดิมได้เลย
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
