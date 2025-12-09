@@ -70,7 +70,7 @@
                         <p class="text-xs text-green-500">● กำลังใช้งาน</p>
                     </div>
                     <div class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
-                        <img src="https://upload.wikimedia.org/wikipedia/th/f/f8/%E0%B8%95%E0%B8%A3%E0%B8%B2%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%88%E0%B8%B3%E0%B9%82%E0%B8%A3%E0%B8%87%E0%B9%80%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%A3%E0%B8%B2%E0%B8%8A%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%8A%E0%B8%B2%E0%B8%99%E0%B8%B8%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B2%E0%B8%B0%E0%B8%AB%E0%B9%8C_26_%E0%B8%88%E0%B8%B1%E0%B8%87%E0%B8%AB%E0%B8%A7%E0%B8%B1%E0%B8%94%E0%B8%A5%E0%B8%B3%E0%B8%9E%E0%B8%B9%E0%B8%99.png" class="w-full h-full object-cover">
+                        <img src="https://upload.wikimedia.org/wikipedia/th/f/f8/%E0%B8%95%E0%B8%A3%E0%B8%B2%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%88%E0%B8%B3%E0%B9%82%E0%B8%A3%E0%B8%87%E0%B9%80%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%A3%E0%B8%B2%E0%B8%8A%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%8A%E0%B8%B2%E0%B8%99%E0%B8%B8%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B0%E0%B8%AB%E0%B9%8C_26_%E0%B8%88%E0%B8%B1%E0%B8%87%E0%B8%AB%E0%B8%A7%E0%B8%B1%E0%B8%94%E0%B8%A5%E0%B8%B3%E0%B8%9E%E0%B8%B9%E0%B8%99.png" class="w-full h-full object-cover">
                     </div>
                 </div>
             </div>
@@ -242,11 +242,11 @@
             const tCl = data.filter(d=>d.type==='classroom').reduce((a,b)=>a+(b.points_class||0),0);
             new Chart(document.getElementById('donutChart'), { type:'doughnut', data:{labels:['ออกกาย','หอนอน','ห้องเรียน'], datasets:[{data:[tEx,tDo,tCl], backgroundColor:['#3b82f6','#a855f7','#f59e0b'], borderWidth:0, hoverOffset:5}]}, options:{cutout:'75%', plugins:{legend:{display:false}}} });
 
-            // Line Chart (Classroom) - Call Update Function
+            // Bar Chart (Classroom) - Call Update Function
             updateClassChart();
         }
 
-        // ฟังก์ชันอัปเดตกราฟห้องเรียน (ตามตัวกรอง)
+        // ฟังก์ชันอัปเดตกราฟห้องเรียน (เปลี่ยนเป็นกราฟแท่ง)
         function updateClassChart() {
             const gradeFilter = document.getElementById('filter-grade').value;
             const periodFilter = document.getElementById('filter-period').value;
@@ -277,22 +277,18 @@
 
             const ctx = document.getElementById('lineChart').getContext('2d');
             
-            // เปลี่ยนสีตามโหมด (รายวัน = ส้ม, ปกติ = เขียว)
-            const chartColor = periodFilter === 'daily' ? '#f59e0b' : (periodFilter === 'weekly' ? '#8b5cf6' : '#10b981');
+            // ใช้สีฟ้าอ่อนแบบในภาพตัวอย่าง
+            const barColor = '#bfdbfe'; // Tailwind blue-200
 
             classChartInstance = new Chart(ctx, {
-                type: 'line', 
+                type: 'bar', // เปลี่ยนเป็น 'bar'
                 data: {
                     labels: labels,
                     datasets: [{
                         label: 'คะแนน',
                         data: scores,
-                        borderColor: chartColor,
-                        backgroundColor: chartColor + '1A', // add opacity
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 6,
-                        pointHoverRadius: 8
+                        backgroundColor: barColor, // ใช้สีเดียว
+                        borderRadius: 4, // เพิ่มความโค้งมนให้แท่งกราฟ
                     }]
                 },
                 options: {
