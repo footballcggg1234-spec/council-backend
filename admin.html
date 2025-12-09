@@ -6,9 +6,7 @@
     <title>Admin Dashboard | Student Council</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -24,12 +22,9 @@
 <body class="flex h-screen overflow-hidden">
 
     <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 flex flex-col p-6 z-20 flex-shrink-0 relative">
-        
         <div class="flex flex-col items-center justify-center mb-8 pb-6 border-b border-gray-100">
             <div class="w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center mb-3 overflow-hidden border-4 border-pink-100 relative group cursor-pointer p-1">
-                <img src="RPK26 Logo.jfif" 
-                     alt="RPK26 Logo" 
-                     class="w-full h-full object-contain group-hover:scale-110 transition duration-500">
+                <img src="RPK26 Logo.jfif" alt="RPK26 Logo" class="w-full h-full object-contain group-hover:scale-110 transition duration-500">
             </div>
             <h1 class="text-lg font-extrabold text-pink-800 tracking-wide text-center leading-tight">ราชประชานุเคราะห์ ๒๖</h1>
             <p class="text-xs text-gray-400 font-medium bg-gray-100 px-2 py-1 rounded-full mt-2">Admin Panel</p>
@@ -114,14 +109,34 @@
                         </h3>
                         <div class="relative h-72 w-full"><canvas id="barChart"></canvas></div>
                     </div>
+                    
                     <div class="card col-span-1 flex flex-col items-center justify-center">
                         <h3 class="text-lg font-bold text-gray-800 mb-4 self-start">องค์ประกอบคะแนน</h3>
                         <div class="relative h-56 w-56"><canvas id="donutChart"></canvas></div>
                     </div>
+                    
                     <div class="card col-span-1 lg:col-span-3">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <i class="fas fa-graduation-cap text-blue-500"></i> อันดับคะแนนห้องเรียน (Top 7)
-                        </h3>
+                        <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
+                            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-graduation-cap text-blue-500"></i> อันดับคะแนนห้องเรียน
+                            </h3>
+                            <div class="flex gap-2">
+                                <select id="filter-grade" onchange="updateClassChart()" class="bg-gray-100 border-none text-sm rounded-lg px-3 py-2 font-bold text-gray-600 focus:ring-2 focus:ring-blue-200 outline-none cursor-pointer">
+                                    <option value="all">🏆 ทุกระดับชั้น (Top 10)</option>
+                                    <option value="ม.1">มัธยม 1</option>
+                                    <option value="ม.2">มัธยม 2</option>
+                                    <option value="ม.3">มัธยม 3</option>
+                                    <option value="ม.4">มัธยม 4</option>
+                                    <option value="ม.5">มัธยม 5</option>
+                                    <option value="ม.6">มัธยม 6</option>
+                                </select>
+                                <select id="filter-period" onchange="updateClassChart()" class="bg-gray-100 border-none text-sm rounded-lg px-3 py-2 font-bold text-gray-600 focus:ring-2 focus:ring-blue-200 outline-none cursor-pointer">
+                                    <option value="total">คะแนนรวมสะสม</option>
+                                    <option value="daily">📅 รายวัน</option>
+                                    <option value="weekly">📆 รายสัปดาห์</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="relative h-64 w-full"><canvas id="lineChart"></canvas></div>
                     </div>
                 </div>
@@ -174,16 +189,20 @@
         const API_BASE = '/api';
         let allScoreData = [];
         let currentAdminMode = '';
+        let classChartInstance = null; // ตัวแปรเก็บกราฟห้องเรียน
 
+        // UI Helpers
         function toggleSidebar() { const s = document.getElementById('sidebar'); s.classList.toggle('hidden'); }
         function toggleFullScreen() {
             if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); document.getElementById('fullscreen-icon').classList.replace('fa-expand', 'fa-compress'); } 
             else { if (document.exitFullscreen) document.exitFullscreen(); document.getElementById('fullscreen-icon').classList.replace('fa-compress', 'fa-expand'); }
         }
 
+        // Auth
         async function checkAuth() { try { const res = await fetch(`${API_BASE}/check-auth`); const data = await res.json(); if (!data.authenticated) location.href='login.html'; else initDashboard(); } catch { location.href='login.html'; } }
         checkAuth();
 
+        // Dashboard Init
         async function initDashboard() {
             const [scRes, sgRes, nwRes] = await Promise.all([fetch(`${API_BASE}/scores`), fetch(`${API_BASE}/suggestions`), fetch(`${API_BASE}/news`)]);
             allScoreData = await scRes.json();
@@ -201,6 +220,7 @@
         }
         async function logout() { await fetch(`${API_BASE}/logout`, {method:'POST'}); location.href='login.html'; }
 
+        // Stats Logic
         function updateStats(scores, sugs, news) {
             const tDorm = scores.filter(s=>s.type==='dorm').reduce((a,b)=>a+(b.points_exercise||0)+(b.points_dorm||0),0);
             const tClass = scores.filter(s=>s.type==='classroom').reduce((a,b)=>a+(b.points_class||0),0);
@@ -210,17 +230,87 @@
             document.getElementById('stat-news-count').innerText = news.length;
         }
 
+        // Charts Logic
         function renderCharts(data) {
+            // Bar Chart (Dorm)
             const dorms = data.filter(d=>d.type==='dorm').sort((a,b)=>(b.points_exercise+b.points_dorm)-(a.points_exercise+a.points_dorm)).slice(0,5);
             new Chart(document.getElementById('barChart'), { type:'bar', data:{labels:dorms.map(d=>d.name), datasets:[{label:'คะแนน', data:dorms.map(d=>(d.points_exercise||0)+(d.points_dorm||0)), backgroundColor:'#3b82f6', borderRadius:6}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}} });
+            
+            // Donut Chart
             const tEx = data.filter(d=>d.type==='dorm').reduce((a,b)=>a+(b.points_exercise||0),0);
             const tDo = data.filter(d=>d.type==='dorm').reduce((a,b)=>a+(b.points_dorm||0),0);
             const tCl = data.filter(d=>d.type==='classroom').reduce((a,b)=>a+(b.points_class||0),0);
             new Chart(document.getElementById('donutChart'), { type:'doughnut', data:{labels:['ออกกาย','หอนอน','ห้องเรียน'], datasets:[{data:[tEx,tDo,tCl], backgroundColor:['#3b82f6','#a855f7','#f59e0b'], borderWidth:0, hoverOffset:5}]}, options:{cutout:'75%', plugins:{legend:{display:false}}} });
-            const cls = data.filter(d=>d.type==='classroom').sort((a,b)=>b.points_class-a.points_class).slice(0,7);
-            new Chart(document.getElementById('lineChart'), { type:'line', data:{labels:cls.map(c=>c.name), datasets:[{label:'คะแนน', data:cls.map(c=>c.points_class), borderColor:'#10b981', backgroundColor:'rgba(16, 185, 129, 0.1)', fill:true, tension:0.4, pointRadius:4}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}} });
+
+            // Line Chart (Classroom) - Call Update Function
+            updateClassChart();
         }
 
+        // ฟังก์ชันอัปเดตกราฟห้องเรียน (ตามตัวกรอง)
+        function updateClassChart() {
+            const gradeFilter = document.getElementById('filter-grade').value;
+            const periodFilter = document.getElementById('filter-period').value;
+
+            // 1. กรองข้อมูล
+            let filteredData = allScoreData.filter(d => d.type === 'classroom');
+            
+            // กรองตามระดับชั้น
+            if (gradeFilter !== 'all') {
+                filteredData = filteredData.filter(d => d.name.includes(gradeFilter));
+            }
+            
+            // เรียงลำดับคะแนน
+            filteredData.sort((a, b) => (b.points_class || 0) - (a.points_class || 0));
+
+            // ถ้าเลือก all ให้แสดงแค่ Top 10 เพื่อไม่ให้รก, ถ้าเลือกระดับชั้น แสดงทั้งหมด
+            if (gradeFilter === 'all') {
+                filteredData = filteredData.slice(0, 10);
+            }
+
+            const labels = filteredData.map(c => c.name);
+            const scores = filteredData.map(c => c.points_class || 0);
+
+            // Destroy กราฟเก่าก่อนสร้างใหม่
+            if (classChartInstance) {
+                classChartInstance.destroy();
+            }
+
+            const ctx = document.getElementById('lineChart').getContext('2d');
+            
+            // เปลี่ยนสีตามโหมด (รายวัน = ส้ม, ปกติ = เขียว)
+            const chartColor = periodFilter === 'daily' ? '#f59e0b' : (periodFilter === 'weekly' ? '#8b5cf6' : '#10b981');
+
+            classChartInstance = new Chart(ctx, {
+                type: 'line', 
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'คะแนน',
+                        data: scores,
+                        borderColor: chartColor,
+                        backgroundColor: chartColor + '1A', // add opacity
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: function(context) { return ` คะแนน: ${context.raw}`; } } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { borderDash: [2, 4] } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Score Input Logic
         function loadScoreInputs(m) {
             currentAdminMode=m; const con=document.getElementById('admin-score-container'); const tit=document.getElementById('score-title');
             document.querySelectorAll('#tab-scores button').forEach(b=>b.classList.remove('ring-2','ring-offset-2','bg-white','shadow-md'));
@@ -234,8 +324,12 @@
         }
 
         async function saveScores(e) { e.preventDefault(); const inps=document.querySelectorAll('.score-input'); const upds=[]; let fld=currentAdminMode==='classroom'?'points_class':(currentAdminMode==='exercise'?'points_exercise':'points_dorm'); inps.forEach(i=>upds.push({_id:i.dataset.id, field:fld, value:i.value})); await fetch(`${API_BASE}/scores`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(upds)}); alert('บันทึกเรียบร้อย ✅'); initDashboard(); }
+        
+        // Suggestions Logic
         function renderSuggestions(d) { document.getElementById('suggestion-tbody').innerHTML=d.map(s=>`<tr class="border-b hover:bg-gray-50"><td class="p-4 font-bold text-gray-700">${s.topic}</td><td class="p-4 text-sm text-gray-500">${s.category}</td><td class="p-4"><span class="px-2 py-1 rounded-md text-xs font-bold ${s.status==='resolved'?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'}">${s.status}</span></td><td class="p-4">${s.status!=='resolved'?`<button onclick="updSug('${s._id}','resolved')" class="text-green-600 hover:bg-green-50 px-3 py-1 rounded font-bold text-sm transition">จบงาน</button>`:'<i class="fas fa-check-circle text-green-500 text-lg"></i>'}</td></tr>`).join(''); }
         async function updSug(id,st) { await fetch(`${API_BASE}/suggestions/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:st})}); initDashboard(); }
+        
+        // News Logic
         function renderNews(d) { document.getElementById('news-grid-admin').innerHTML=d.map(n=>`<div class="bg-white p-4 rounded-xl border shadow-sm relative group hover:shadow-md transition"><button onclick="delNews('${n._id}')" class="absolute top-2 right-2 bg-red-50 text-red-500 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"><i class="fas fa-trash"></i></button><h4 class="font-bold text-gray-800 mb-2">${n.title}</h4><p class="text-sm text-gray-500 truncate">${n.content}</p></div>`).join(''); }
         async function postNews(e) { e.preventDefault(); await fetch(`${API_BASE}/news`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({title:document.getElementById('news-title').value, content:document.getElementById('news-content').value, image:document.getElementById('news-image').value})}); alert('โพสต์แล้ว'); initDashboard(); }
         async function delNews(id) { if(confirm('ลบ?')) { await fetch(`${API_BASE}/news/${id}`, {method:'DELETE'}); initDashboard(); } }
