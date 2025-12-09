@@ -151,8 +151,8 @@
                     </div>
                     <h3 id="score-title" class="text-xl font-bold text-gray-700 mb-4">กรุณาเลือกหมวดหมู่ด้านบน</h3>
                     <form onsubmit="saveScores(event)">
-                        <div id="admin-score-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-[60vh] overflow-y-auto p-1"></div>
-                        <button id="btn-save-score" type="submit" class="hidden mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition"><i class="fas fa-save mr-2"></i> บันทึกคะแนนทั้งหมด</button>
+                        <div id="admin-score-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-h-[65vh] overflow-y-auto p-2"></div>
+                        <button id="btn-save-score" type="submit" class="hidden mt-6 w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition text-lg"><i class="fas fa-save mr-2"></i> บันทึกคะแนนทั้งหมด</button>
                     </form>
                 </div>
             </div>
@@ -189,7 +189,7 @@
         const API_BASE = '/api';
         let allScoreData = [];
         let currentAdminMode = '';
-        let classChartInstance = null; // ตัวแปรเก็บกราฟห้องเรียน
+        let classChartInstance = null;
 
         // UI Helpers
         function toggleSidebar() { const s = document.getElementById('sidebar'); s.classList.toggle('hidden'); }
@@ -242,90 +242,148 @@
             const tCl = data.filter(d=>d.type==='classroom').reduce((a,b)=>a+(b.points_class||0),0);
             new Chart(document.getElementById('donutChart'), { type:'doughnut', data:{labels:['ออกกาย','หอนอน','ห้องเรียน'], datasets:[{data:[tEx,tDo,tCl], backgroundColor:['#3b82f6','#a855f7','#f59e0b'], borderWidth:0, hoverOffset:5}]}, options:{cutout:'75%', plugins:{legend:{display:false}}} });
 
-            // Bar Chart (Classroom) - Call Update Function
             updateClassChart();
         }
 
-        // ฟังก์ชันอัปเดตกราฟห้องเรียน (เปลี่ยนเป็นกราฟแท่ง)
         function updateClassChart() {
             const gradeFilter = document.getElementById('filter-grade').value;
             const periodFilter = document.getElementById('filter-period').value;
-
-            // 1. กรองข้อมูล
             let filteredData = allScoreData.filter(d => d.type === 'classroom');
-            
-            // กรองตามระดับชั้น
-            if (gradeFilter !== 'all') {
-                filteredData = filteredData.filter(d => d.name.includes(gradeFilter));
-            }
-            
-            // เรียงลำดับคะแนน
+            if (gradeFilter !== 'all') filteredData = filteredData.filter(d => d.name.includes(gradeFilter));
             filteredData.sort((a, b) => (b.points_class || 0) - (a.points_class || 0));
-
-            // ถ้าเลือก all ให้แสดงแค่ Top 10 เพื่อไม่ให้รก, ถ้าเลือกระดับชั้น แสดงทั้งหมด
-            if (gradeFilter === 'all') {
-                filteredData = filteredData.slice(0, 10);
-            }
-
+            if (gradeFilter === 'all') filteredData = filteredData.slice(0, 10);
             const labels = filteredData.map(c => c.name);
             const scores = filteredData.map(c => c.points_class || 0);
 
-            // Destroy กราฟเก่าก่อนสร้างใหม่
-            if (classChartInstance) {
-                classChartInstance.destroy();
-            }
-
+            if (classChartInstance) classChartInstance.destroy();
             const ctx = document.getElementById('lineChart').getContext('2d');
-            
-            // ใช้สีฟ้าอ่อนแบบในภาพตัวอย่าง
-            const barColor = '#bfdbfe'; // Tailwind blue-200
+            const barColor = '#bfdbfe';
 
             classChartInstance = new Chart(ctx, {
-                type: 'bar', // เปลี่ยนเป็น 'bar'
+                type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [{
                         label: 'คะแนน',
                         data: scores,
-                        backgroundColor: barColor, // ใช้สีเดียว
-                        borderRadius: 4, // เพิ่มความโค้งมนให้แท่งกราฟ
+                        backgroundColor: barColor,
+                        borderRadius: 4,
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { callbacks: { label: function(context) { return ` คะแนน: ${context.raw}`; } } }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, grid: { borderDash: [2, 4] } },
-                        x: { grid: { display: false } }
-                    }
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return ` คะแนน: ${context.raw}`; } } } },
+                    scales: { y: { beginAtZero: true, grid: { borderDash: [2, 4] } }, x: { grid: { display: false } } }
                 }
             });
         }
 
-        // Score Input Logic
+        // ==========================================
+        //  NEW: Score Input Logic (Buttons & Reasons)
+        // ==========================================
         function loadScoreInputs(m) {
-            currentAdminMode=m; const con=document.getElementById('admin-score-container'); const tit=document.getElementById('score-title');
-            document.querySelectorAll('#tab-scores button').forEach(b=>b.classList.remove('ring-2','ring-offset-2','bg-white','shadow-md'));
+            currentAdminMode = m; 
+            const con = document.getElementById('admin-score-container'); 
+            const tit = document.getElementById('score-title');
+            
+            document.querySelectorAll('#tab-scores button').forEach(b => b.classList.remove('ring-2','ring-offset-2','bg-white','shadow-md'));
             document.getElementById(`btn-mode-${m}`).classList.add('ring-2','ring-offset-2','bg-white','shadow-md');
-            let fil=[], fld=''; 
-            if(m==='classroom'){ fil=allScoreData.filter(d=>d.type==='classroom'); fld='points_class'; tit.innerHTML='<i class="fas fa-chalkboard text-green-600"></i> กรอกคะแนนห้องเรียน'; }
-            else { fil=allScoreData.filter(d=>d.type==='dorm'); fld=m==='exercise'?'points_exercise':'points_dorm'; tit.innerHTML=m==='exercise'?'<i class="fas fa-running text-blue-600"></i> กรอกคะแนนตรวจออกกาย':'<i class="fas fa-bed text-purple-600"></i> กรอกคะแนนตรวจหอนอน'; }
-            fil.sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
-            con.innerHTML=''; fil.forEach(i=>{ con.innerHTML+=`<div class="bg-gray-50 p-3 rounded-xl border hover:border-blue-400 transition"><label class="text-xs font-bold text-gray-500 block mb-1 uppercase">${i.name}</label><input type="number" class="score-input w-full bg-white border border-gray-200 rounded-lg p-2 text-center font-bold text-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" data-id="${i._id}" value="${i[fld]||0}"></div>`; });
+            
+            let fil = [], fld = ''; 
+            if (m === 'classroom') { 
+                fil = allScoreData.filter(d => d.type === 'classroom'); fld = 'points_class'; 
+                tit.innerHTML = '<i class="fas fa-chalkboard text-green-600"></i> ตรวจความสะอาดห้องเรียน'; 
+            } else { 
+                fil = allScoreData.filter(d => d.type === 'dorm'); fld = m === 'exercise' ? 'points_exercise' : 'points_dorm'; 
+                tit.innerHTML = m === 'exercise' ? '<i class="fas fa-running text-blue-600"></i> ตรวจการออกกำลังกาย' : '<i class="fas fa-bed text-purple-600"></i> ตรวจหอนอน'; 
+            }
+            
+            fil.sort((a,b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
+            
+            con.innerHTML = ''; 
+            fil.forEach(i => {
+                const currentScore = i[fld] || 0;
+                // Determine initial active button
+                const isGreen = currentScore >= 5;
+                const isYellow = currentScore > 0 && currentScore < 5;
+                const isRed = currentScore === 0;
+
+                con.innerHTML += `
+                <div class="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition group">
+                    <div class="flex justify-between items-center mb-3">
+                        <label class="text-lg font-bold text-gray-700">${i.name}</label>
+                        <span class="text-xs text-gray-400 font-mono bg-gray-100 px-2 py-1 rounded">แต้มเดิม: ${currentScore}</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-2 mb-3">
+                        <button type="button" onclick="selectStatus(this, '${i._id}', 5)" 
+                            class="py-2 rounded-lg font-bold border transition duration-200 ${isGreen ? 'bg-green-500 text-white border-green-600 shadow-inner' : 'bg-white text-green-600 border-green-200 hover:bg-green-50'}">
+                            <i class="fas fa-check"></i> ผ่าน
+                        </button>
+                        <button type="button" onclick="selectStatus(this, '${i._id}', 3)" 
+                            class="py-2 rounded-lg font-bold border transition duration-200 ${isYellow ? 'bg-yellow-400 text-black border-yellow-500 shadow-inner' : 'bg-white text-yellow-600 border-yellow-200 hover:bg-yellow-50'}">
+                            <i class="fas fa-exclamation"></i> เตือน
+                        </button>
+                        <button type="button" onclick="selectStatus(this, '${i._id}', 0)" 
+                            class="py-2 rounded-lg font-bold border transition duration-200 ${isRed ? 'bg-red-500 text-white border-red-600 shadow-inner' : 'bg-white text-red-600 border-red-200 hover:bg-red-50'}">
+                            <i class="fas fa-times"></i> ขาด
+                        </button>
+                    </div>
+
+                    <input type="hidden" class="score-input" data-id="${i._id}" value="${currentScore}">
+                    <input type="text" class="reason-input w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200 transition" 
+                           placeholder="ระบุเหตุผล (ถ้ามี)..." value="${i.last_reason || ''}">
+                </div>`; 
+            });
             document.getElementById('btn-save-score').classList.remove('hidden');
         }
 
-        async function saveScores(e) { e.preventDefault(); const inps=document.querySelectorAll('.score-input'); const upds=[]; let fld=currentAdminMode==='classroom'?'points_class':(currentAdminMode==='exercise'?'points_exercise':'points_dorm'); inps.forEach(i=>upds.push({_id:i.dataset.id, field:fld, value:i.value})); await fetch(`${API_BASE}/scores`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(upds)}); alert('บันทึกเรียบร้อย ✅'); initDashboard(); }
+        function selectStatus(btn, id, score) {
+            const container = btn.parentElement;
+            const buttons = container.querySelectorAll('button');
+            buttons[0].className = 'py-2 rounded-lg font-bold border transition duration-200 bg-white text-green-600 border-green-200 hover:bg-green-50';
+            buttons[1].className = 'py-2 rounded-lg font-bold border transition duration-200 bg-white text-yellow-600 border-yellow-200 hover:bg-yellow-50';
+            buttons[2].className = 'py-2 rounded-lg font-bold border transition duration-200 bg-white text-red-600 border-red-200 hover:bg-red-50';
+
+            if (score === 5) btn.className = 'py-2 rounded-lg font-bold border transition duration-200 bg-green-500 text-white border-green-600 shadow-inner transform scale-105';
+            else if (score === 3) btn.className = 'py-2 rounded-lg font-bold border transition duration-200 bg-yellow-400 text-black border-yellow-500 shadow-inner transform scale-105';
+            else if (score === 0) btn.className = 'py-2 rounded-lg font-bold border transition duration-200 bg-red-500 text-white border-red-600 shadow-inner transform scale-105';
+
+            const hiddenInput = container.nextElementSibling;
+            if(hiddenInput && hiddenInput.classList.contains('score-input')) hiddenInput.value = score;
+        }
+
+        async function saveScores(e) { 
+            e.preventDefault(); 
+            const containers = document.querySelectorAll('#admin-score-container > div');
+            const upds = []; 
+            let fld = currentAdminMode === 'classroom' ? 'points_class' : (currentAdminMode === 'exercise' ? 'points_exercise' : 'points_dorm'); 
+            
+            containers.forEach(div => {
+                const scoreInp = div.querySelector('.score-input');
+                const reasonInp = div.querySelector('.reason-input');
+                if(scoreInp) {
+                    upds.push({
+                        _id: scoreInp.dataset.id, 
+                        field: fld, 
+                        value: parseInt(scoreInp.value), 
+                        reason: reasonInp.value 
+                    });
+                }
+            });
+
+            try {
+                await fetch(`${API_BASE}/scores`, {
+                    method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(upds)
+                }); 
+                alert('บันทึกคะแนนและเหตุผลเรียบร้อย ✅'); 
+                initDashboard();
+            } catch (err) { alert('เกิดข้อผิดพลาด'); console.error(err); }
+        }
         
-        // Suggestions Logic
+        // Suggestions & News Logic
         function renderSuggestions(d) { document.getElementById('suggestion-tbody').innerHTML=d.map(s=>`<tr class="border-b hover:bg-gray-50"><td class="p-4 font-bold text-gray-700">${s.topic}</td><td class="p-4 text-sm text-gray-500">${s.category}</td><td class="p-4"><span class="px-2 py-1 rounded-md text-xs font-bold ${s.status==='resolved'?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'}">${s.status}</span></td><td class="p-4">${s.status!=='resolved'?`<button onclick="updSug('${s._id}','resolved')" class="text-green-600 hover:bg-green-50 px-3 py-1 rounded font-bold text-sm transition">จบงาน</button>`:'<i class="fas fa-check-circle text-green-500 text-lg"></i>'}</td></tr>`).join(''); }
         async function updSug(id,st) { await fetch(`${API_BASE}/suggestions/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:st})}); initDashboard(); }
-        
-        // News Logic
         function renderNews(d) { document.getElementById('news-grid-admin').innerHTML=d.map(n=>`<div class="bg-white p-4 rounded-xl border shadow-sm relative group hover:shadow-md transition"><button onclick="delNews('${n._id}')" class="absolute top-2 right-2 bg-red-50 text-red-500 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"><i class="fas fa-trash"></i></button><h4 class="font-bold text-gray-800 mb-2">${n.title}</h4><p class="text-sm text-gray-500 truncate">${n.content}</p></div>`).join(''); }
         async function postNews(e) { e.preventDefault(); await fetch(`${API_BASE}/news`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({title:document.getElementById('news-title').value, content:document.getElementById('news-content').value, image:document.getElementById('news-image').value})}); alert('โพสต์แล้ว'); initDashboard(); }
         async function delNews(id) { if(confirm('ลบ?')) { await fetch(`${API_BASE}/news/${id}`, {method:'DELETE'}); initDashboard(); } }
