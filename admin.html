@@ -239,9 +239,11 @@
             classChartInstance = new Chart(document.getElementById('lineChart').getContext('2d'), { type: 'bar', data: { labels: filteredData.map(c => c.name), datasets: [{ label: 'คะแนน', data: filteredData.map(c => c.points_class || 0), backgroundColor: '#bfdbfe', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { borderDash: [2, 4] } }, x: { grid: { display: false } } } } });
         }
 
-        // ==========================================
-        //  SCORE INPUT LOGIC (UPDATED: 10, 5, 0)
-        // ==========================================
+        // =======================================================
+        //  UPDATED LOGIC: 
+        //  1. Dorm/Exercise: Buttons 3 (Green), 2 (Yellow), 1 (Red)
+        //  2. Classroom: Manual Input (10 = No Reason, <10 = Need Reason)
+        // =======================================================
         function loadScoreInputs(m) {
             currentAdminMode = m; 
             const con = document.getElementById('admin-score-container'); 
@@ -251,38 +253,71 @@
             document.getElementById(`btn-mode-${m}`).classList.add('ring-2','ring-offset-2','bg-white','shadow-md');
             
             let fil = [], fld = ''; 
-            if (m === 'classroom') { fil = allScoreData.filter(d => d.type === 'classroom'); fld = 'points_class'; tit.innerHTML = '<i class="fas fa-chalkboard text-green-600"></i> ตรวจความสะอาดห้องเรียน'; } 
-            else { fil = allScoreData.filter(d => d.type === 'dorm'); fld = m === 'exercise' ? 'points_exercise' : 'points_dorm'; tit.innerHTML = m === 'exercise' ? '<i class="fas fa-running text-blue-600"></i> ตรวจการออกกำลังกาย' : '<i class="fas fa-bed text-purple-600"></i> ตรวจหอนอน'; }
             
-            fil.sort((a,b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
-            con.innerHTML = ''; 
-            fil.forEach(i => {
-                const currentScore = i[fld] || 0;
-                // ปรับเงื่อนไขการแสดงผลปุ่ม Active เป็น 10 คะแนน
-                const isGreen = currentScore >= 10; 
-                const isYellow = currentScore > 0 && currentScore < 10; 
-                const isRed = currentScore === 0;
+            if (m === 'classroom') { 
+                // --- MODE: Classroom (Manual Input) ---
+                fil = allScoreData.filter(d => d.type === 'classroom'); 
+                fld = 'points_class'; 
+                tit.innerHTML = '<i class="fas fa-chalkboard text-green-600"></i> ตรวจความสะอาดห้องเรียน (คะแนนเต็ม 10)'; 
+                
+                fil.sort((a,b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
+                con.innerHTML = ''; 
+                
+                fil.forEach(i => {
+                    const currentScore = i[fld] || 0;
+                    con.innerHTML += `
+                    <div class="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition group">
+                         <div class="flex justify-between items-center mb-3">
+                            <label class="text-lg font-bold text-gray-700">${i.name}</label>
+                        </div>
+                        <div class="mb-2">
+                            <label class="text-xs text-gray-400">คะแนน (เต็ม 10)</label>
+                            <input type="number" class="score-input w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-center font-bold text-xl text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" 
+                                   data-id="${i._id}" value="${currentScore}" max="10" min="0" oninput="checkReasonRequired(this)">
+                        </div>
+                        <div>
+                             <input type="text" class="reason-input w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200 transition" 
+                                   placeholder="ระบุเหตุผล (เมื่อคะแนน < 10)..." value="${i.last_reason || ''}">
+                        </div>
+                    </div>`; 
+                });
+            } else { 
+                // --- MODE: Dorm / Exercise (Buttons 3, 2, 1) ---
+                fil = allScoreData.filter(d => d.type === 'dorm'); 
+                fld = m === 'exercise' ? 'points_exercise' : 'points_dorm'; 
+                tit.innerHTML = m === 'exercise' ? '<i class="fas fa-running text-blue-600"></i> ตรวจการออกกำลังกาย' : '<i class="fas fa-bed text-purple-600"></i> ตรวจหอนอน'; 
+                
+                fil.sort((a,b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
+                con.innerHTML = ''; 
+                
+                fil.forEach(i => {
+                    const currentScore = i[fld] || 0;
+                    // เงื่อนไขสีปุ่ม: 3=เขียว, 2=เหลือง, 1=แดง
+                    const isGreen = currentScore === 3; 
+                    const isYellow = currentScore === 2; 
+                    const isRed = currentScore === 1;
 
-                con.innerHTML += `
-                <div class="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition group">
-                    <div class="flex justify-between items-center mb-3">
-                        <label class="text-lg font-bold text-gray-700">${i.name}</label>
-                        <span class="text-xs text-gray-400 font-mono bg-gray-100 px-2 py-1 rounded">แต้มเดิม: ${currentScore}</span>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2 mb-3">
-                        <button type="button" onclick="selectStatus(this, '${i._id}', 10)" class="py-2 rounded-lg font-bold border transition duration-200 ${isGreen?'bg-green-500 text-white border-green-600':'bg-white text-green-600 border-green-200 hover:bg-green-50'}"><i class="fas fa-check"></i> ผ่าน (10)</button>
-                        <button type="button" onclick="selectStatus(this, '${i._id}', 5)" class="py-2 rounded-lg font-bold border transition duration-200 ${isYellow?'bg-yellow-400 text-black border-yellow-500':'bg-white text-yellow-600 border-yellow-200 hover:bg-yellow-50'}"><i class="fas fa-exclamation"></i> เตือน (5)</button>
-                        <button type="button" onclick="selectStatus(this, '${i._id}', 0)" class="py-2 rounded-lg font-bold border transition duration-200 ${isRed?'bg-red-500 text-white border-red-600':'bg-white text-red-600 border-red-200 hover:bg-red-50'}"><i class="fas fa-times"></i> ขาด (0)</button>
-                    </div>
-                    <input type="hidden" class="score-input" data-id="${i._id}" value="${currentScore}">
-                    <input type="text" class="reason-input w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200 transition" placeholder="ระบุเหตุผล (ถ้ามี)..." value="${i.last_reason || ''}">
-                </div>`; 
-            });
+                    con.innerHTML += `
+                    <div class="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition group">
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="text-lg font-bold text-gray-700">${i.name}</label>
+                            <span class="text-xs text-gray-400 font-mono bg-gray-100 px-2 py-1 rounded">แต้มเดิม: ${currentScore}</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mb-3">
+                            <button type="button" onclick="selectStatus(this, '${i._id}', 3)" class="py-2 rounded-lg font-bold border transition duration-200 ${isGreen?'bg-green-500 text-white border-green-600':'bg-white text-green-600 border-green-200 hover:bg-green-50'}"><i class="fas fa-check"></i> (3)</button>
+                            <button type="button" onclick="selectStatus(this, '${i._id}', 2)" class="py-2 rounded-lg font-bold border transition duration-200 ${isYellow?'bg-yellow-400 text-black border-yellow-500':'bg-white text-yellow-600 border-yellow-200 hover:bg-yellow-50'}"><i class="fas fa-exclamation"></i> (2)</button>
+                            <button type="button" onclick="selectStatus(this, '${i._id}', 1)" class="py-2 rounded-lg font-bold border transition duration-200 ${isRed?'bg-red-500 text-white border-red-600':'bg-white text-red-600 border-red-200 hover:bg-red-50'}"><i class="fas fa-times"></i> (1)</button>
+                        </div>
+                        <input type="hidden" class="score-input" data-id="${i._id}" value="${currentScore}">
+                        <input type="text" class="reason-input w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200 transition" placeholder="ระบุเหตุผล (ถ้ามี)..." value="${i.last_reason || ''}">
+                    </div>`; 
+                });
+            }
             document.getElementById('score-actions').classList.remove('hidden');
             document.getElementById('btn-reset-score').classList.remove('hidden');
         }
 
-        // ปรับฟังก์ชันการเลือกให้รองรับ 10 คะแนน
+        // Helper: เปลี่ยนสีปุ่มเมื่อเลือก (สำหรับ Dorm/Exercise)
         function selectStatus(btn, id, score) {
             const container = btn.parentElement;
             const buttons = container.querySelectorAll('button');
@@ -290,28 +325,68 @@
             buttons[1].className = 'py-2 rounded-lg font-bold border transition duration-200 bg-white text-yellow-600 border-yellow-200 hover:bg-yellow-50';
             buttons[2].className = 'py-2 rounded-lg font-bold border transition duration-200 bg-white text-red-600 border-red-200 hover:bg-red-50';
 
-            if (score === 10) btn.className = 'py-2 rounded-lg font-bold border transition duration-200 bg-green-500 text-white border-green-600 shadow-inner transform scale-105';
-            else if (score === 5) btn.className = 'py-2 rounded-lg font-bold border transition duration-200 bg-yellow-400 text-black border-yellow-500 shadow-inner transform scale-105';
-            else if (score === 0) btn.className = 'py-2 rounded-lg font-bold border transition duration-200 bg-red-500 text-white border-red-600 shadow-inner transform scale-105';
+            if (score === 3) btn.className = 'py-2 rounded-lg font-bold border transition duration-200 bg-green-500 text-white border-green-600 shadow-inner transform scale-105';
+            else if (score === 2) btn.className = 'py-2 rounded-lg font-bold border transition duration-200 bg-yellow-400 text-black border-yellow-500 shadow-inner transform scale-105';
+            else if (score === 1) btn.className = 'py-2 rounded-lg font-bold border transition duration-200 bg-red-500 text-white border-red-600 shadow-inner transform scale-105';
 
             const hiddenInput = container.nextElementSibling;
             if(hiddenInput) hiddenInput.value = score;
         }
 
+        // Helper: ตรวจสอบ Input (สำหรับ Classroom) - แค่ Visual cue
+        function checkReasonRequired(input) {
+            const score = parseInt(input.value);
+            const reasonInput = input.parentElement.nextElementSibling.querySelector('.reason-input');
+            if(score < 10) {
+                reasonInput.classList.add('ring-2', 'ring-red-100', 'bg-red-50');
+                reasonInput.placeholder = "⚠️ จำเป็นต้องระบุเหตุผล";
+            } else {
+                reasonInput.classList.remove('ring-2', 'ring-red-100', 'bg-red-50');
+                reasonInput.placeholder = "ระบุเหตุผล (ถ้ามี)...";
+            }
+        }
+
+        // Save Function พร้อม Validation สำหรับห้องเรียน
         async function saveScores(e) { 
             e.preventDefault(); 
             const upds = []; 
+            let error = false;
+            
             let fld = currentAdminMode === 'classroom' ? 'points_class' : (currentAdminMode === 'exercise' ? 'points_exercise' : 'points_dorm'); 
-            document.querySelectorAll('#admin-score-container > div').forEach(div => {
+            
+            const containers = document.querySelectorAll('#admin-score-container > div');
+            
+            for (const div of containers) {
                 const scoreInp = div.querySelector('.score-input');
                 const reasonInp = div.querySelector('.reason-input');
-                if(scoreInp) upds.push({_id: scoreInp.dataset.id, field: fld, value: parseInt(scoreInp.value), reason: reasonInp.value });
-            });
-            try { await fetch(`${API_BASE}/scores`, {method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(upds)}); alert('บันทึกเรียบร้อย ✅'); initDashboard(); } catch (err) { alert('ผิดพลาด'); }
+                
+                if(scoreInp) {
+                    const scoreVal = parseInt(scoreInp.value) || 0;
+                    const reasonVal = reasonInp.value.trim();
+
+                    // Validation เฉพาะห้องเรียน: คะแนน < 10 ต้องมีเหตุผล
+                    if (currentAdminMode === 'classroom' && scoreVal < 10 && reasonVal === '') {
+                        alert(`กรุณาระบุเหตุผลสำหรับห้องที่ได้คะแนนไม่เต็ม (${scoreVal})`);
+                        reasonInp.focus();
+                        error = true;
+                        break; // หยุด Loop
+                    }
+
+                    upds.push({_id: scoreInp.dataset.id, field: fld, value: scoreVal, reason: reasonVal });
+                }
+            }
+
+            if(error) return; // ถ้ามี Error ไม่ส่งข้อมูล
+
+            try { 
+                await fetch(`${API_BASE}/scores`, {method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(upds)}); 
+                alert('บันทึกเรียบร้อย ✅'); 
+                initDashboard(); 
+            } catch (err) { alert('ผิดพลาดในการเชื่อมต่อ'); }
         }
 
         async function resetAllScores() {
-            if(!confirm('⚠️ ยืนยันการล้างคะแนน?\n\nการกระทำนี้จะเปลี่ยนคะแนนทั้งหมดในหน้านี้เป็น "0" และลบเหตุผลออกทั้งหมด')) return;
+            if(!confirm('⚠️ ยืนยันการล้างคะแนน?')) return;
             const upds = [];
             let fld = currentAdminMode === 'classroom' ? 'points_class' : (currentAdminMode === 'exercise' ? 'points_exercise' : 'points_dorm');
             document.querySelectorAll('#admin-score-container > div').forEach(div => {
