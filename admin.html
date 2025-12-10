@@ -148,7 +148,6 @@
                     
                     <div class="flex justify-between items-center mb-4">
                         <h3 id="score-title" class="text-xl font-bold text-gray-700">กรุณาเลือกหมวดหมู่ด้านบน</h3>
-                        
                         <button id="btn-reset-score" onclick="resetAllScores()" class="hidden px-4 py-2 bg-red-100 text-red-600 rounded-lg font-bold hover:bg-red-200 transition text-sm">
                             <i class="fas fa-trash-alt mr-1"></i> ล้างคะแนน (Reset)
                         </button>
@@ -156,7 +155,6 @@
 
                     <form onsubmit="saveScores(event)">
                         <div id="admin-score-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-h-[65vh] overflow-y-auto p-2"></div>
-                        
                         <div id="score-actions" class="hidden mt-6 flex gap-4">
                             <button type="submit" class="flex-1 bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition text-lg">
                                 <i class="fas fa-save mr-2"></i> บันทึกคะแนน
@@ -242,7 +240,7 @@
         }
 
         // ==========================================
-        //  SCORE INPUT LOGIC (Buttons, Reason, Reset)
+        //  SCORE INPUT LOGIC (UPDATED: 10, 5, 0)
         // ==========================================
         function loadScoreInputs(m) {
             currentAdminMode = m; 
@@ -260,7 +258,10 @@
             con.innerHTML = ''; 
             fil.forEach(i => {
                 const currentScore = i[fld] || 0;
-                const isGreen = currentScore >= 5; const isYellow = currentScore > 0 && currentScore < 5; const isRed = currentScore === 0;
+                // ปรับเงื่อนไขการแสดงผลปุ่ม Active เป็น 10 คะแนน
+                const isGreen = currentScore >= 10; 
+                const isYellow = currentScore > 0 && currentScore < 10; 
+                const isRed = currentScore === 0;
 
                 con.innerHTML += `
                 <div class="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition group">
@@ -269,9 +270,9 @@
                         <span class="text-xs text-gray-400 font-mono bg-gray-100 px-2 py-1 rounded">แต้มเดิม: ${currentScore}</span>
                     </div>
                     <div class="grid grid-cols-3 gap-2 mb-3">
-                        <button type="button" onclick="selectStatus(this, '${i._id}', 5)" class="py-2 rounded-lg font-bold border transition duration-200 ${isGreen?'bg-green-500 text-white border-green-600':'bg-white text-green-600 border-green-200 hover:bg-green-50'}"><i class="fas fa-check"></i> ผ่าน</button>
-                        <button type="button" onclick="selectStatus(this, '${i._id}', 3)" class="py-2 rounded-lg font-bold border transition duration-200 ${isYellow?'bg-yellow-400 text-black border-yellow-500':'bg-white text-yellow-600 border-yellow-200 hover:bg-yellow-50'}"><i class="fas fa-exclamation"></i> เตือน</button>
-                        <button type="button" onclick="selectStatus(this, '${i._id}', 0)" class="py-2 rounded-lg font-bold border transition duration-200 ${isRed?'bg-red-500 text-white border-red-600':'bg-white text-red-600 border-red-200 hover:bg-red-50'}"><i class="fas fa-times"></i> ขาด</button>
+                        <button type="button" onclick="selectStatus(this, '${i._id}', 10)" class="py-2 rounded-lg font-bold border transition duration-200 ${isGreen?'bg-green-500 text-white border-green-600':'bg-white text-green-600 border-green-200 hover:bg-green-50'}"><i class="fas fa-check"></i> ผ่าน (10)</button>
+                        <button type="button" onclick="selectStatus(this, '${i._id}', 5)" class="py-2 rounded-lg font-bold border transition duration-200 ${isYellow?'bg-yellow-400 text-black border-yellow-500':'bg-white text-yellow-600 border-yellow-200 hover:bg-yellow-50'}"><i class="fas fa-exclamation"></i> เตือน (5)</button>
+                        <button type="button" onclick="selectStatus(this, '${i._id}', 0)" class="py-2 rounded-lg font-bold border transition duration-200 ${isRed?'bg-red-500 text-white border-red-600':'bg-white text-red-600 border-red-200 hover:bg-red-50'}"><i class="fas fa-times"></i> ขาด (0)</button>
                     </div>
                     <input type="hidden" class="score-input" data-id="${i._id}" value="${currentScore}">
                     <input type="text" class="reason-input w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200 transition" placeholder="ระบุเหตุผล (ถ้ามี)..." value="${i.last_reason || ''}">
@@ -281,6 +282,7 @@
             document.getElementById('btn-reset-score').classList.remove('hidden');
         }
 
+        // ปรับฟังก์ชันการเลือกให้รองรับ 10 คะแนน
         function selectStatus(btn, id, score) {
             const container = btn.parentElement;
             const buttons = container.querySelectorAll('button');
@@ -288,8 +290,8 @@
             buttons[1].className = 'py-2 rounded-lg font-bold border transition duration-200 bg-white text-yellow-600 border-yellow-200 hover:bg-yellow-50';
             buttons[2].className = 'py-2 rounded-lg font-bold border transition duration-200 bg-white text-red-600 border-red-200 hover:bg-red-50';
 
-            if (score === 5) btn.className = 'py-2 rounded-lg font-bold border transition duration-200 bg-green-500 text-white border-green-600 shadow-inner transform scale-105';
-            else if (score === 3) btn.className = 'py-2 rounded-lg font-bold border transition duration-200 bg-yellow-400 text-black border-yellow-500 shadow-inner transform scale-105';
+            if (score === 10) btn.className = 'py-2 rounded-lg font-bold border transition duration-200 bg-green-500 text-white border-green-600 shadow-inner transform scale-105';
+            else if (score === 5) btn.className = 'py-2 rounded-lg font-bold border transition duration-200 bg-yellow-400 text-black border-yellow-500 shadow-inner transform scale-105';
             else if (score === 0) btn.className = 'py-2 rounded-lg font-bold border transition duration-200 bg-red-500 text-white border-red-600 shadow-inner transform scale-105';
 
             const hiddenInput = container.nextElementSibling;
@@ -308,26 +310,17 @@
             try { await fetch(`${API_BASE}/scores`, {method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(upds)}); alert('บันทึกเรียบร้อย ✅'); initDashboard(); } catch (err) { alert('ผิดพลาด'); }
         }
 
-        // NEW: Reset Function
         async function resetAllScores() {
             if(!confirm('⚠️ ยืนยันการล้างคะแนน?\n\nการกระทำนี้จะเปลี่ยนคะแนนทั้งหมดในหน้านี้เป็น "0" และลบเหตุผลออกทั้งหมด')) return;
-            
             const upds = [];
             let fld = currentAdminMode === 'classroom' ? 'points_class' : (currentAdminMode === 'exercise' ? 'points_exercise' : 'points_dorm');
-            
             document.querySelectorAll('#admin-score-container > div').forEach(div => {
                 const scoreInp = div.querySelector('.score-input');
                 if(scoreInp) upds.push({_id: scoreInp.dataset.id, field: fld, value: 0, reason: ''});
             });
-
-            try { 
-                await fetch(`${API_BASE}/scores`, {method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(upds)}); 
-                alert('ล้างคะแนนเรียบร้อยแล้ว'); 
-                initDashboard(); 
-            } catch (err) { alert('เกิดข้อผิดพลาดในการรีเซ็ต'); }
+            try { await fetch(`${API_BASE}/scores`, {method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(upds)}); alert('ล้างคะแนนเรียบร้อยแล้ว'); initDashboard(); } catch (err) { alert('เกิดข้อผิดพลาดในการรีเซ็ต'); }
         }
 
-        // Suggestions & News
         function renderSuggestions(d) { document.getElementById('suggestion-tbody').innerHTML=d.map(s=>`<tr class="border-b hover:bg-gray-50"><td class="p-4 font-bold text-gray-700">${s.topic}</td><td class="p-4 text-sm text-gray-500">${s.category}</td><td class="p-4"><span class="px-2 py-1 rounded-md text-xs font-bold ${s.status==='resolved'?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'}">${s.status}</span></td><td class="p-4">${s.status!=='resolved'?`<button onclick="updSug('${s._id}','resolved')" class="text-green-600 hover:bg-green-50 px-3 py-1 rounded font-bold text-sm transition">จบงาน</button>`:'<i class="fas fa-check-circle text-green-500 text-lg"></i>'}</td></tr>`).join(''); }
         async function updSug(id,st) { await fetch(`${API_BASE}/suggestions/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:st})}); initDashboard(); }
         function renderNews(d) { document.getElementById('news-grid-admin').innerHTML=d.map(n=>`<div class="bg-white p-4 rounded-xl border shadow-sm relative group hover:shadow-md transition"><button onclick="delNews('${n._id}')" class="absolute top-2 right-2 bg-red-50 text-red-500 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"><i class="fas fa-trash"></i></button><h4 class="font-bold text-gray-800 mb-2">${n.title}</h4><p class="text-sm text-gray-500 truncate">${n.content}</p></div>`).join(''); }
