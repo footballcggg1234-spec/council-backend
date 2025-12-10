@@ -46,7 +46,7 @@
         </nav>
 
         <button onclick="fixDatabase()" class="flex items-center gap-3 px-4 py-2 text-gray-400 hover:text-blue-500 text-xs mt-4 transition">
-            <i class="fas fa-cog"></i> อัปเดตรายชื่อหอ (Repair)
+            <i class="fas fa-cog"></i> ซ่อมรายชื่อหอพัก
         </button>
 
         <button onclick="logout()" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl mt-auto transition font-bold text-sm">
@@ -76,53 +76,15 @@
             
             <div id="tab-dashboard" class="tab-content block space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="card hover:shadow-md transition border-l-4 border-blue-500">
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">คะแนนรวม (หอพัก)</p>
-                        <h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-dorm-score">0</h3>
-                        <div class="mt-2 text-xs text-blue-500 font-bold"><i class="fas fa-check-circle"></i> อัปเดตล่าสุด</div>
-                    </div>
-                    <div class="card hover:shadow-md transition border-l-4 border-green-500">
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">คะแนนรวม (ห้องเรียน)</p>
-                        <h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-class-score">0</h3>
-                        <div class="mt-2 text-xs text-green-500 font-bold"><i class="fas fa-chart-line"></i> Active</div>
-                    </div>
-                    <div class="card hover:shadow-md transition border-l-4 border-purple-500 cursor-pointer" onclick="switchTab('suggestions')">
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">เรื่องร้องเรียน</p>
-                        <h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-sug-count">0</h3>
-                        <div class="mt-2 text-xs text-purple-500">คลิกเพื่อจัดการ ></div>
-                    </div>
-                    <div class="card hover:shadow-md transition border-l-4 border-orange-500 cursor-pointer" onclick="switchTab('news')">
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">ข่าวประชาสัมพันธ์</p>
-                        <h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-news-count">0</h3>
-                        <div class="mt-2 text-xs text-orange-500">คลิกเพื่อดู ></div>
-                    </div>
+                    <div class="card hover:shadow-md transition border-l-4 border-blue-500"><p class="text-gray-400 text-xs font-bold uppercase">คะแนนรวม (หอพัก)</p><h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-dorm-score">0</h3></div>
+                    <div class="card hover:shadow-md transition border-l-4 border-green-500"><p class="text-gray-400 text-xs font-bold uppercase">คะแนนรวม (ห้องเรียน)</p><h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-class-score">0</h3></div>
+                    <div class="card hover:shadow-md transition border-l-4 border-purple-500 cursor-pointer" onclick="switchTab('suggestions')"><p class="text-gray-400 text-xs font-bold uppercase">เรื่องร้องเรียน</p><h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-sug-count">0</h3></div>
+                    <div class="card hover:shadow-md transition border-l-4 border-orange-500 cursor-pointer" onclick="switchTab('news')"><p class="text-gray-400 text-xs font-bold uppercase">ข่าวประชาสัมพันธ์</p><h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-news-count">0</h3></div>
                 </div>
-
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="card col-span-1 lg:col-span-2">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <i class="fas fa-trophy text-yellow-500"></i> 5 อันดับหอพักสูงสุด
-                        </h3>
-                        <div class="relative h-72 w-full"><canvas id="barChart"></canvas></div>
-                    </div>
-                    <div class="card col-span-1 flex flex-col items-center justify-center">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 self-start">องค์ประกอบคะแนน</h3>
-                        <div class="relative h-56 w-56"><canvas id="donutChart"></canvas></div>
-                    </div>
-                    <div class="card col-span-1 lg:col-span-3">
-                        <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
-                            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i class="fas fa-graduation-cap text-blue-500"></i> อันดับคะแนนห้องเรียน</h3>
-                            <div class="flex gap-2">
-                                <select id="filter-grade" onchange="updateClassChart()" class="bg-gray-100 border-none text-sm rounded-lg px-3 py-2 font-bold text-gray-600 focus:ring-2 focus:ring-blue-200 outline-none cursor-pointer">
-                                    <option value="all">🏆 ทุกระดับชั้น</option><option value="ม.1">ม.1</option><option value="ม.2">ม.2</option><option value="ม.3">ม.3</option><option value="ม.4">ม.4</option><option value="ม.5">ม.5</option><option value="ม.6">ม.6</option>
-                                </select>
-                                <select id="filter-period" onchange="updateClassChart()" class="bg-gray-100 border-none text-sm rounded-lg px-3 py-2 font-bold text-gray-600 focus:ring-2 focus:ring-blue-200 outline-none cursor-pointer">
-                                    <option value="total">คะแนนรวมสะสม</option><option value="daily">📅 รายวัน</option><option value="weekly">📆 รายสัปดาห์</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="relative h-64 w-full"><canvas id="lineChart"></canvas></div>
-                    </div>
+                    <div class="card col-span-1 lg:col-span-2"><h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-trophy text-yellow-500"></i> 5 อันดับหอพักสูงสุด</h3><div class="relative h-72 w-full"><canvas id="barChart"></canvas></div></div>
+                    <div class="card col-span-1 flex flex-col items-center justify-center"><h3 class="text-lg font-bold text-gray-800 mb-4 self-start">องค์ประกอบคะแนน</h3><div class="relative h-56 w-56"><canvas id="donutChart"></canvas></div></div>
+                    <div class="card col-span-1 lg:col-span-3"><h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-graduation-cap text-blue-500"></i> อันดับคะแนนห้องเรียน</h3><div class="relative h-64 w-full"><canvas id="lineChart"></canvas></div></div>
                 </div>
             </div>
 
@@ -141,8 +103,8 @@
                 </div>
             </div>
 
-            <div id="tab-suggestions" class="tab-content hidden"><div class="card"><h2 class="text-xl font-bold mb-4">กล่องความคิดเห็น</h2><div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-gray-50 border-b"><th class="p-4 rounded-tl-lg">หัวข้อ</th><th class="p-4">หมวดหมู่</th><th class="p-4">สถานะ</th><th class="p-4 rounded-tr-lg">จัดการ</th></tr></thead><tbody id="suggestion-tbody" class="divide-y divide-gray-100"></tbody></table></div></div></div>
-            <div id="tab-news" class="tab-content hidden space-y-6"><div class="card"><h3 class="text-lg font-bold mb-4">โพสต์ข่าวประชาสัมพันธ์</h3><form onsubmit="postNews(event)" class="space-y-4"><input id="news-title" class="w-full p-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-200 outline-none" placeholder="หัวข้อข่าว" required><textarea id="news-content" rows="3" class="w-full p-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-200 outline-none" placeholder="รายละเอียด..." required></textarea><input id="news-image" class="w-full p-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-200 outline-none" placeholder="URL รูปภาพ (ถ้ามี)"><button class="px-8 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition">โพสต์</button></form></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="news-grid-admin"></div></div>
+            <div id="tab-suggestions" class="tab-content hidden"><div class="card"><h2 class="text-xl font-bold mb-4">กล่องความคิดเห็น</h2><div class="overflow-x-auto"><table class="w-full text-left border-collapse"><tbody id="suggestion-tbody"></tbody></table></div></div></div>
+            <div id="tab-news" class="tab-content hidden space-y-6"><div class="card"><h3 class="text-lg font-bold mb-4">โพสต์ข่าวประชาสัมพันธ์</h3><form onsubmit="postNews(event)" class="space-y-4"><input id="news-title" class="w-full p-3 bg-gray-50 border rounded-xl" placeholder="หัวข้อข่าว" required><textarea id="news-content" rows="3" class="w-full p-3 bg-gray-50 border rounded-xl" placeholder="รายละเอียด..." required></textarea><input id="news-image" class="w-full p-3 bg-gray-50 border rounded-xl" placeholder="URL รูปภาพ (ถ้ามี)"><button class="px-8 py-2 bg-blue-600 text-white rounded-lg font-bold">โพสต์</button></form></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="news-grid-admin"></div></div>
         </div>
     </main>
 
@@ -161,6 +123,7 @@
             try {
                 const [scRes, sgRes, nwRes] = await Promise.all([fetch(`${API_BASE}/scores`), fetch(`${API_BASE}/suggestions`), fetch(`${API_BASE}/news`)]);
                 if (scRes.ok) allScoreData = await scRes.json();
+                else allScoreData = []; 
                 const suggestions = sgRes.ok ? await sgRes.json() : [];
                 const news = nwRes.ok ? await nwRes.json() : [];
                 updateStats(allScoreData, suggestions, news);
@@ -187,10 +150,7 @@
 
         function renderCharts(data) {
             const dorms = data.filter(d=>d.type==='dorm').sort((a,b)=>(b.points_exercise+b.points_dorm)-(a.points_exercise+a.points_dorm)).slice(0,5);
-            new Chart(document.getElementById('barChart'), { 
-                type:'bar', data:{labels:dorms.map(d=>d.name), datasets:[{label:'คะแนน', data:dorms.map(d=>(d.points_exercise||0)+(d.points_dorm||0)), backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#3b82f6', '#3b82f6'], borderRadius:6}]}, 
-                options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}} 
-            });
+            new Chart(document.getElementById('barChart'), { type:'bar', data:{labels:dorms.map(d=>d.name), datasets:[{label:'คะแนน', data:dorms.map(d=>(d.points_exercise||0)+(d.points_dorm||0)), backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#3b82f6', '#3b82f6'], borderRadius:6}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}} });
             const tEx = data.filter(d=>d.type==='dorm').reduce((a,b)=>a+(b.points_exercise||0),0);
             const tDo = data.filter(d=>d.type==='dorm').reduce((a,b)=>a+(b.points_dorm||0),0);
             const tCl = data.filter(d=>d.type==='classroom').reduce((a,b)=>a+(b.points_class||0),0);
@@ -199,17 +159,15 @@
         }
 
         function updateClassChart() {
-            const gradeFilter = document.getElementById('filter-grade').value;
             let filteredData = allScoreData.filter(d => d.type === 'classroom');
-            if (gradeFilter !== 'all') filteredData = filteredData.filter(d => d.name.includes(gradeFilter));
             filteredData.sort((a, b) => (b.points_class || 0) - (a.points_class || 0));
-            if (gradeFilter === 'all') filteredData = filteredData.slice(0, 10);
+            filteredData = filteredData.slice(0, 10);
             if (classChartInstance) classChartInstance.destroy();
             classChartInstance = new Chart(document.getElementById('lineChart').getContext('2d'), { type: 'bar', data: { labels: filteredData.map(c => c.name), datasets: [{ label: 'คะแนน', data: filteredData.map(c => c.points_class || 0), backgroundColor: '#bfdbfe', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { borderDash: [2, 4] } }, x: { grid: { display: false } } } } });
         }
 
         // ==========================================================
-        //  FIXED: แสดงเฉพาะ ชาย 1-7 และ หญิง 1-10 เท่านั้น
+        //  FIXED: แสดงเฉพาะ ชาย 1-7 และ หญิง 1-10 (รองรับชื่อที่มี/ไม่มี "ที่")
         // ==========================================================
         function loadScoreInputs(m) {
             currentAdminMode=m; const con=document.getElementById('admin-score-container'); const tit=document.getElementById('score-title');
@@ -229,19 +187,44 @@
                 fld=m==='exercise'?'points_exercise':'points_dorm'; tit.innerHTML=m==='exercise'?'<i class="fas fa-running text-blue-600"></i> กรอกคะแนนตรวจออกกาย':'<i class="fas fa-bed text-purple-600"></i> กรอกคะแนนตรวจหอนอน'; 
                 con.innerHTML=''; 
                 
-                // สร้างรายการหอพักที่ต้องการ (ชาย 1-7, หญิง 1-10)
-                const targetDorms = [];
-                for(let i=1; i<=7; i++) targetDorms.push(`หอพักชาย ${i}`);
-                for(let i=1; i<=10; i++) targetDorms.push(`หอพักหญิง ${i}`);
+                // --- Logic: สร้างรายการตามที่ขอ (ชาย 1-7, หญิง 1-10) ---
+                const targetList = [
+                    { type: 'M', max: 7, label: 'หอพักชาย' },
+                    { type: 'F', max: 10, label: 'หอพักหญิง' }
+                ];
 
-                // วนลูปสร้างการ์ดตามรายชื่อที่กำหนด
-                targetDorms.forEach(name => {
-                    // หาข้อมูลจาก DB ที่ชื่อตรงกัน
-                    const item = allScoreData.find(d => d.name === name && d.type === 'dorm');
-                    if (item) {
-                        const s = item[fld] || 0;
-                        const isGreen = s===3; const isYellow = s===2; const isRed = s===1;
-                        con.innerHTML+=`<div class="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition group"><div class="flex justify-between items-center mb-3"><label class="text-lg font-bold text-gray-700">${item.name}</label><span class="text-xs bg-gray-100 px-2 py-1 rounded">เดิม: ${s}</span></div><div class="grid grid-cols-3 gap-2 mb-3"><button type="button" onclick="selectStatus(this, '${item._id}', 3)" class="py-2 rounded-lg font-bold border transition ${isGreen?'bg-green-500 text-white shadow-inner':'bg-white text-green-600 border-green-200'}">3</button><button type="button" onclick="selectStatus(this, '${item._id}', 2)" class="py-2 rounded-lg font-bold border transition ${isYellow?'bg-yellow-400 text-black shadow-inner':'bg-white text-yellow-600 border-yellow-200'}">2</button><button type="button" onclick="selectStatus(this, '${item._id}', 1)" class="py-2 rounded-lg font-bold border transition ${isRed?'bg-red-500 text-white shadow-inner':'bg-white text-red-600 border-red-200'}">1</button></div><input type="hidden" class="score-input" data-id="${item._id}" value="${s}"><input type="text" class="reason-input w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700" placeholder="เหตุผล..." value="${item.last_reason||''}"></div>`;
+                targetList.forEach(group => {
+                    for(let i=1; i<=group.max; i++) {
+                        // ค้นหาข้อมูลใน DB (รองรับทั้ง "หอพักชาย 1" และ "หอพักชายที่ 1")
+                        const item = allScoreData.find(d => 
+                            d.type === 'dorm' && 
+                            (d.name === `${group.label} ${i}` || d.name === `${group.label}ที่ ${i}` || d.name === `${group.label}ที่${i}`)
+                        );
+
+                        if (item) {
+                            const s = item[fld] || 0;
+                            const isGreen = s===3; const isYellow = s===2; const isRed = s===1;
+                            // แสดงชื่อแบบมาตรฐาน (ไม่มี "ที่")
+                            const displayName = `${group.label} ${i}`;
+                            
+                            con.innerHTML+=`
+                            <div class="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition group">
+                                <div class="flex justify-between items-center mb-3">
+                                    <label class="text-lg font-bold text-gray-700">${displayName}</label>
+                                    <span class="text-xs bg-gray-100 px-2 py-1 rounded">เดิม: ${s}</span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 mb-3">
+                                    <button type="button" onclick="selectStatus(this, '${item._id}', 3)" class="py-2 rounded-lg font-bold border transition ${isGreen?'bg-green-500 text-white shadow-inner':'bg-white text-green-600 border-green-200'}">3</button>
+                                    <button type="button" onclick="selectStatus(this, '${item._id}', 2)" class="py-2 rounded-lg font-bold border transition ${isYellow?'bg-yellow-400 text-black shadow-inner':'bg-white text-yellow-600 border-yellow-200'}">2</button>
+                                    <button type="button" onclick="selectStatus(this, '${item._id}', 1)" class="py-2 rounded-lg font-bold border transition ${isRed?'bg-red-500 text-white shadow-inner':'bg-white text-red-600 border-red-200'}">1</button>
+                                </div>
+                                <input type="hidden" class="score-input" data-id="${item._id}" value="${s}">
+                                <input type="text" class="reason-input w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700" placeholder="เหตุผล..." value="${item.last_reason||''}">
+                            </div>`;
+                        } else {
+                            // กรณีหาไม่เจอ (สร้างการ์ดเปล่าให้รู้ว่าข้อมูลขาด)
+                            con.innerHTML+=`<div class="bg-red-50 p-4 rounded-xl border border-red-200 text-center"><p class="text-red-500 font-bold">ไม่พบข้อมูล: ${group.label} ${i}</p><p class="text-xs text-gray-500">กรุณากดปุ่ม "ซ่อมรายชื่อหอพัก" เมนูซ้ายมือ</p></div>`;
+                        }
                     }
                 });
             }
@@ -271,16 +254,12 @@
             await fetch(`${API_BASE}/scores`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(upds)}); alert('บันทึกเรียบร้อย ✅'); initDashboard(); 
         }
 
-        // --- NEW: Fix Database Function ---
+        // --- Fix Database (สร้างข้อมูลหอพักถ้ายังไม่มี) ---
         async function fixDatabase() {
-            if(!confirm('ยืนยันการสร้าง/ซ่อมแซมรายชื่อหอพัก (ช 1-7, ญ 1-10)?')) return;
-            const seedData = [];
-            for(let i=1; i<=7; i++) seedData.push({name: `หอพักชาย ${i}`, type: 'dorm'});
-            for(let i=1; i<=10; i++) seedData.push({name: `หอพักหญิง ${i}`, type: 'dorm'});
-            // ส่งไปให้ API สร้างใหม่ (ต้องมี Route รองรับ หรือใช้วิธีเช็คทีละอัน)
-            // หมายเหตุ: โค้ดนี้เป็นการจำลอง Logic ถ้า Backend คุณรองรับการสร้าง
-            // วิธีง่ายสุด: แจ้งเตือนว่าเสร็จสิ้นแล้วให้ Refresh
-            alert('กรุณาติดต่อผู้ดูแลระบบเพื่อรัน Seed Script บน Server โดยตรง');
+            if(!confirm('ยืนยันการซ่อมแซมฐานข้อมูล (สร้างหอชาย 1-7, หญิง 1-10)?')) return;
+            // เนื่องจากเราแก้ไขฝั่ง Server ไม่ได้จากตรงนี้โดยตรงในระบบ static 
+            // โค้ดนี้จะแจ้งเตือนเฉยๆ แต่ถ้าคุณมี backend ที่รับ route /seed ก็ยิงไปได้
+            alert('กรุณาติดต่อผู้ดูแลระบบเพื่อรันคำสั่ง Seed ใน Database ครับ');
         }
         
         function renderSuggestions(d) { document.getElementById('suggestion-tbody').innerHTML=d.map(s=>`<tr class="border-b hover:bg-gray-50"><td class="p-4 font-bold text-gray-700">${s.topic}</td><td class="p-4 text-sm text-gray-500">${s.category}</td><td class="p-4"><span class="px-2 py-1 rounded-md text-xs font-bold ${s.status==='resolved'?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'}">${s.status}</span></td><td class="p-4">${s.status!=='resolved'?`<button onclick="updSug('${s._id}','resolved')" class="text-green-600 hover:bg-green-50 px-3 py-1 rounded font-bold text-sm transition">จบงาน</button>`:'<i class="fas fa-check-circle text-green-500 text-lg"></i>'}</td></tr>`).join(''); }
