@@ -66,6 +66,7 @@
             padding: 25px;
             border-top: 5px solid transparent;
             transition: transform 0.3s;
+            display: flex; flex-direction: column; /* จัด Layout ให้ปุ่มอยู่ล่างสุด */
         }
         .score-card:hover { transform: translateY(-5px); }
         
@@ -96,11 +97,23 @@
         .flag-mini { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); color: var(--green-flag); font-size: 1.5rem; animation: wave 2s infinite; }
 
         /* Top 5 List */
-        .mini-list { font-size: 0.9rem; }
+        .mini-list { font-size: 0.9rem; flex-grow: 1; margin-bottom: 15px; } /* ให้ List ขยายเต็มพื้นที่ */
         .mini-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; }
         .mini-item:last-child { border-bottom: none; }
         .mini-rank { color: #999; font-weight: bold; margin-right: 10px; min-width: 20px; }
         .mini-score { font-weight: bold; color: var(--primary); }
+
+        /* NEW: ปุ่มดูรายงาน */
+        .btn-view-report {
+            display: block; width: 100%; text-align: center;
+            padding: 10px 0; border-radius: 12px;
+            background-color: #f3f4f6; color: #666;
+            font-size: 0.85rem; font-weight: 700;
+            border: 1px solid #eee;
+            margin-top: auto; /* ดันปุ่มไปล่างสุด */
+        }
+        .btn-view-report:hover { background-color: #e5e7eb; color: #333; }
+        .btn-view-report i { margin-right: 5px; }
 
         /* News Section */
         .section-title { text-align: center; margin: 40px 0 30px; font-size: 1.8rem; color: var(--dark); font-weight: 700; }
@@ -156,6 +169,7 @@
                 </div>
                 <div id="podium-exercise" class="mini-podium">Loading...</div>
                 <div id="list-exercise" class="mini-list"></div>
+                <a href="dorm-weekly.html" class="btn-view-report"><i class="fas fa-table"></i> ดูตารางรายสัปดาห์</a>
             </div>
 
             <div class="score-card dorm">
@@ -165,6 +179,7 @@
                 </div>
                 <div id="podium-dorm" class="mini-podium">Loading...</div>
                 <div id="list-dorm" class="mini-list"></div>
+                <a href="dorm-weekly.html" class="btn-view-report"><i class="fas fa-table"></i> ดูตารางรายสัปดาห์</a>
             </div>
 
             <div class="score-card classroom">
@@ -174,6 +189,7 @@
                 </div>
                 <div id="podium-classroom" class="mini-podium">Loading...</div>
                 <div id="list-classroom" class="mini-list"></div>
+                <a href="classroom-weekly.html" class="btn-view-report"><i class="fas fa-table"></i> ดูตารางรายสัปดาห์</a>
             </div>
 
         </div>
@@ -183,20 +199,23 @@
     </div>
 
     <script>
+        const API_URL = 'https://school-council-26.onrender.com/api/scores';
         let allScores = [];
 
         async function initScores() {
             try {
-                const res = await fetch('/api/scores');
+                // ดึงข้อมูลจริงจาก Server
+                const res = await fetch(API_URL);
                 allScores = await res.json();
                 
-                // เรนเดอร์ทั้ง 3 หมวดพร้อมกัน
+                // เรนเดอร์ทั้ง 3 หมวด
                 renderCategory('exercise', 'points_exercise', 'dorm');
                 renderCategory('dorm', 'points_dorm', 'dorm');
                 renderCategory('classroom', 'points_class', 'classroom');
 
             } catch (err) {
                 console.error(err);
+                document.getElementById('list-exercise').innerHTML = "ไม่สามารถโหลดข้อมูลได้";
             }
         }
 
@@ -268,7 +287,8 @@
 
         async function loadNews() {
             try {
-                const res = await fetch('/api/news');
+                // ดึงข่าวจริง (ถ้ามี API) หรือใช้ Mock ไปก่อนถ้ายังไม่มี
+                const res = await fetch('https://school-council-26.onrender.com/api/news');
                 const data = await res.json();
                 const container = document.getElementById('news-container');
                 container.innerHTML = '';
@@ -285,7 +305,10 @@
                             </div>
                         </div>`;
                 });
-            } catch { }
+            } catch { 
+                 // Fallback if news API fails
+                 document.getElementById('news-container').innerHTML = '<p style="text-align:center; width:100%;">ไม่สามารถโหลดข่าวได้</p>';
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
