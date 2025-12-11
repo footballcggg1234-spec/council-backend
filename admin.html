@@ -63,7 +63,7 @@
                 <button onclick="toggleFullScreen()" class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition"><i id="fullscreen-icon" class="fas fa-expand text-xl"></i></button>
                 <div class="flex items-center gap-3 pl-4 border-l">
                     <div class="text-right hidden md:block"><p class="text-sm font-bold text-gray-700">ผู้ดูแลระบบ</p><p class="text-xs text-green-500">● กำลังใช้งาน</p></div>
-                    <div class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center overflow-hidden border-2 border-white shadow-sm"><img src="https://upload.wikimedia.org/wikipedia/th/f/f8/%E0%B8%95%E0%B8%A3%E0%B8%B2%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%88%E0%B8%B3%E0%B9%82%E0%B8%A3%E0%B8%87%E0%B9%80%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%A3%E0%B8%B2%E0%B8%8A%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%8A%E0%B8%94%E0%B8%A2%E0%B8%B8%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B0%E0%B8%AB%E0%B9%8C_26_%E0%B8%88%E0%B8%B1%E0%B8%87%E0%B8%AB%E0%B8%A7%E0%B8%B1%E0%B8%94%E0%B8%A5%E0%B8%B3%E0%B8%9E%E0%B8%B9%E0%B8%99.png" class="w-full h-full object-cover"></div>
+                    <div class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center overflow-hidden border-2 border-white shadow-sm"><img src="https://upload.wikimedia.org/wikipedia/th/f/f8/%E0%B8%95%E0%B8%A3%E0%B8%B2%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%88%E0%B8%B3%E0%B9%82%E0%B8%A3%E0%B8%87%E0%B9%80%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%A3%E0%B8%A2%E0%B8%B0%E0%B8%9E%E0%B8%B0%E0%B9%80%E0%B8%A2%E0%B8%B2.png" class="w-full h-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=Admin'"></div>
                 </div>
             </div>
         </header>
@@ -98,9 +98,6 @@
                                 <select id="filter-grade" onchange="updateClassChart()" class="bg-gray-100 border-none text-sm rounded-lg px-3 py-2 font-bold text-gray-600 focus:ring-2 focus:ring-blue-200 outline-none cursor-pointer">
                                     <option value="all">🏆 ทุกระดับชั้น</option><option value="ม.1">ม.1</option><option value="ม.2">ม.2</option><option value="ม.3">ม.3</option><option value="ม.4">ม.4</option><option value="ม.5">ม.5</option><option value="ม.6">ม.6</option>
                                 </select>
-                                <select id="filter-period" onchange="updateClassChart()" class="bg-gray-100 border-none text-sm rounded-lg px-3 py-2 font-bold text-gray-600 focus:ring-2 focus:ring-blue-200 outline-none cursor-pointer">
-                                    <option value="total">คะแนนรวมสะสม</option><option value="daily">📅 รายวัน</option><option value="weekly">📆 รายสัปดาห์</option>
-                                </select>
                             </div>
                         </div>
                         <div class="relative h-64 w-full"><canvas id="lineChart"></canvas></div>
@@ -118,7 +115,15 @@
                     <h3 id="score-title" class="text-xl font-bold text-gray-700 mb-4">กรุณาเลือกหมวดหมู่ด้านบน</h3>
                     <form onsubmit="saveScores(event)">
                         <div id="admin-score-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-h-[65vh] overflow-y-auto p-2"></div>
-                        <button id="btn-save-score" type="submit" class="hidden mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition"><i class="fas fa-save mr-2"></i> บันทึกคะแนนทั้งหมด</button>
+                        
+                        <div id="action-buttons" class="hidden flex flex-col md:flex-row gap-4 mt-6">
+                            <button type="button" onclick="resetScores()" class="w-full md:w-auto px-6 py-3 rounded-xl font-bold bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition flex items-center justify-center gap-2">
+                                <i class="fas fa-undo"></i> รีเซ็ตเป็น 0
+                            </button>
+                            <button id="btn-save-score" type="submit" class="flex-1 w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition flex items-center justify-center gap-2">
+                                <i class="fas fa-save"></i> บันทึกคะแนนทั้งหมด
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -191,9 +196,6 @@
             classChartInstance = new Chart(document.getElementById('lineChart').getContext('2d'), { type: 'bar', data: { labels: filteredData.map(c => c.name), datasets: [{ label: 'คะแนน', data: filteredData.map(c => c.points_class || 0), backgroundColor: '#bfdbfe', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { borderDash: [2, 4] } }, x: { grid: { display: false } } } } });
         }
 
-        // ==========================================================
-        //  FIXED: ค้นหาชื่อหอพักแบบยืดหยุ่น & บังคับแสดงการ์ดเสมอ
-        // ==========================================================
         function loadScoreInputs(m) {
             currentAdminMode=m; const con=document.getElementById('admin-score-container'); const tit=document.getElementById('score-title');
             document.querySelectorAll('#tab-scores button').forEach(b=>b.classList.remove('ring-2','ring-offset-2','bg-white','shadow-md'));
@@ -212,7 +214,6 @@
                 fld=m==='exercise'?'points_exercise':'points_dorm'; tit.innerHTML=m==='exercise'?'<i class="fas fa-running text-blue-600"></i> กรอกคะแนนตรวจออกกาย':'<i class="fas fa-bed text-purple-600"></i> กรอกคะแนนตรวจหอนอน'; 
                 con.innerHTML=''; 
                 
-                // รายการที่ต้องการ: ชาย 1-7, หญิง 1-10
                 const targetList = [
                     { max: 7, label: 'หอพักชาย', keyword: 'ชาย' },
                     { max: 10, label: 'หอพักหญิง', keyword: 'หญิง' }
@@ -220,35 +221,24 @@
 
                 targetList.forEach(group => {
                     for(let i=1; i<=group.max; i++) {
-                        
-                        // --- Logic ค้นหาแบบเข้มข้น ---
-                        // พยายามหาชื่อที่ตรงกัน โดยตัดคำว่า "ที่" และ "ช่องว่าง" ออกก่อนเปรียบเทียบ
                         let item = allScoreData.find(d => {
                             if (d.type !== 'dorm') return false;
-                            
-                            // Normalized DB Name: ลบ "ที่", ลบ space
                             const dbNameClean = d.name.replace(/ที่|\s/g, ''); 
-                            // Target Name: ลบ space
                             const targetNameClean = `${group.label}${i}`.replace(/\s/g, ''); 
-
                             return dbNameClean === targetNameClean;
                         });
 
-                        // ถ้าหาไม่เจอ -> สร้าง Object ปลอมขึ้นมาเพื่อแสดงผล (คะแนน 0)
                         if (!item) {
                             item = {
-                                _id: 'temp_' + Math.random(), // ID ชั่วคราว (เพื่อไม่ให้ error)
+                                _id: 'temp_' + Math.random(),
                                 name: `${group.label} ${i}`,
                                 [fld]: 0,
                                 last_reason: ''
                             };
                         }
 
-                        // แสดงผลการ์ด
                         const s = item[fld] || 0;
                         const isGreen = s===3; const isYellow = s===2; const isRed = s===1;
-                        
-                        // เช็คว่าเป็น ID จริงหรือปลอม (ถ้าปลอมอาจจะบันทึกไม่ได้ แต่แสดงผลได้)
                         const isTemp = item._id.toString().startsWith('temp_');
                         const statusDot = isTemp ? '<span class="w-2 h-2 rounded-full bg-gray-300 ml-2" title="New Entry"></span>' : '';
 
@@ -269,7 +259,7 @@
                     }
                 });
             }
-            document.getElementById('btn-save-score').classList.remove('hidden');
+            document.getElementById('action-buttons').classList.remove('hidden');
         }
 
         function selectStatus(btn, id, score) {
@@ -296,7 +286,6 @@
                 const scoreInp = div.querySelector('.score-input');
                 const reasonInp = div.querySelector('.reason-input');
                 
-                // กรองเฉพาะที่มี ID จริง (ไม่ส่ง temp_ ไปเพราะ server จะ error)
                 if(scoreInp && !scoreInp.dataset.id.startsWith('temp_')) {
                     upds.push({_id: scoreInp.dataset.id, field:fld, value: parseInt(scoreInp.value), reason: reasonInp.value });
                 }
@@ -307,9 +296,58 @@
                 return;
             }
 
-            await fetch(`${API_BASE}/scores`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(upds)}); 
-            alert('บันทึกเรียบร้อย ✅'); 
-            initDashboard(); 
+            try {
+                const res = await fetch(`${API_BASE}/scores`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(upds)});
+                if(!res.ok) throw new Error('Save Failed');
+                alert('บันทึกเรียบร้อย ✅'); 
+                initDashboard(); 
+            } catch(err) {
+                console.error(err);
+                alert('บันทึกไม่สำเร็จ! กรุณาตรวจสอบอินเทอร์เน็ต');
+            }
+        }
+
+        // ============================================
+        //  ฟังก์ชันใหม่: รีเซ็ตคะแนนเป็น 0
+        // ============================================
+        async function resetScores() {
+            if(!confirm(`⚠️ คุณแน่ใจหรือไม่ที่จะ "รีเซ็ตคะแนน" ของหมวดนี้ทั้งหมดเป็น 0?\n(ข้อมูลเหตุผลจะถูกลบด้วย)`)) return;
+
+            let fld = currentAdminMode === 'classroom' ? 'points_class' : (currentAdminMode === 'exercise' ? 'points_exercise' : 'points_dorm');
+            let targets = [];
+            
+            if (currentAdminMode === 'classroom') {
+                targets = allScoreData.filter(d => d.type === 'classroom');
+            } else {
+                targets = allScoreData.filter(d => d.type === 'dorm');
+            }
+
+            // เตรียมข้อมูลสำหรับส่งไป Server (คะแนน=0, เหตุผล=ว่าง)
+            const upds = targets
+                .filter(item => !item._id.toString().startsWith('temp_')) // เอาเฉพาะที่มี ID จริง
+                .map(item => ({
+                    _id: item._id,
+                    field: fld,
+                    value: 0,
+                    reason: ""
+                }));
+
+            try {
+                const res = await fetch(`${API_BASE}/scores`, {
+                    method: 'PUT', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify(upds)
+                });
+                if(!res.ok) throw new Error('Reset Failed');
+                
+                alert('✅ รีเซ็ตคะแนนเรียบร้อยแล้ว');
+                // โหลดข้อมูลใหม่ทันที
+                await initDashboard(); 
+                loadScoreInputs(currentAdminMode);
+            } catch (error) {
+                console.error(error);
+                alert('❌ เกิดข้อผิดพลาดในการรีเซ็ต (Server อาจกำลังหลับ ลองใหม่อีกครั้ง)');
+            }
         }
         
         function renderSuggestions(d) { document.getElementById('suggestion-tbody').innerHTML=d.map(s=>`<tr class="border-b hover:bg-gray-50"><td class="p-4 font-bold text-gray-700">${s.topic}</td><td class="p-4 text-sm text-gray-500">${s.category}</td><td class="p-4"><span class="px-2 py-1 rounded-md text-xs font-bold ${s.status==='resolved'?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'}">${s.status}</span></td><td class="p-4">${s.status!=='resolved'?`<button onclick="updSug('${s._id}','resolved')" class="text-green-600 hover:bg-green-50 px-3 py-1 rounded font-bold text-sm transition">จบงาน</button>`:'<i class="fas fa-check-circle text-green-500 text-lg"></i>'}</td></tr>`).join(''); }
