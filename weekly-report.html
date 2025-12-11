@@ -27,7 +27,9 @@
 </head>
 <body class="p-4 md:p-8 min-h-screen">
 
-    <div class="max-w-[1600px] mx-auto space-y-8"> <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-2">
+    <div class="max-w-[1600px] mx-auto space-y-8">
+        
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-2">
             <div>
                 <h1 class="text-3xl font-extrabold text-gray-800">รายงานคะแนนหอพักประจำสัปดาห์</h1>
                 <p class="text-gray-500 font-medium mt-1">
@@ -120,7 +122,6 @@
 
         async function fetchAndRender() {
             try {
-                // แจ้งสถานะกำลังโหลด
                 const loadingHtml = '<tr><td colspan="7" class="p-4 text-center text-gray-400"><i class="fas fa-circle-notch fa-spin mr-2"></i>กำลังเชื่อมต่อ Server...</td></tr>';
                 document.getElementById('tbody-exercise').innerHTML = loadingHtml;
                 document.getElementById('tbody-dorm').innerHTML = loadingHtml;
@@ -130,16 +131,12 @@
                 
                 const allData = await res.json();
                 
-                // ตรวจสอบข้อมูลใน Console (กด F12 เพื่อดูว่าข้อมูลมาครบไหม)
-                console.log("Data from Server:", allData);
-
                 const dormData = allData.filter(d => d.type === 'dorm');
                 dormData.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
 
                 renderTable('tbody-exercise', dormData, 'exercise', 'blue');
                 renderTable('tbody-dorm', dormData, 'dorm', 'purple');
 
-                // ไฮไลท์หัวตารางวันปัจจุบัน
                 if(today >= 1 && today <= 5) {
                     document.querySelectorAll(`.day-col-${today}`).forEach(el => {
                         el.classList.add('bg-yellow-100', 'text-yellow-700');
@@ -160,7 +157,7 @@
             tbody.innerHTML = data.map((item, index) => {
                 const score = item[key] || 0;
                 
-                // --- จุดแก้ไขสำคัญ: เช็คตัวแปรทั้ง last_reason และ reason ---
+                // ดักจับชื่อตัวแปรทั้ง 2 แบบ
                 let reason = item.reason || item.last_reason || ""; 
                 reason = reason.trim();
                 
@@ -169,7 +166,6 @@
                 let daysHtml = '';
                 for (let i = 1; i <= 5; i++) {
                     if (i === today) {
-                        // วันนี้: แสดงคะแนน + เหตุผล (ถ้ามี)
                         let reasonHtml = '';
                         if (reason) {
                             reasonHtml = `
@@ -180,7 +176,6 @@
                                 </div>
                             `;
                         } else {
-                            // พื้นที่ว่างเพื่อให้ตารางไม่เบี้ยวเวลามีหออื่นมีเหตุผล
                             reasonHtml = `<div class="mt-2 h-1 w-full"></div>`;
                         }
                         
@@ -195,7 +190,6 @@
                                 </div>
                             </td>`;
                     } else {
-                        // วันอื่น: แสดงขีด
                         daysHtml += `<td class="table-cell text-gray-300 align-middle">-</td>`;
                     }
                 }
