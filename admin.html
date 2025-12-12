@@ -162,7 +162,7 @@
             document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden')); document.getElementById(`tab-${t}`).classList.remove('hidden');
             document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active')); document.getElementById(`nav-${t}`).classList.add('active');
         }
-        async function logout() { location.href='login.html'; }
+        async function logout() { location.href='index.html'; }
 
         function updateStats(scores, sugs, news) {
             const tDorm = scores.filter(s=>s.type==='dorm').reduce((a,b)=>a+(b.points_exercise||0)+(b.points_dorm||0),0);

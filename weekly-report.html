@@ -118,7 +118,7 @@
 
     <script>
         const API_URL = 'https://school-council-26.onrender.com/api/scores';
-        const today = new Date().getDay(); 
+        const today = new Date().getDay(); // 1=Mon, 5=Fri
 
         async function fetchAndRender() {
             try {
@@ -131,12 +131,14 @@
                 
                 const allData = await res.json();
                 
+                // กรองและเรียงลำดับ
                 const dormData = allData.filter(d => d.type === 'dorm');
                 dormData.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
 
                 renderTable('tbody-exercise', dormData, 'exercise', 'blue');
                 renderTable('tbody-dorm', dormData, 'dorm', 'purple');
 
+                // ไฮไลท์หัวตารางวันปัจจุบัน
                 if(today >= 1 && today <= 5) {
                     document.querySelectorAll(`.day-col-${today}`).forEach(el => {
                         el.classList.add('bg-yellow-100', 'text-yellow-700');
@@ -151,46 +153,66 @@
 
         function renderTable(elementId, data, category, colorTheme) {
             const tbody = document.getElementById(elementId);
-            const key = category === 'exercise' ? 'points_exercise' : 'points_dorm';
+            // key หลัก: points_exercise หรือ points_dorm
+            const mainKey = category === 'exercise' ? 'points_exercise' : 'points_dorm';
             const totalColor = colorTheme === 'blue' ? 'text-blue-600 bg-blue-50' : 'text-purple-600 bg-purple-50';
 
             tbody.innerHTML = data.map((item, index) => {
-                const score = item[key] || 0;
-                
-                // ดักจับชื่อตัวแปรทั้ง 2 แบบ
-                let reason = item.reason || item.last_reason || ""; 
-                reason = reason.trim();
+                // คำนวณผลรวม (ถ้าต้องการ) หรือดึงค่าล่าสุด
+                const currentScore = item[mainKey] || 0;
                 
                 const rowBg = index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50';
 
                 let daysHtml = '';
+                // ลูปสร้างช่อง 5 วัน (จันทร์-ศุกร์)
                 for (let i = 1; i <= 5; i++) {
-                    if (i === today) {
+                    
+                    // 1. พยายามหาคะแนนเจาะจงของวันนั้นๆ ก่อน (เช่น points_exercise_1)
+                    // *คุณต้องแก้ Backend ให้ส่ง key พวกนี้มาด้วย ถ้าอยากให้มันจำค่าเก่าได้*
+                    let dayScore = item[`${mainKey}_${i}`];
+                    let dayReason = item[`reason_${i}`] || "";
+
+                    // 2. Logic ช่วยเหลือ: ถ้าเป็น 'วันนี้' และไม่มีคะแนนแยกเก็บไว้ ให้ใช้คะแนนหลัก (Realtime)
+                    if (i === today && (dayScore === undefined || dayScore === null)) {
+                        dayScore = currentScore;
+                        dayReason = item.reason || item.last_reason || "";
+                    }
+
+                    // ตกแต่งช่องวันปัจจุบัน (สีเหลืองอ่อน)
+                    const isTodayClass = (i === today) ? 'bg-yellow-50' : '';
+                    
+                    if (dayScore !== undefined && dayScore !== null && dayScore !== 0) {
+                        // === กรณีมีคะแนน (แสดง Badge) ===
                         let reasonHtml = '';
-                        if (reason) {
+                        if (dayReason && dayReason.trim() !== "") {
                             reasonHtml = `
                                 <div class="mt-2 w-full max-w-[150px] mx-auto group relative cursor-help">
-                                    <div class="bg-yellow-50 border border-yellow-200 text-gray-700 text-xs text-left p-2 rounded shadow-sm break-words whitespace-normal leading-tight">
-                                        <i class="fas fa-comment-dots text-yellow-500 mr-1"></i> ${reason}
+                                    <div class="hidden group-hover:block absolute z-10 bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[200px] bg-gray-800 text-white text-xs p-2 rounded shadow-lg">
+                                        ${dayReason}
+                                    </div>
+                                    <div class="bg-white/50 border border-gray-200 text-gray-600 text-[10px] text-center p-1 rounded truncate">
+                                        <i class="fas fa-comment-dots text-yellow-500 mr-1"></i>${dayReason}
                                     </div>
                                 </div>
                             `;
                         } else {
-                            reasonHtml = `<div class="mt-2 h-1 w-full"></div>`;
+                            // เว้นที่ว่างไว้ให้ตารางเท่ากัน
+                            reasonHtml = `<div class="mt-2 h-[26px] w-full"></div>`;
                         }
-                        
+
                         daysHtml += `
-                            <td class="table-cell px-2 bg-yellow-50 align-top min-w-[120px]">
+                            <td class="table-cell px-2 align-top min-w-[100px] ${isTodayClass}">
                                 <div class="flex flex-col items-center">
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold shadow-sm ${getBadgeColor(score)}">
-                                        <span class="w-5 h-5 flex items-center justify-center rounded-full bg-white/20 text-[10px]">${score}</span>
-                                        <span>${getScoreText(score)}</span>
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold shadow-sm ${getBadgeColor(dayScore)}">
+                                        <span class="w-5 h-5 flex items-center justify-center rounded-full bg-white/20 text-[10px]">${dayScore}</span>
+                                        <span>${getScoreText(dayScore)}</span>
                                     </span>
                                     ${reasonHtml}
                                 </div>
                             </td>`;
                     } else {
-                        daysHtml += `<td class="table-cell text-gray-300 align-middle">-</td>`;
+                        // === กรณีไม่มีคะแนน (แสดงขีด -) ===
+                        daysHtml += `<td class="table-cell text-gray-300 align-middle ${isTodayClass}">-</td>`;
                     }
                 }
 
@@ -201,7 +223,7 @@
                     </td>
                     ${daysHtml}
                     <td class="table-cell total-cell ${totalColor} border-l border-gray-100 align-middle">
-                        ${score}
+                        ${currentScore}
                     </td>
                 </tr>
                 `;
@@ -209,6 +231,8 @@
         }
 
         function getScoreText(score) {
+            // แปลง score เป็นตัวเลขก่อนเพื่อความชัวร์
+            score = parseInt(score);
             if (score === 3) return 'ผ่าน';
             if (score === 2) return 'ปรับปรุง';
             if (score === 1) return 'ไม่ผ่าน';
@@ -216,6 +240,7 @@
         }
 
         function getBadgeColor(score) {
+            score = parseInt(score);
             if (score === 3) return 'badge-green';
             if (score === 2) return 'badge-yellow';
             if (score === 1) return 'badge-red';
@@ -224,5 +249,4 @@
 
         document.addEventListener('DOMContentLoaded', fetchAndRender);
     </script>
-</body>
 </html>
