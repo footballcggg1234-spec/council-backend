@@ -3,234 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>คณะกรรมการ | สภานักเรียน</title>
+    <title>Team RPK26</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        /* --- 🎨 ธีมหลัก (แกะสีจากรูปเป๊ะๆ) --- */
-        :root {
-            --primary: #a31818;      /* แดงเลือดหมู (สีหลักสภา) */
-            --secondary: #ffc107;    /* เหลืองทอง (คำว่า "นักเรียน") */
-            --active-bg: #fff5cc;    /* ⭐ สีครีมไข่ไก่ (พื้นหลังเมนูที่เลือก) */
-            --dark: #2c0b0b;         
-            --bg: #fdfbf7;           
-            --white: #ffffff;
-            --card-shadow: 0 10px 40px rgba(163, 24, 24, 0.08);
-            --gold-gradient: linear-gradient(135deg, #ffd700, #e6b800);
-        }
-
-        body { 
-            font-family: 'Sarabun', sans-serif; margin: 0; 
-            background-color: var(--bg);
-            background-image: radial-gradient(#a31818 0.5px, transparent 0.5px), radial-gradient(#a31818 0.5px, var(--bg) 0.5px);
-            background-size: 20px 20px;
-            color: #333; line-height: 1.6; 
-        }
-
-        a { text-decoration: none; transition: 0.3s; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; overflow-x: hidden; }
-
-        /* --- Navbar (ปรับสีให้เหมือนรูปต้นฉบับ) --- */
-        nav { 
-            background: rgba(255, 255, 255, 0.98); 
-            backdrop-filter: blur(10px); 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
-            border-top: 5px solid var(--primary); 
-            position: sticky; top: 0; z-index: 1000; 
-        }
-
-        .nav-content { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 15px 0; position: relative;
-        }
-
-        /* โลโก้ */
-        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; z-index: 1001; }
-        .logo span { color: var(--secondary); /* สีเหลืองทอง */ }
-
-        /* Hamburger (มือถือ) */
-        .hamburger {
-            display: none; font-size: 1.8rem; cursor: pointer; color: var(--primary); z-index: 1001;
-        }
-
-        /* เมนู */
-        .menu { list-style: none; display: flex; gap: 10px; margin: 0; padding: 0; align-items: center; }
-        
-        /* ลิงก์เมนูทั่วไป */
-        .menu a { 
-            color: var(--dark); 
-            font-weight: 700; /* ตัวหนาขึ้น */
-            padding: 8px 18px; 
-            border-radius: 50px; 
-            font-size: 0.95rem; 
-            white-space: nowrap; 
-        }
-
-        /* ⭐ เมนูที่เลือกอยู่ (Active) - สีครีมเหมือนในรูป */
-        .menu a.active { 
-            background-color: var(--active-bg); 
-            color: var(--primary); 
-        }
-        
-        .menu a:hover { 
-            background-color: #fdfbf7; 
-            color: var(--primary); 
-        }
-
-        /* ⭐ ปุ่ม Admin - ขอบแดง พื้นขาว */
-        .btn-admin-nav { 
-            border: 2px solid var(--primary) !important; 
-            color: var(--primary) !important; 
-            background: transparent !important;
-            padding: 6px 20px !important; 
-            font-size: 0.9rem !important; 
-            display: flex; align-items: center; gap: 5px;
-        }
-        .btn-admin-nav:hover { 
-            background: var(--primary) !important; 
-            color: white !important; 
-            box-shadow: 0 4px 10px rgba(163, 24, 24, 0.2);
-        }
-
-        /* --- Header --- */
-        .page-header {
-            background: linear-gradient(135deg, var(--primary), #600a0a), url('bg.jpg');
-            background-size: cover; background-position: center; background-blend-mode: multiply;
-            padding: 100px 0 150px; text-align: center; color: white;
-            position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .page-header h1 { font-size: 3rem; margin: 0 0 10px; text-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; z-index: 1; }
-        .page-header p { font-size: 1.2rem; color: #ffd700; font-weight: 500; position: relative; z-index: 1; opacity: 0.9; }
-
-        /* --- Team Section --- */
-        .team-section { margin-top: -80px; padding-bottom: 80px; position: relative; z-index: 10; }
-        .team-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; }
-
-        .team-card {
-            background: white; width: 100%; max-width: 300px; border-radius: 24px;
-            overflow: hidden; box-shadow: var(--card-shadow); transition: all 0.4s ease;
-            position: relative; border: 1px solid rgba(0,0,0,0.05);
-        }
-        .team-card:hover { transform: translateY(-10px); box-shadow: 0 20px 50px rgba(163, 24, 24, 0.15); }
-        .image-box { width: 100%; height: 320px; overflow: hidden; position: relative; }
-        .image-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .team-card:hover .image-box img { transform: scale(1.1); }
-        .role-badge {
-            position: absolute; top: 20px; right: 20px; background: var(--gold-gradient); color: var(--dark);
-            padding: 6px 15px; border-radius: 50px; font-size: 0.8rem; font-weight: 800; text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 10;
-        }
-        .team-info { padding: 25px; text-align: center; }
-        .team-info h3 { margin: 10px 0 5px; color: var(--primary); font-size: 1.4rem; font-weight: 700; }
-        .team-info p { color: #888; font-size: 0.95rem; margin: 0; font-weight: 500; }
-
-        footer { background: var(--primary); color: white; text-align: center; padding: 40px 0; margin-top: auto; }
-
-        /* 📱 MOBILE RESPONSIVE (ยังคงระบบปุ่ม 3 ขีดไว้) */
-        @media (max-width: 768px) {
-            .hamburger { display: block; }
-
-            .menu {
-                display: none; 
-                flex-direction: column;
-                position: absolute;
-                top: 100%; left: 0; width: 100%;
-                background: white;
-                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-                padding: 20px 0;
-                border-bottom: 5px solid var(--secondary);
-                animation: slideDown 0.3s ease;
-            }
-            .menu.active { display: flex; }
-            .menu li { width: 100%; text-align: center; }
-            .menu a { display: inline-block; width: 80%; padding: 12px; margin: 5px 0; }
-            
-            /* ในมือถือ ให้ปุ่ม Active เป็นสีครีมเหมือนกัน */
-            .menu a.active { background-color: var(--active-bg); color: var(--primary); }
-
-            .page-header { padding: 80px 0 100px; }
-            .page-header h1 { font-size: 2rem; }
-            .team-section { margin-top: -50px; padding: 0 20px 60px; }
-            .team-card { max-width: 100%; }
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>body { font-family: 'Sarabun', sans-serif; background: #F8FAFC; }</style>
 </head>
 <body>
 
-    <nav>
-        <div class="container nav-content">
-            <div class="logo">🏛️ สภา <span>นักเรียน</span></div>
-            
-            <div class="hamburger" onclick="toggleMenu()">☰</div>
-
-            <ul class="menu" id="nav-menu">
-                <li><a href="index.html">หน้าแรก</a></li>
-                <li><a href="suggestion.html">กล่องความคิดเห็น</a></li>
-                <li><a href="team.html" class="active">คณะกรรมการ</a></li>
-                <li><a href="register.html">สมัครสมาชิก</a></li>
-                <li><a href="login.html" class="btn-admin-nav">🔒 Admin</a></li>
-            </ul>
+    <nav class="hidden lg:flex items-center justify-between px-10 py-5 bg-white/80 backdrop-blur sticky top-0 z-50 border-b border-gray-100">
+        <a href="index.html" class="text-2xl font-black text-slate-800">RPK<span class="text-red-600">26</span></a>
+        <div class="flex gap-8 font-bold text-gray-500">
+            <a href="index.html" class="hover:text-red-600 transition">หน้าแรก</a>
+            <a href="team.html" class="text-red-600">คณะกรรมการ</a>
+            <a href="register.html" class="hover:text-red-600 transition">สมัครสมาชิก</a>
         </div>
     </nav>
 
-    <header class="page-header">
-        <h1>คณะกรรมการสภานักเรียน</h1>
-        <p>ผู้นำกิจกรรม พัฒนาวิชาการ สานสัมพันธ์น้องพี่</p>
+    <div class="lg:hidden h-20 flex items-center justify-between px-6 bg-white sticky top-0 z-50 shadow-sm">
+        <a href="index.html" class="text-gray-500"><i class="fas fa-arrow-left text-xl"></i></a>
+        <span class="font-bold text-lg">คณะกรรมการ</span>
+        <div class="w-5"></div>
+    </div>
+
+    <header class="bg-slate-900 text-white py-20 px-6 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-red-600 rounded-full blur-[150px] opacity-20 pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+            <div class="text-center md:text-left">
+                <div class="inline-block px-3 py-1 border border-white/30 rounded-full text-xs font-bold mb-4 backdrop-blur">GEN 26</div>
+                <h1 class="text-5xl md:text-7xl font-black mb-4 tracking-tight">LEADERS</h1>
+                <p class="text-xl text-gray-400 max-w-lg">คณะกรรมการนักเรียน ประจำปีการศึกษา 2568 ผู้นำกิจกรรม พัฒนาวิชาการ</p>
+            </div>
+            <div class="hidden md:block text-9xl text-white/5 rotate-12"><i class="fas fa-users"></i></div>
+        </div>
     </header>
 
-    <div class="container team-section">
-        <div class="team-grid">
+    <div class="max-w-[1600px] mx-auto px-6 py-16 -mt-10 relative z-20">
+        
+        <div class="bg-white rounded-[40px] p-10 shadow-2xl mb-12 flex flex-col lg:flex-row items-center gap-12 hover:shadow-red-900/10 transition duration-500 border border-gray-100">
+            <div class="w-64 h-64 lg:w-80 lg:h-80 relative flex-shrink-0">
+                <div class="absolute inset-0 bg-yellow-400 rounded-full blur-3xl opacity-20"></div>
+                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-full border-[8px] border-white shadow-lg relative z-10">
+                <div class="absolute -right-0 top-10 bg-black text-white px-5 py-2 rounded-full font-bold shadow-xl z-20 rotate-6 border-4 border-white">PRESIDENT</div>
+            </div>
+            <div class="text-center lg:text-left max-w-2xl">
+                <h2 class="text-4xl lg:text-5xl font-black text-slate-900 mb-2">นายสมชาย รักเรียน</h2>
+                <p class="text-xl text-red-600 font-bold mb-6">ประธานนักเรียน • ชั้น ม.6/1</p>
+                <p class="text-gray-500 text-lg leading-relaxed mb-8">"หน้าที่ของผู้นำ คือการสร้างผู้นำคนต่อไป ผมพร้อมที่จะรับฟังและผลักดันทุกไอเดียของเพื่อนๆ ให้เป็นจริง"</p>
+                <div class="flex gap-4 justify-center lg:justify-start">
+                    <button class="w-12 h-12 rounded-full bg-gray-100 hover:bg-black hover:text-white transition flex items-center justify-center text-xl"><i class="fab fa-instagram"></i></button>
+                    <button class="w-12 h-12 rounded-full bg-gray-100 hover:bg-blue-600 hover:text-white transition flex items-center justify-center text-xl"><i class="fab fa-facebook-f"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             
-            <div class="team-card">
-                <span class="role-badge">President</span>
-                <div class="image-box">
-                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=500&q=80" alt="ประธาน">
+            <div class="bg-white rounded-[30px] p-6 shadow-lg hover:-translate-y-2 transition duration-300 group">
+                <div class="w-full aspect-square rounded-[24px] overflow-hidden mb-6 bg-gray-200 relative">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                    <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-xs font-bold shadow-sm">VICE PRESIDENT</div>
                 </div>
-                <div class="team-info">
-                    <h3>นายสมชาย รักเรียน</h3>
-                    <p>ประธานนักเรียน (ม.6/1)</p>
-                </div>
+                <h3 class="text-xl font-bold text-slate-800">น.ส.สมหญิง จริงใจ</h3>
+                <p class="text-gray-500 text-sm">รองประธานฝ่ายกิจกรรม</p>
             </div>
 
-            <div class="team-card">
-                <span class="role-badge">Vice President</span>
-                <div class="image-box">
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" alt="รองประธาน">
+            <div class="bg-white rounded-[30px] p-6 shadow-lg hover:-translate-y-2 transition duration-300 group">
+                <div class="w-full aspect-square rounded-[24px] overflow-hidden mb-6 bg-gray-200 relative">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                    <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-xs font-bold shadow-sm">TREASURER</div>
                 </div>
-                <div class="team-info">
-                    <h3>นางสาวสมหญิง จริงใจ</h3>
-                    <p>รองประธานฝ่ายกิจกรรม (ม.6/2)</p>
-                </div>
+                <h3 class="text-xl font-bold text-slate-800">นายมานะ อดทน</h3>
+                <p class="text-gray-500 text-sm">เหรัญญิก</p>
             </div>
 
-            <div class="team-card">
-                <span class="role-badge">Treasurer</span>
-                <div class="image-box">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80" alt="เหรัญญิก">
-                </div>
-                <div class="team-info">
-                    <h3>นายมานะ อดทน</h3>
-                    <p>เหรัญญิก (ม.5/1)</p>
-                </div>
-            </div>
+            <a href="register.html" class="bg-gray-50 rounded-[30px] p-6 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-center hover:bg-white hover:border-red-200 hover:text-red-600 transition group cursor-pointer aspect-square lg:aspect-auto">
+                <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center text-2xl shadow-sm mb-4 group-hover:scale-110 transition"><i class="fas fa-plus"></i></div>
+                <h3 class="text-lg font-bold">ร่วมทีมกับเรา</h3>
+                <p class="text-sm opacity-60">สมัครสมาชิกสภานักเรียน</p>
+            </a>
 
         </div>
     </div>
-
-    <footer>
-        <p>© 2025 สภานักเรียนโรงเรียนประชาราชสงเคราะห์ 26</p>
-    </footer>
-
-    <script>
-        function toggleMenu() {
-            const menu = document.getElementById('nav-menu');
-            menu.classList.toggle('active');
-        }
-    </script>
-
 </body>
 </html>

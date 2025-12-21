@@ -2,210 +2,253 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>หน้าแรก - สภานักเรียน</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RPK26 Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#9F1239', gold: '#F59E0B', dark: '#0F172A' },
+                    fontFamily: { sans: ['Sarabun', 'sans-serif'] },
+                    animation: { 'aurora': 'aurora 20s infinite alternate' },
+                    keyframes: { aurora: { '0%': { backgroundPosition: '0% 50%' }, '100%': { backgroundPosition: '100% 50%' } } }
+                }
+            }
+        }
+    </script>
     <style>
-        /* --- 🎨 PALETTE --- */
-        :root { --primary: #a31818; --secondary: #e6b800; --secondary-light: #fff5cc; --dark: #4a0d0d; --bg: #fdfbf7; --white: #ffffff; --green-flag: #10b981; }
-        body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); color: #333; line-height: 1.6; }
-        a { text-decoration: none; transition: 0.3s; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-
-        /* Navbar */
-        nav { background: var(--white); box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); position: sticky; top: 0; z-index: 100; }
-        .nav-content { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; }
-        .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; }
-        .logo span { color: var(--secondary); }
-        .menu { list-style: none; display: flex; gap: 15px; margin: 0; padding: 0; align-items: center; }
-        .menu a { color: var(--dark); font-weight: 500; padding: 8px 12px; border-radius: 50px; font-size: 0.9rem; }
-        .menu a:hover, .menu a.active { background: var(--secondary-light); color: var(--primary); }
-        .btn-admin-nav { border: 1px solid var(--primary); color: var(--primary) !important; padding: 6px 15px !important; }
-        .btn-admin-nav:hover { background: var(--primary) !important; color: white !important; }
-
-        /* Hero */
-        .hero { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80'); background-size: cover; background-position: center; padding: 80px 0 120px; text-align: center; color: white; border-bottom: 5px solid var(--secondary); margin-bottom: -60px; }
-        .hero h1 { font-size: 2.5rem; margin: 0 0 10px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-        .btn-main { background: var(--secondary); color: var(--dark); padding: 10px 25px; border-radius: 50px; font-weight: 700; margin-top: 20px; display: inline-block; box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4); }
-        .btn-main:hover { transform: translateY(-3px); background: #ffca2c; }
-
-        /* Cards */
-        .score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-bottom: 50px; position: relative; z-index: 10; }
-        .score-card { background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 25px; border-top: 5px solid transparent; transition: transform 0.3s; display: flex; flex-direction: column; }
-        .score-card:hover { transform: translateY(-5px); }
+        body { background-color: #F8FAFC; overflow-x: hidden; }
         
-        .score-card.exercise { border-color: #3b82f6; }
-        .score-card.dorm { border-color: #a855f7; }
-        .score-card.classroom { border-color: #10b981; }
+        /* Aurora Background */
+        .mesh-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            background: radial-gradient(at 0% 0%, rgba(254,226,226,0.8) 0, transparent 50%), 
+                        radial-gradient(at 100% 0%, rgba(253,230,138,0.5) 0, transparent 50%), 
+                        radial-gradient(at 100% 100%, rgba(224,231,255,0.5) 0, transparent 50%);
+            background-size: 150% 150%; animation: aurora 15s ease infinite;
+        }
 
-        .card-header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
-        .card-header h3 { margin: 0; font-size: 1.3rem; font-weight: 800; color: #444; }
-        .card-header i { font-size: 1.5rem; margin-bottom: 5px; display: block; }
-        .exercise i { color: #3b82f6; } .dorm i { color: #a855f7; } .classroom i { color: #10b981; }
+        /* Glass Panel */
+        .glass {
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        }
 
-        /* Podium & List */
-        .mini-podium { display: flex; justify-content: center; align-items: flex-end; gap: 8px; height: 140px; margin-bottom: 20px; }
-        .podium-col { text-align: center; width: 30%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
-        .p-bar { width: 100%; border-radius: 6px 6px 0 0; position: relative; color: #333; font-weight: bold; font-size: 0.8rem; padding-top: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .rank-1 .p-bar { height: 100px; background: #ffd700; border: 2px solid #eec900; }
-        .rank-2 .p-bar { height: 70px; background: #e0e0e0; }
-        .rank-3 .p-bar { height: 50px; background: #cd7f32; opacity: 0.7; }
-        .p-name { font-size: 0.8rem; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; font-weight: 600; }
-        .flag-mini { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); color: var(--green-flag); font-size: 1.5rem; animation: wave 2s infinite; }
-        @keyframes wave { 0%, 100% { transform: translateX(-50%) rotate(-5deg); } 50% { transform: translateX(-50%) rotate(5deg); } }
+        /* Responsive Layout Handling */
+        @media (min-width: 1024px) {
+            .app-layout { display: grid; grid-template-columns: 260px 1fr 300px; gap: 24px; padding: 24px; height: 100vh; overflow: hidden; }
+            .mobile-nav { display: none; }
+            .desktop-sidebar { display: flex; }
+            .desktop-widgets { display: block; }
+            .main-content { overflow-y: auto; height: 100%; border-radius: 24px; scrollbar-width: none; }
+        }
+        @media (max-width: 1023px) {
+            .app-layout { display: block; padding: 16px; padding-bottom: 100px; }
+            .mobile-nav { display: flex; }
+            .desktop-sidebar { display: none; }
+            .desktop-widgets { display: none; }
+        }
 
-        .mini-list { font-size: 0.9rem; flex-grow: 1; margin-bottom: 15px; }
-        .mini-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; }
-        .mini-item:last-child { border-bottom: none; }
-        .mini-score { font-weight: bold; color: var(--primary); }
-
-        /* Button */
-        .btn-view-report { display: block; width: 100%; text-align: center; padding: 10px 0; border-radius: 12px; background-color: #f3f4f6; color: #666; font-size: 0.85rem; font-weight: 700; border: 1px solid #eee; margin-top: auto; cursor: pointer; }
-        .btn-view-report:hover { background-color: #e5e7eb; color: #333; }
-
-        /* News */
-        .section-title { text-align: center; margin: 40px 0 30px; font-size: 1.8rem; color: var(--dark); font-weight: 700; }
-        .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding-bottom: 60px; }
-        .news-card { background: var(--white); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid #eee; }
-        .news-card img { width: 100%; height: 200px; object-fit: cover; }
-        .news-content { padding: 20px; }
-        .date { font-size: 0.8rem; color: var(--secondary); font-weight: 700; margin-bottom: 5px; }
-        @media (max-width: 768px) { .nav-content { flex-direction: column; gap: 10px; } .menu { flex-wrap: wrap; justify-content: center; } .hero h1 { font-size: 2rem; } }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border-radius: 16px; color: #64748b; font-weight: 600; transition: 0.2s;
+        }
+        .nav-item:hover, .nav-item.active { background: #fff1f2; color: #9F1239; }
+        .nav-item.active i { color: #9F1239; }
     </style>
 </head>
-<body>
-    <nav>
-        <div class="container nav-content">
-            <div class="logo">🏫 สภา<span>นักเรียน</span></div>
-            <ul class="menu">
-                <li><a href="index.html" class="active">หน้าแรก</a></li>
-                <li><a href="suggestion.html">กล่องความคิดเห็น</a></li>
-                <li><a href="team.html">คณะกรรมการ</a></li>
-                <li><a href="register.html">สมัครสมาชิก</a></li>
-                <li><a href="login.html" class="btn-admin-nav">🔒 Admin</a></li>
-            </ul>
-        </div>
-    </nav>
+<body class="text-slate-800">
 
-    <header class="hero">
-        <div class="container">
-            <h1>สภานักเรียน รุ่นที่ 26</h1>
-            <p>โรงเรียนประชาราชสงเคราะห์ 26<br>ร่วมคิด ร่วมทำ สร้างสรรค์สังคมโรงเรียนให้น่าอยู่</p>
-            <a href="suggestion.html" class="btn-main">🗳️ ส่งเรื่องร้องเรียน</a>
-        </div>
-    </header>
+    <div class="mesh-bg"></div>
 
-    <div class="container">
+    <div class="app-layout max-w-[1920px] mx-auto">
         
-        <div class="section-title" style="margin-top: 80px; margin-bottom: 20px;">
-            <i class="fas fa-trophy text-yellow-500"></i> อันดับคะแนนสูงสุด
-        </div>
+        <aside class="desktop-sidebar glass rounded-[32px] p-6 flex-col justify-between h-full sticky top-6">
+            <div>
+                <div class="flex items-center gap-3 mb-10 px-2">
+                    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white text-xl shadow-lg shadow-red-500/30">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-black text-xl tracking-tight text-slate-800">RPK<span class="text-primary">26</span></h1>
+                        <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Student Council</p>
+                    </div>
+                </div>
 
-        <div class="score-grid">
-            
-            <div class="score-card exercise">
-                <div class="card-header exercise"><i class="fas fa-running"></i><h3>ตรวจออกกาย</h3></div>
-                <div id="podium-exercise" class="mini-podium">Loading...</div>
-                <div id="list-exercise" class="mini-list"></div>
-                <a href="weekly-report.html" class="btn-view-report"><i class="fas fa-table"></i> ดูตารางรายสัปดาห์</a>
+                <nav class="space-y-1">
+                    <a href="index.html" class="nav-item active"><i class="fas fa-home w-6"></i> หน้าแรก</a>
+                    <a href="weekly-report.html" class="nav-item"><i class="fas fa-chart-pie w-6"></i> รายงานคะแนน</a>
+                    <a href="team.html" class="nav-item"><i class="fas fa-users w-6"></i> คณะกรรมการ</a>
+                    <a href="suggestion.html" class="nav-item"><i class="fas fa-envelope-open-text w-6"></i> กล่องรับความคิดเห็น</a>
+                    <a href="register.html" class="nav-item"><i class="fas fa-user-plus w-6"></i> สมัครสมาชิก</a>
+                </nav>
             </div>
 
-            <div class="score-card dorm">
-                <div class="card-header dorm"><i class="fas fa-bed"></i><h3>ตรวจหอนอน</h3></div>
-                <div id="podium-dorm" class="mini-podium">Loading...</div>
-                <div id="list-dorm" class="mini-list"></div>
-                <a href="weekly-report.html" class="btn-view-report"><i class="fas fa-table"></i> ดูตารางรายสัปดาห์</a>
+            <a href="login.html" class="flex items-center gap-3 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition group">
+                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-primary group-hover:text-white transition">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div>
+                    <div class="text-xs font-bold text-gray-400">System</div>
+                    <div class="text-sm font-bold text-gray-800">Admin Login</div>
+                </div>
+            </a>
+        </aside>
+
+        <main class="main-content">
+            <div class="lg:hidden flex justify-between items-center mb-6">
+                <div>
+                    <h1 class="text-2xl font-black text-slate-800">หน้าแรก</h1>
+                    <p class="text-xs text-gray-500">สภานักเรียน รุ่นที่ 26</p>
+                </div>
+                <a href="login.html" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow text-primary"><i class="fas fa-user"></i></a>
             </div>
 
-            <div class="score-card classroom">
-                <div class="card-header classroom"><i class="fas fa-chalkboard"></i><h3>ห้องเรียนสะอาด</h3></div>
-                <div id="podium-classroom" class="mini-podium">Loading...</div>
-                <div id="list-classroom" class="mini-list"></div>
-                <a href="classroom-weekly.html" class="btn-view-report"><i class="fas fa-table"></i> ดูตารางรายสัปดาห์</a>
+            <div class="relative w-full h-64 lg:h-80 rounded-[32px] overflow-hidden shadow-xl group cursor-pointer mb-6" onclick="location.href='weekly-report.html'">
+                <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070" class="w-full h-full object-cover transition duration-700 group-hover:scale-105 brightness-90">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                <div class="absolute bottom-8 left-8 text-white">
+                    <div class="bg-gold text-black text-[10px] font-bold px-3 py-1 rounded-full inline-block mb-2">WEEKLY HIGHLIGHT</div>
+                    <h2 class="text-3xl lg:text-4xl font-extrabold leading-tight">สรุปคะแนนประจำสัปดาห์</h2>
+                    <p class="text-white/80 mt-1">ตรวจสอบคะแนนความประพฤติล่าสุด</p>
+                </div>
             </div>
 
-        </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="glass p-5 rounded-[24px] border-l-4 border-blue-500 relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-4 relative z-10">
+                        <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fas fa-running"></i></div>
+                        <span class="text-xs font-bold text-gray-400">EXERCISE</span>
+                    </div>
+                    <div id="podium-exercise" class="h-24 flex items-end justify-center gap-2">Loading...</div>
+                </div>
+                <div class="glass p-5 rounded-[24px] border-l-4 border-purple-500 relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-4 relative z-10">
+                        <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-lg"><i class="fas fa-bed"></i></div>
+                        <span class="text-xs font-bold text-gray-400">DORM</span>
+                    </div>
+                    <div id="podium-dorm" class="h-24 flex items-end justify-center gap-2">Loading...</div>
+                </div>
+                <div class="glass p-5 rounded-[24px] border-l-4 border-green-500 relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-4 relative z-10">
+                        <div class="w-10 h-10 rounded-xl bg-green-100 text-green-600 flex items-center justify-center text-lg"><i class="fas fa-chalkboard"></i></div>
+                        <span class="text-xs font-bold text-gray-400">CLASS</span>
+                    </div>
+                    <div id="podium-classroom" class="h-24 flex items-end justify-center gap-2">Loading...</div>
+                </div>
+            </div>
 
-        <h2 class="section-title">ข่าวสาร <span>ประชาสัมพันธ์</span></h2>
-        <div id="news-container" class="news-grid"><p style="text-align:center; width:100%;">กำลังโหลดข้อมูล...</p></div>
+            <h3 class="text-lg font-bold text-gray-800 mb-4 px-1">ข่าวประชาสัมพันธ์</h3>
+            <div id="news-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-2xl animate-pulse h-32"></div>
+                <div class="bg-white p-4 rounded-2xl animate-pulse h-32"></div>
+            </div>
+        </main>
+
+        <aside class="desktop-widgets h-full sticky top-6 space-y-6">
+            <div class="glass rounded-[32px] p-6">
+                <h3 class="font-bold text-gray-800 mb-4">ปฏิทินกิจกรรม</h3>
+                <div class="bg-white rounded-2xl p-4 shadow-sm text-center border border-gray-100">
+                    <div class="text-primary font-black text-xl mb-1">ธันวาคม</div>
+                    <div class="text-xs text-gray-400 font-bold mb-4">DECEMBER 2025</div>
+                    <div class="grid grid-cols-7 gap-2 text-xs font-bold text-gray-400 mb-2">
+                        <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                    </div>
+                    <div class="grid grid-cols-7 gap-2 text-sm font-semibold text-gray-600">
+                        <span class="text-gray-300">30</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
+                        <span>7</span><span>8</span><span>9</span><span class="bg-primary text-white rounded-lg shadow-md">10</span><span>11</span><span>12</span>
+                        <span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-[32px] p-6 text-white relative overflow-hidden group">
+                <div class="absolute -right-5 -top-5 w-24 h-24 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition duration-700"></div>
+                <h3 class="text-lg font-bold relative z-10">มีปัญหาแจ้งสภา?</h3>
+                <p class="text-sm text-gray-400 mb-4 relative z-10">ร้องเรียนปัญหาต่างๆ ภายในโรงเรียน</p>
+                <a href="suggestion.html" class="flex items-center justify-between bg-white/10 hover:bg-white/20 p-3 rounded-xl backdrop-blur transition border border-white/10">
+                    <span class="text-sm font-bold ml-2">ส่งเรื่องร้องเรียน</span>
+                    <div class="w-8 h-8 bg-white text-black rounded-lg flex items-center justify-center"><i class="fas fa-arrow-right"></i></div>
+                </a>
+            </div>
+        </aside>
+
     </div>
+
+    <nav class="mobile-nav fixed bottom-6 left-4 right-4 bg-gray-900/90 backdrop-blur-xl text-white p-3 rounded-[24px] shadow-2xl z-50 justify-between items-center px-6 border border-white/10">
+        <a href="index.html" class="flex flex-col items-center text-primary"><i class="fas fa-home text-xl"></i></a>
+        <a href="team.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-users text-xl"></i></a>
+        <a href="suggestion.html" class="flex flex-col items-center justify-center -mt-10"><div class="w-14 h-14 rounded-full bg-gradient-to-r from-primary to-red-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-red-900/50 border-4 border-gray-100"><i class="fas fa-plus"></i></div></a>
+        <a href="register.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-user-plus text-xl"></i></a>
+        <a href="weekly-report.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-chart-bar text-xl"></i></a>
+    </nav>
 
     <script>
         const API_URL = 'https://school-council-26.onrender.com/api/scores';
         const NEWS_API = 'https://school-council-26.onrender.com/api/news';
 
-        async function initScores() {
+        async function init() {
             try {
-                const res = await fetch(API_URL);
-                if (!res.ok) throw new Error("API Error");
-                const allScores = await res.json();
+                const [s, n] = await Promise.all([fetch(API_URL), fetch(NEWS_API)]);
+                const scores = await s.json();
                 
-                renderCategory('exercise', 'points_exercise', 'dorm', allScores);
-                renderCategory('dorm', 'points_dorm', 'dorm', allScores);
-                renderCategory('classroom', 'points_class', 'classroom', allScores);
-            } catch (err) {
-                console.error(err);
-                document.getElementById('list-exercise').innerHTML = '<p class="text-center text-gray-400 text-xs">โหลดข้อมูลไม่สำเร็จ</p>';
-            }
+                // --- FIX: ใช้ข้อมูลชุด 'dorm' สำหรับการ render ทั้ง Exercise และ Dorm ---
+                const dormData = scores.filter(d => d.type === 'dorm');
+                const classData = scores.filter(d => d.type === 'classroom');
+
+                renderPodium('exercise', dormData, 'bg-blue-500', 'text-blue-600');
+                renderPodium('dorm', dormData, 'bg-purple-500', 'text-purple-600');
+                renderPodium('classroom', classData, 'bg-green-500', 'text-green-600');
+                
+                renderNews(await n.json());
+            } catch(e) { console.error(e); }
         }
 
-        function renderCategory(elementId, key, typeFilter, allScores) {
-            let filtered = allScores.filter(d => d.type === typeFilter);
-            filtered.sort((a, b) => (b[key]||0) - (a[key]||0));
-
-            const podiumEl = document.getElementById(`podium-${elementId}`);
-            const listEl = document.getElementById(`list-${elementId}`);
+        function renderPodium(id, data, color, txt) {
+            const el = document.getElementById(`podium-${id}`);
+            // เลือก key ที่ถูกต้อง
+            const scoreKey = id === 'exercise' ? 'points_exercise' : (id === 'dorm' ? 'points_dorm' : 'points_class');
             
-            if (filtered.length === 0) {
-                podiumEl.innerHTML = '<span style="font-size:0.8rem; color:#999; align-self:center;">ไม่มีข้อมูล</span>';
-                return;
-            }
+            // เรียงลำดับจากมากไปน้อย
+            data.sort((a,b) => (b[scoreKey]||0) - (a[scoreKey]||0));
+            
+            if(!data.length) return el.innerHTML = '<span class="text-xs text-gray-400 w-full text-center">ไม่มีข้อมูล</span>';
+            
+            let html = '';
+            // 2nd Place
+            if(data[1]) html += `<div class="w-1/3 flex flex-col items-center"><div class="w-full ${color} opacity-30 h-10 rounded-t-xl relative"></div><span class="text-[9px] font-bold mt-1 text-gray-400 truncate w-full text-center">${data[1].name}</span></div>`; 
+            else html += '<div class="w-1/3"></div>';
+            
+            // 1st Place
+            if(data[0]) html += `<div class="w-1/3 flex flex-col items-center z-10"><div class="w-full ${color} h-20 rounded-t-xl shadow-lg relative flex items-center justify-center shadow-md"><span class="text-white font-bold text-xl">${data[0][scoreKey]||0}</span></div><span class="text-xs font-bold mt-1 ${txt} truncate w-full text-center">${data[0].name}</span></div>`;
+            else html += '<div class="w-1/3"></div>';
 
-            // Podium Logic
-            let podiumHTML = '';
-            // Rank 2
-            if(filtered[1]) podiumHTML += `<div class="podium-col rank-2"><div class="p-name">${filtered[1].name}</div><div class="p-bar">${filtered[1][key]}</div></div>`;
-            else podiumHTML += `<div class="podium-col"></div>`;
-            // Rank 1
-            if(filtered[0]) podiumHTML += `<div class="podium-col rank-1"><div class="p-bar"><i class="fas fa-flag flag-mini"></i>${filtered[0][key]}</div><div class="p-name" style="font-weight:800; color:var(--primary);">${filtered[0].name}</div></div>`;
-            // Rank 3
-            if(filtered[2]) podiumHTML += `<div class="podium-col rank-3"><div class="p-name">${filtered[2].name}</div><div class="p-bar">${filtered[2][key]}</div></div>`;
-            else podiumHTML += `<div class="podium-col"></div>`;
-
-            podiumEl.innerHTML = podiumHTML;
-
-            // List Logic (Rank 4-5)
-            let listHTML = '';
-            const rest = filtered.slice(3, 5); 
-            if(rest.length > 0) {
-                rest.forEach((item, idx) => {
-                    listHTML += `<div class="mini-item"><div><span class="mini-rank">#${idx + 4}</span> ${item.name}</div><div class="mini-score">${item[key]}</div></div>`;
-                });
-            } else {
-                listHTML = '<div style="text-align:center; color:#ccc; font-size:0.8rem; margin-top:10px;">- End -</div>';
-            }
-            listEl.innerHTML = listHTML;
+            // 3rd Place
+            if(data[2]) html += `<div class="w-1/3 flex flex-col items-center"><div class="w-full ${color} opacity-20 h-6 rounded-t-xl relative"></div><span class="text-[9px] font-bold mt-1 text-gray-400 truncate w-full text-center">${data[2].name}</span></div>`; 
+            else html += '<div class="w-1/3"></div>';
+            
+            el.innerHTML = html;
         }
 
-        async function loadNews() {
-            try {
-                const res = await fetch(NEWS_API);
-                const data = await res.json();
-                const container = document.getElementById('news-container');
-                container.innerHTML = '';
-                if(data.length === 0) return container.innerHTML = '<p style="text-align:center; width:100%;">ยังไม่มีข่าวประกาศ</p>';
-                data.forEach(news => {
-                    const date = new Date(news.date).toLocaleDateString('th-TH');
-                    container.innerHTML += `<div class="news-card"><img src="${news.image || 'https://via.placeholder.com/400'}" alt="news"><div class="news-content"><div class="date">${date}</div><h3>${news.title}</h3><p>${news.content.substring(0,90)}...</p></div></div>`;
-                });
-            } catch { }
+        function renderNews(data) {
+            const el = document.getElementById('news-container');
+            if(!data.length) return el.innerHTML = '<div class="col-span-full text-center text-xs text-gray-400 py-4">ยังไม่มีข่าวประชาสัมพันธ์</div>';
+            el.innerHTML = data.map(n => `
+            <div class="glass-panel p-4 rounded-[25px] flex gap-4 items-center group cursor-pointer border border-transparent hover:border-white hover:bg-white transition">
+                <div class="w-20 h-20 rounded-2xl bg-gray-100 overflow-hidden flex-shrink-0">
+                    <img src="${n.image||'https://via.placeholder.com/150'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-bold text-sm text-gray-800 line-clamp-2 mb-1 group-hover:text-primary transition">${n.title}</h4>
+                    <p class="text-[10px] text-gray-400">${new Date(n.date).toLocaleDateString('th-TH')}</p>
+                </div>
+            </div>`).join('');
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initScores();
-            loadNews();
-        });
+        init();
     </script>
 </body>
 </html>

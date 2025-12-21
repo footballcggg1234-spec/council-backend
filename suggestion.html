@@ -2,279 +2,85 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>กล่องรับความคิดเห็น | สภานักเรียน</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Suggestion Box</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* --- 🎨 ตั้งค่าธีมสี (แดง-ทอง พรีเมียม) --- */
-        :root {
-            --primary: #c21515;       /* แดงเข้ม */
-            --primary-gradient: linear-gradient(135deg, #a30f0f, #d91f1f);
-            --gold: #ffc107;          /* เหลืองทอง */
-            --gold-gradient: linear-gradient(135deg, #ffd700, #ffca28);
-            --dark: #2d0a0a;
-            --bg: #fffbf0;            /* พื้นหลังสีครีมอ่อนๆ */
-            --input-bg: #f8f9fa;
-            --shadow: 0 20px 60px rgba(163, 24, 24, 0.15);
+        body { font-family: 'Sarabun', sans-serif; background: #f0f2f5; }
+        .mesh-bg {
+            position: fixed; inset: 0; z-index: -1;
+            background: radial-gradient(at 100% 100%, #fee2e2 0, transparent 50%), radial-gradient(at 0% 0%, #fff7ed 0, transparent 50%);
         }
-
-        body {
-            font-family: 'Sarabun', sans-serif;
-            margin: 0;
-            background-color: var(--bg);
-            color: #333;
-            line-height: 1.6;
+        .input-glass {
+            background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.5);
+            transition: 0.3s;
         }
-
-        a { text-decoration: none; transition: 0.3s; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
-
-        /* --- 🟢 Navbar (เมนูบาร์) --- */
-        nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px); /* เบลอพื้นหลัง */
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            position: sticky; top: 0; z-index: 1000;
-            border-top: 5px solid var(--primary);
-        }
-
-        .nav-content {
-            display: flex; justify-content: space-between; align-items: center; padding: 12px 0;
-        }
-
-        .logo {
-            font-size: 1.6rem; font-weight: 800; color: var(--primary);
-            display: flex; align-items: center; gap: 10px;
-        }
-        .logo i { font-size: 1.8rem; }
-        .logo span { color: var(--gold); text-shadow: 1px 1px 0px rgba(0,0,0,0.1); }
-
-        .menu { list-style: none; display: flex; gap: 10px; margin: 0; padding: 0; align-items: center; }
-        .menu a {
-            color: var(--dark); font-weight: 600; padding: 8px 18px; border-radius: 50px; font-size: 0.95rem;
-        }
-        .menu a:hover, .menu a.active {
-            background-color: #fff5cc; color: var(--primary);
-        }
-        .btn-admin {
-            border: 2px solid var(--primary); color: var(--primary) !important;
-            padding: 6px 20px !important; background: transparent;
-        }
-        .btn-admin:hover { background: var(--primary) !important; color: white !important; }
-
-        /* --- 🔴 Header (ส่วนหัวสีแดง) --- */
-        .hero-header {
-            background: var(--primary-gradient);
-            /* เพิ่มลวดลายกราฟิกจางๆ ให้ดูแพง */
-            background-image: 
-                var(--primary-gradient),
-                radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 0%, rgba(255,215,0,0.15) 0%, transparent 30%);
-            padding: 100px 0 160px; /* เว้นที่ด้านล่างให้กล่องฟอร์มทับ */
-            text-align: center; color: white;
-            position: relative; overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .hero-header h1 {
-            font-size: 3.2rem; margin: 0 0 15px; font-weight: 800;
-            text-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            position: relative; z-index: 2;
-        }
-        .hero-header p {
-            font-size: 1.25rem; color: #ffeeb0; font-weight: 500;
-            position: relative; z-index: 2; opacity: 0.95;
-        }
-
-        /* --- 📝 Form Card (กล่องฟอร์มลอยได้) --- */
-        .form-card {
-            background: #ffffff;
-            max-width: 750px;
-            margin: -100px auto 60px; /* ดึงขึ้นไปทับ Header 100px */
-            padding: 50px;
-            border-radius: 24px;
-            box-shadow: var(--shadow);
-            position: relative; z-index: 10;
-            border: 1px solid rgba(0,0,0,0.03);
-        }
-
-        .form-title {
-            text-align: center; margin-bottom: 35px;
-            color: var(--primary); font-size: 1.6rem; font-weight: 800;
-            position: relative; display: inline-block; width: 100%;
-        }
-        .form-title::after {
-            content: ''; display: block; width: 60px; height: 4px;
-            background: var(--gold); margin: 10px auto 0; border-radius: 2px;
-        }
-
-        .form-group { margin-bottom: 25px; }
-        label {
-            display: block; font-weight: 700; margin-bottom: 8px;
-            color: #444; font-size: 1rem;
-        }
-        
-        /* ช่องกรอกข้อมูลสุดโมเดิร์น */
-        input, select, textarea {
-            width: 100%; padding: 14px 18px;
-            background: var(--input-bg);
-            border: 2px solid transparent; border-radius: 12px;
-            font-family: 'Sarabun'; font-size: 1rem; color: #333;
-            box-sizing: border-box; transition: all 0.3s ease;
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            background: #fff;
-            border-color: var(--gold); /* เส้นขอบสีทอง */
-            box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.15); /* แสงเรืองๆ */
-            outline: none;
-        }
-        
-        textarea { resize: vertical; min-height: 140px; }
-
-        /* ปุ่มส่งเรื่อง */
-        .btn-submit {
-            width: 100%; padding: 16px;
-            background: var(--gold-gradient);
-            color: var(--dark);
-            border: none; border-radius: 50px;
-            font-size: 1.2rem; font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 10px 25px rgba(255, 193, 7, 0.4);
-            transition: all 0.3s; margin-top: 15px;
-            display: flex; justify-content: center; align-items: center; gap: 10px;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 35px rgba(255, 193, 7, 0.6);
-        }
-
-        /* --- 📱 Mobile Responsive (มือถือ) --- */
-        @media (max-width: 768px) {
-            .nav-content { flex-direction: column; gap: 15px; }
-            .menu { flex-wrap: wrap; justify-content: center; gap: 5px; }
-            
-            .hero-header { padding: 70px 0 120px; }
-            .hero-header h1 { font-size: 2.2rem; }
-            .hero-header p { font-size: 1rem; padding: 0 20px; }
-
-            .form-card {
-                margin: -80px 15px 40px; /* เว้นขอบข้าง */
-                padding: 30px 20px;
-            }
-            .form-title { font-size: 1.3rem; }
-        }
+        .input-glass:focus { background: white; border-color: #9F1239; box-shadow: 0 0 0 4px rgba(159, 18, 57, 0.1); }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex items-center justify-center p-4">
 
-    <nav>
-        <div class="container nav-content">
-            <div class="logo">
-                <i class="fas fa-university"></i>
-                สภา <span>นักเรียน</span>
-            </div>
-            <ul class="menu">
-                <li><a href="index.html">หน้าแรก</a></li>
-                <li><a href="suggestion.html" class="active">กล่องความคิดเห็น</a></li>
-                <li><a href="team.html">คณะกรรมการ</a></li>
-                <li><a href="register.html">สมัครสมาชิก</a></li>
-                <li><a href="login.html" class="btn-admin"><i class="fas fa-lock"></i> Admin</a></li>
-            </ul>
-        </div>
-    </nav>
+    <div class="mesh-bg"></div>
 
-    <header class="hero-header">
-        <div class="container">
-            <h1><i class="fas fa-box-open"></i> กล่องรับความคิดเห็น</h1>
-            <p>ทุกเสียงของคุณมีค่า เราพร้อมรับฟังและแก้ไขปัญหาเพื่อโรงเรียนของเรา</p>
-        </div>
-    </header>
-
-    <div class="container">
-        <div class="form-card">
-            <div class="form-title">เขียนเรื่องร้องเรียน / เสนอแนะ</div>
+    <div class="max-w-4xl w-full bg-white/80 backdrop-blur-2xl rounded-[40px] shadow-2xl overflow-hidden flex flex-col md:flex-row border border-white">
+        
+        <div class="md:w-5/12 bg-gray-900 text-white p-10 flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-primary rounded-full blur-[100px] opacity-50"></div>
             
-            <form id="suggestionForm">
-                <div class="form-group">
-                    <label><i class="fas fa-pen"></i> หัวข้อเรื่อง</label>
-                    <input type="text" id="topic" placeholder="เช่น ห้องน้ำตึก 2 เหม็นมาก, ขอเพิ่มถังขยะ" required>
+            <a href="index.html" class="relative z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-black transition"><i class="fas fa-arrow-left"></i></a>
+            
+            <div class="relative z-10 mt-10">
+                <div class="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-3xl mb-6 shadow-lg shadow-red-900/50">
+                    <i class="fas fa-comment-dots"></i>
                 </div>
+                <h1 class="text-4xl font-bold mb-2">Voice Box</h1>
+                <p class="text-gray-400 leading-relaxed">พื้นที่ปลอดภัยสำหรับทุกความคิดเห็น เพื่อโรงเรียนของเรา</p>
+            </div>
 
-                <div class="form-group">
-                    <label><i class="fas fa-layer-group"></i> หมวดหมู่</label>
-                    <select id="category">
-                        <option>ทั่วไป</option>
-                        <option>วิชาการ / การเรียน</option>
-                        <option>อาคารสถานที่ / ห้องน้ำ</option>
-                        <option>กิจกรรม / กีฬา</option>
-                        <option>โรงอาหาร</option>
+            <div class="relative z-10 text-xs text-gray-600 mt-10">© RPK26 Student Council</div>
+        </div>
+
+        <div class="flex-1 p-8 md:p-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">แจ้งเรื่องร้องเรียน</h2>
+            
+            <form id="sugForm" class="space-y-5">
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">หัวข้อ</label>
+                    <input type="text" id="topic" class="w-full input-glass rounded-xl px-4 py-3 outline-none text-gray-800 font-medium mt-1" placeholder="ระบุหัวข้อ..." required>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">หมวดหมู่</label>
+                    <select id="category" class="w-full input-glass rounded-xl px-4 py-3 outline-none text-gray-800 font-medium mt-1 cursor-pointer">
+                        <option>ทั่วไป</option><option>การเรียน</option><option>อาคารสถานที่</option><option>กิจกรรม</option>
                     </select>
                 </div>
-
-                <div class="form-group">
-                    <label><i class="fas fa-align-left"></i> รายละเอียด</label>
-                    <textarea id="detail" placeholder="อธิบายรายละเอียดปัญหา หรือข้อเสนอแนะของคุณ..." required></textarea>
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">รายละเอียด</label>
+                    <textarea id="detail" class="w-full input-glass rounded-xl px-4 py-3 outline-none text-gray-800 font-medium mt-1 h-32 resize-none" placeholder="อธิบายเพิ่มเติม..." required></textarea>
                 </div>
-
-                <button type="submit" class="btn-submit">
-                    ส่งเรื่องเลย <i class="fas fa-paper-plane"></i>
+                <button type="submit" class="w-full py-4 bg-primary text-white rounded-xl font-bold hover:bg-red-900 transition shadow-lg shadow-red-900/20 active:scale-[0.98]">
+                    ส่งเรื่องทันที
                 </button>
             </form>
         </div>
+
     </div>
 
     <script>
-        // ✅ ลิงก์ API ที่ถูกต้อง (เปลี่ยนเป็นของคุณถ้า Deploy ใหม่)
-        const API_URL = '/api/suggestions';
-
-        document.getElementById('suggestionForm').addEventListener('submit', async (e) => {
+        const API = '/api/suggestions';
+        document.getElementById('sugForm').addEventListener('submit', async(e)=>{
             e.preventDefault();
-            
-            const btn = document.querySelector('.btn-submit');
-            const originalText = btn.innerHTML;
-            
-            // เปลี่ยนปุ่มเป็นสถานะกำลังโหลด
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...';
-            btn.style.opacity = '0.7';
-            btn.disabled = true;
-
-            const body = {
-                topic: document.getElementById('topic').value,
-                category: document.getElementById('category').value,
-                detail: document.getElementById('detail').value
-            };
-
+            const btn = document.querySelector('button');
+            const old = btn.innerHTML;
+            btn.innerHTML = 'Sending...';
             try {
-                // ส่งข้อมูลไป Server (ใช้ path /api/... เพื่อให้ทำงานได้ทั้ง Local และ Render)
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-
-                const data = await res.json();
-
-                if (data.success) {
-                    alert('✅ ส่งเรื่องเรียบร้อย! ขอบคุณครับ');
-                    document.getElementById('suggestionForm').reset(); // ล้างฟอร์ม
-                } else {
-                    alert('❌ เกิดข้อผิดพลาด: ' + (data.message || 'ส่งไม่สำเร็จ'));
-                }
-            } catch (err) {
-                console.error(err);
-                alert('❌ เชื่อมต่อ Server ไม่ได้ (ลอง Refresh หรือเช็คเน็ต)');
-            } finally {
-                // คืนค่าปุ่มกลับมาเหมือนเดิม
-                btn.innerHTML = originalText;
-                btn.style.opacity = '1';
-                btn.disabled = false;
-            }
+                await fetch(API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({topic:document.getElementById('topic').value, category:document.getElementById('category').value, detail:document.getElementById('detail').value})});
+                alert('Success'); e.target.reset();
+            } catch { alert('Error'); } finally { btn.innerHTML = old; }
         });
     </script>
-
 </body>
 </html>
