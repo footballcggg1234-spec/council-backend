@@ -15,6 +15,7 @@
         .bg-grid { background-image: radial-gradient(#334155 1px, transparent 1px); background-size: 30px 30px; opacity: 0.1; }
         .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.5; } 100% { transform: scale(2); opacity: 0; } }
     </style>
 </head>
 <body class="min-h-screen relative text-white pb-24">
@@ -36,18 +37,21 @@
             <h1 class="text-3xl md:text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
                 เลือกคนที่ใช่ เพื่อโรงเรียนของเรา
             </h1>
-            <p class="text-slate-400 mb-6 text-lg">1 สิทธิ์ 1 เสียง ร่วมกำหนดอนาคต RPK26</p>
+            <p class="text-slate-400 mb-8 text-lg">1 สิทธิ์ 1 เสียง ร่วมกำหนดอนาคต RPK26</p>
 
-            <div class="inline-flex items-center gap-3 bg-slate-800/50 backdrop-blur-md border border-slate-600 px-6 py-2 rounded-full mb-10 shadow-lg animate-pulse">
-                <div class="flex items-center gap-2">
+            <div class="inline-flex items-center gap-4 bg-slate-800/80 backdrop-blur border border-slate-600 px-6 py-3 rounded-full mb-12 shadow-xl hover:bg-slate-700/80 transition cursor-default group">
+                <div class="flex items-center gap-2 relative">
+                    <span class="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-20 animate-[pulse-ring_2s_infinite]"></span>
                     <span class="relative flex h-3 w-3">
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                       <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                     </span>
-                    <span class="text-slate-300 font-bold text-sm">ผู้ใช้สิทธิ์แล้ว:</span>
+                    <span class="text-slate-300 font-bold text-sm group-hover:text-white transition">ผู้ใช้สิทธิ์แล้ว:</span>
                 </div>
-                <span id="live-counter" class="text-2xl font-black text-white">0</span>
-                <span class="text-slate-300 text-sm">คน</span>
+                <div class="flex items-baseline gap-1">
+                    <span id="live-counter" class="text-3xl font-black text-white tabular-nums tracking-tight">0</span>
+                    <span class="text-slate-400 text-xs font-bold uppercase">คน</span>
+                </div>
             </div>
         </div>
 
@@ -116,6 +120,7 @@
                 <a href="index.html" class="px-8 py-3 rounded-xl bg-slate-800 text-white border border-slate-700 hover:bg-slate-700 transition font-bold">
                     <i class="fas fa-home mr-2"></i> กลับหน้าหลัก
                 </a>
+                
                 <button onclick="resetMyVote()" class="px-8 py-3 rounded-xl bg-yellow-500/10 text-yellow-500 border border-yellow-500/30 hover:bg-yellow-500/20 transition font-bold">
                     <i class="fas fa-undo mr-2"></i> โหวตใหม่ (โหมดทดสอบ)
                 </button>
@@ -126,14 +131,15 @@
 
     <script>
         let selectedParty = null;
+        let counterInterval = null;
         
         // 1. ตรวจสอบสถานะการโหวตตอนโหลดหน้า
         if(localStorage.getItem('hasVoted')) {
             showVotedState();
         } else {
-            // ถ้ายังไม่โหวต ให้เริ่มนับยอดคนโหวตทันที
+            // ถ้ายังไม่โหวต ให้เริ่มนับยอดคนโหวต (Update ทุก 3 วินาที)
             updateTotalVotes();
-            setInterval(updateTotalVotes, 3000); // อัปเดตทุก 3 วินาที
+            counterInterval = setInterval(updateTotalVotes, 3000);
         }
 
         // ฟังก์ชันดึงยอดคนโหวตจาก Server
@@ -142,12 +148,15 @@
                 const res = await fetch('/api/election-results');
                 if(res.ok) {
                     const data = await res.json();
-                    // แสดงเฉพาะยอดรวม (total)
-                    document.getElementById('live-counter').innerText = data.total.toLocaleString();
+                    // อัปเดตตัวเลขพร้อม Animation เล็กน้อย
+                    const el = document.getElementById('live-counter');
+                    if (el.innerText !== data.total.toString()) {
+                        el.classList.add('scale-125', 'text-green-400');
+                        setTimeout(() => el.classList.remove('scale-125', 'text-green-400'), 200);
+                        el.innerText = data.total.toLocaleString();
+                    }
                 }
-            } catch(e) {
-                console.log('Error fetching votes:', e);
-            }
+            } catch(e) { console.log('Error fetching votes:', e); }
         }
 
         function selectParty(num) {
@@ -191,6 +200,7 @@
 
                 if (res.ok) {
                     localStorage.setItem('hasVoted', 'true');
+                    clearInterval(counterInterval); // หยุดนับเมื่อโหวตเสร็จ (ประหยัดเน็ต)
                     setTimeout(() => showVotedState(), 500);
                 } else {
                     alert('เกิดข้อผิดพลาดในการส่งข้อมูล');
