@@ -36,7 +36,19 @@
             <h1 class="text-3xl md:text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
                 เลือกคนที่ใช่ เพื่อโรงเรียนของเรา
             </h1>
-            <p class="text-slate-400 mb-12 text-lg">1 สิทธิ์ 1 เสียง ร่วมกำหนดอนาคต RPK26</p>
+            <p class="text-slate-400 mb-6 text-lg">1 สิทธิ์ 1 เสียง ร่วมกำหนดอนาคต RPK26</p>
+
+            <div class="inline-flex items-center gap-3 bg-slate-800/50 backdrop-blur-md border border-slate-600 px-6 py-2 rounded-full mb-10 shadow-lg animate-pulse">
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
+                    <span class="text-slate-300 font-bold text-sm">ผู้ใช้สิทธิ์แล้ว:</span>
+                </div>
+                <span id="live-counter" class="text-2xl font-black text-white">0</span>
+                <span class="text-slate-300 text-sm">คน</span>
+            </div>
         </div>
 
         <div id="voting-area" class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto transition-all duration-500">
@@ -104,12 +116,10 @@
                 <a href="index.html" class="px-8 py-3 rounded-xl bg-slate-800 text-white border border-slate-700 hover:bg-slate-700 transition font-bold">
                     <i class="fas fa-home mr-2"></i> กลับหน้าหลัก
                 </a>
-                
                 <button onclick="resetMyVote()" class="px-8 py-3 rounded-xl bg-yellow-500/10 text-yellow-500 border border-yellow-500/30 hover:bg-yellow-500/20 transition font-bold">
                     <i class="fas fa-undo mr-2"></i> โหวตใหม่ (โหมดทดสอบ)
                 </button>
             </div>
-            <p class="mt-4 text-xs text-slate-600">*ปุ่มโหวตใหม่ใช้สำหรับทดสอบระบบเท่านั้น ในการใช้งานจริงจะไม่มีปุ่มนี้</p>
         </div>
 
     </div>
@@ -120,13 +130,30 @@
         // 1. ตรวจสอบสถานะการโหวตตอนโหลดหน้า
         if(localStorage.getItem('hasVoted')) {
             showVotedState();
+        } else {
+            // ถ้ายังไม่โหวต ให้เริ่มนับยอดคนโหวตทันที
+            updateTotalVotes();
+            setInterval(updateTotalVotes, 3000); // อัปเดตทุก 3 วินาที
+        }
+
+        // ฟังก์ชันดึงยอดคนโหวตจาก Server
+        async function updateTotalVotes() {
+            try {
+                const res = await fetch('/api/election-results');
+                if(res.ok) {
+                    const data = await res.json();
+                    // แสดงเฉพาะยอดรวม (total)
+                    document.getElementById('live-counter').innerText = data.total.toLocaleString();
+                }
+            } catch(e) {
+                console.log('Error fetching votes:', e);
+            }
         }
 
         function selectParty(num) {
             if(localStorage.getItem('hasVoted')) return;
             selectedParty = num;
             
-            // Highlight การ์ดที่เลือก
             document.querySelectorAll('.party-card').forEach((card, idx) => {
                 const btn = card.querySelector('.check-btn');
                 if (idx + 1 === num) {
@@ -142,7 +169,6 @@
                 }
             });
 
-            // แสดงแถบยืนยันด้านล่าง
             document.getElementById('submit-bar').classList.remove('translate-y-full');
             document.getElementById('selected-text').innerText = `เบอร์ ${num}`;
         }
@@ -151,7 +177,6 @@
             if (!selectedParty) return;
             if (!confirm(`ยืนยันที่จะเลือก "เบอร์ ${selectedParty}" ใช่หรือไม่?`)) return;
 
-            // เปลี่ยนปุ่มเป็น Loading
             const btn = document.querySelector('#submit-bar button');
             const oldHtml = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> กำลังบันทึก...';
@@ -166,7 +191,7 @@
 
                 if (res.ok) {
                     localStorage.setItem('hasVoted', 'true');
-                    setTimeout(() => showVotedState(), 500); // รอแป๊บแล้วเปลี่ยนหน้า
+                    setTimeout(() => showVotedState(), 500);
                 } else {
                     alert('เกิดข้อผิดพลาดในการส่งข้อมูล');
                     btn.innerHTML = oldHtml;
@@ -180,18 +205,15 @@
         }
 
         function showVotedState() {
-            // ซ่อนบัตรเลือกตั้ง และแถบยืนยัน
             document.getElementById('header-text').style.display = 'none';
             document.getElementById('voting-area').style.display = 'none';
             document.getElementById('submit-bar').style.display = 'none';
             
-            // แสดงหน้าขอบคุณ
             const votedMsg = document.getElementById('voted-msg');
             votedMsg.classList.remove('hidden');
             votedMsg.classList.add('flex');
         }
 
-        // ฟังก์ชันลับ: ล้างประวัติในเครื่องเพื่อโหวตใหม่
         function resetMyVote() {
             if(confirm('⚠️ ต้องการล้างสถานะการโหวตในเครื่องนี้หรือไม่?\n(เพื่อให้สามารถทดสอบกดโหวตซ้ำได้)')) {
                 localStorage.removeItem('hasVoted');
