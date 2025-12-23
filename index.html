@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RPK26 Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,8 +21,6 @@
     </script>
     <style>
         body { background-color: #F8FAFC; overflow-x: hidden; }
-        
-        /* Aurora Background */
         .mesh-bg {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
             background: radial-gradient(at 0% 0%, rgba(254,226,226,0.8) 0, transparent 50%), 
@@ -30,35 +28,11 @@
                         radial-gradient(at 100% 100%, rgba(224,231,255,0.5) 0, transparent 50%);
             background-size: 150% 150%; animation: aurora 15s ease infinite;
         }
-
-        /* Glass Panel */
-        .glass {
-            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Responsive Layout Handling */
-        @media (min-width: 1024px) {
-            .app-layout { display: grid; grid-template-columns: 260px 1fr 300px; gap: 24px; padding: 24px; height: 100vh; overflow: hidden; }
-            .mobile-nav { display: none; }
-            .desktop-sidebar { display: flex; }
-            .desktop-widgets { display: block; }
-            .main-content { overflow-y: auto; height: 100%; border-radius: 24px; scrollbar-width: none; }
-        }
-        @media (max-width: 1023px) {
-            .app-layout { display: block; padding: 16px; padding-bottom: 100px; }
-            .mobile-nav { display: flex; }
-            .desktop-sidebar { display: none; }
-            .desktop-widgets { display: none; }
-        }
-
-        .nav-item {
-            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-            border-radius: 16px; color: #64748b; font-weight: 600; transition: 0.2s;
-        }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); }
+        @media (min-width: 1024px) { .app-layout { display: grid; grid-template-columns: 260px 1fr 300px; gap: 24px; padding: 24px; height: 100vh; overflow: hidden; } .mobile-nav { display: none; } .main-content { overflow-y: auto; height: 100%; border-radius: 24px; scrollbar-width: none; } }
+        @media (max-width: 1023px) { .app-layout { display: block; padding: 16px; padding-bottom: 100px; } .mobile-nav { display: flex; } .desktop-sidebar, .desktop-widgets { display: none; } }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; color: #64748b; font-weight: 600; transition: 0.2s; }
         .nav-item:hover, .nav-item.active { background: #fff1f2; color: #9F1239; }
-        .nav-item.active i { color: #9F1239; }
     </style>
 </head>
 <body class="text-slate-800">
@@ -70,75 +44,60 @@
         <aside class="desktop-sidebar glass rounded-[32px] p-6 flex-col justify-between h-full sticky top-6">
             <div>
                 <div class="flex items-center gap-3 mb-10 px-2">
-                    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white text-xl shadow-lg shadow-red-500/30">
-                        <i class="fas fa-university"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-black text-xl tracking-tight text-slate-800">RPK<span class="text-primary">26</span></h1>
-                        <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Student Council</p>
-                    </div>
+                    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white text-xl shadow-lg shadow-red-500/30"><i class="fas fa-university"></i></div>
+                    <div><h1 class="font-black text-xl tracking-tight text-slate-800">RPK<span class="text-primary">26</span></h1><p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Student Council</p></div>
                 </div>
-
                 <nav class="space-y-1">
                     <a href="index.html" class="nav-item active"><i class="fas fa-home w-6"></i> หน้าแรก</a>
                     <a href="weekly-report.html" class="nav-item"><i class="fas fa-chart-pie w-6"></i> รายงานคะแนน</a>
+                    <a href="election.html" class="nav-item text-blue-600 bg-blue-50"><i class="fas fa-vote-yea w-6"></i> เลือกตั้ง</a>
                     <a href="team.html" class="nav-item"><i class="fas fa-users w-6"></i> คณะกรรมการ</a>
-                    <a href="suggestion.html" class="nav-item"><i class="fas fa-envelope-open-text w-6"></i> กล่องรับความคิดเห็น</a>
-                    <a href="register.html" class="nav-item"><i class="fas fa-user-plus w-6"></i> สมัครสมาชิก</a>
+                    <a href="suggestion.html" class="nav-item"><i class="fas fa-envelope-open-text w-6"></i> ร้องเรียน</a>
                 </nav>
             </div>
-
-            <a href="login.html" class="flex items-center gap-3 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition group">
-                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-primary group-hover:text-white transition">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <div>
-                    <div class="text-xs font-bold text-gray-400">System</div>
-                    <div class="text-sm font-bold text-gray-800">Admin Login</div>
-                </div>
-            </a>
+            <a href="login.html" class="flex items-center gap-3 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition"><div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-shield-alt"></i></div><div><div class="text-xs font-bold text-gray-400">System</div><div class="text-sm font-bold text-gray-800">Admin Login</div></div></a>
         </aside>
 
         <main class="main-content">
             <div class="lg:hidden flex justify-between items-center mb-6">
-                <div>
-                    <h1 class="text-2xl font-black text-slate-800">หน้าแรก</h1>
-                    <p class="text-xs text-gray-500">สภานักเรียน รุ่นที่ 26</p>
-                </div>
+                <div><h1 class="text-2xl font-black text-slate-800">หน้าแรก</h1><p class="text-xs text-gray-500">สภานักเรียน รุ่นที่ 26</p></div>
                 <a href="login.html" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow text-primary"><i class="fas fa-user"></i></a>
             </div>
 
-            <div class="relative w-full h-64 lg:h-80 rounded-[32px] overflow-hidden shadow-xl group cursor-pointer mb-6" onclick="location.href='weekly-report.html'">
-                <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070" class="w-full h-full object-cover transition duration-700 group-hover:scale-105 brightness-90">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                <div class="absolute bottom-8 left-8 text-white">
+            <a href="election.html" class="block w-full bg-gradient-to-r from-blue-900 to-indigo-800 rounded-[32px] p-6 md:p-8 text-white relative overflow-hidden shadow-2xl hover:scale-[1.01] transition duration-300 group mb-6">
+                <div class="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none group-hover:bg-white/20 transition"></div>
+                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div>
+                        <div class="inline-block bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full mb-3 animate-pulse">เปิดลงคะแนนแล้ว!</div>
+                        <h2 class="text-3xl md:text-4xl font-black mb-2">ELECTION 2026</h2>
+                        <p class="text-blue-200">ร่วมเลือกประธานนักเรียนคนใหม่ 1 สิทธิ์ 1 เสียง</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md px-6 py-3 rounded-xl border border-white/20 flex items-center gap-3 font-bold group-hover:bg-white group-hover:text-blue-900 transition whitespace-nowrap">
+                        เข้าคูหาเลือกตั้ง <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+            </a>
+
+            <div class="relative w-full h-48 lg:h-64 rounded-[32px] overflow-hidden shadow-lg group cursor-pointer mb-6" onclick="location.href='weekly-report.html'">
+                <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070" class="w-full h-full object-cover transition duration-700 group-hover:scale-105 brightness-75">
+                <div class="absolute bottom-6 left-8 text-white">
                     <div class="bg-gold text-black text-[10px] font-bold px-3 py-1 rounded-full inline-block mb-2">WEEKLY HIGHLIGHT</div>
-                    <h2 class="text-3xl lg:text-4xl font-extrabold leading-tight">สรุปคะแนนประจำสัปดาห์</h2>
-                    <p class="text-white/80 mt-1">ตรวจสอบคะแนนความประพฤติล่าสุด</p>
+                    <h2 class="text-2xl font-extrabold leading-tight">สรุปคะแนนประจำสัปดาห์</h2>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div class="glass p-5 rounded-[24px] border-l-4 border-blue-500 relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-4 relative z-10">
-                        <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fas fa-running"></i></div>
-                        <span class="text-xs font-bold text-gray-400">EXERCISE</span>
-                    </div>
-                    <div id="podium-exercise" class="h-24 flex items-end justify-center gap-2">Loading...</div>
+                    <div class="flex justify-between items-start mb-4"><div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fas fa-running"></i></div><span class="text-xs font-bold text-gray-400">EXERCISE</span></div>
+                    <div id="podium-exercise" class="h-20 flex items-end justify-center gap-2">Loading...</div>
                 </div>
                 <div class="glass p-5 rounded-[24px] border-l-4 border-purple-500 relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-4 relative z-10">
-                        <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-lg"><i class="fas fa-bed"></i></div>
-                        <span class="text-xs font-bold text-gray-400">DORM</span>
-                    </div>
-                    <div id="podium-dorm" class="h-24 flex items-end justify-center gap-2">Loading...</div>
+                    <div class="flex justify-between items-start mb-4"><div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-lg"><i class="fas fa-bed"></i></div><span class="text-xs font-bold text-gray-400">DORM</span></div>
+                    <div id="podium-dorm" class="h-20 flex items-end justify-center gap-2">Loading...</div>
                 </div>
                 <div class="glass p-5 rounded-[24px] border-l-4 border-green-500 relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-4 relative z-10">
-                        <div class="w-10 h-10 rounded-xl bg-green-100 text-green-600 flex items-center justify-center text-lg"><i class="fas fa-chalkboard"></i></div>
-                        <span class="text-xs font-bold text-gray-400">CLASS</span>
-                    </div>
-                    <div id="podium-classroom" class="h-24 flex items-end justify-center gap-2">Loading...</div>
+                    <div class="flex justify-between items-start mb-4"><div class="w-10 h-10 rounded-xl bg-green-100 text-green-600 flex items-center justify-center text-lg"><i class="fas fa-chalkboard"></i></div><span class="text-xs font-bold text-gray-400">CLASS</span></div>
+                    <div id="podium-classroom" class="h-20 flex items-end justify-center gap-2">Loading...</div>
                 </div>
             </div>
 
@@ -151,13 +110,11 @@
 
         <aside class="desktop-widgets h-full sticky top-6 space-y-6">
             <div class="glass rounded-[32px] p-6">
-                <h3 class="font-bold text-gray-800 mb-4">ปฏิทินกิจกรรม</h3>
+                <h3 class="font-bold text-gray-800 mb-4">ปฏิทิน</h3>
                 <div class="bg-white rounded-2xl p-4 shadow-sm text-center border border-gray-100">
                     <div class="text-primary font-black text-xl mb-1">ธันวาคม</div>
                     <div class="text-xs text-gray-400 font-bold mb-4">DECEMBER 2025</div>
-                    <div class="grid grid-cols-7 gap-2 text-xs font-bold text-gray-400 mb-2">
-                        <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-                    </div>
+                    <div class="grid grid-cols-7 gap-2 text-xs font-bold text-gray-400 mb-2"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
                     <div class="grid grid-cols-7 gap-2 text-sm font-semibold text-gray-600">
                         <span class="text-gray-300">30</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
                         <span>7</span><span>8</span><span>9</span><span class="bg-primary text-white rounded-lg shadow-md">10</span><span>11</span><span>12</span>
@@ -165,38 +122,27 @@
                     </div>
                 </div>
             </div>
-
-            <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-[32px] p-6 text-white relative overflow-hidden group">
-                <div class="absolute -right-5 -top-5 w-24 h-24 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition duration-700"></div>
-                <h3 class="text-lg font-bold relative z-10">มีปัญหาแจ้งสภา?</h3>
-                <p class="text-sm text-gray-400 mb-4 relative z-10">ร้องเรียนปัญหาต่างๆ ภายในโรงเรียน</p>
-                <a href="suggestion.html" class="flex items-center justify-between bg-white/10 hover:bg-white/20 p-3 rounded-xl backdrop-blur transition border border-white/10">
-                    <span class="text-sm font-bold ml-2">ส่งเรื่องร้องเรียน</span>
-                    <div class="w-8 h-8 bg-white text-black rounded-lg flex items-center justify-center"><i class="fas fa-arrow-right"></i></div>
-                </a>
-            </div>
         </aside>
 
     </div>
 
     <nav class="mobile-nav fixed bottom-6 left-4 right-4 bg-gray-900/90 backdrop-blur-xl text-white p-3 rounded-[24px] shadow-2xl z-50 justify-between items-center px-6 border border-white/10">
         <a href="index.html" class="flex flex-col items-center text-primary"><i class="fas fa-home text-xl"></i></a>
-        <a href="team.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-users text-xl"></i></a>
-        <a href="suggestion.html" class="flex flex-col items-center justify-center -mt-10"><div class="w-14 h-14 rounded-full bg-gradient-to-r from-primary to-red-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-red-900/50 border-4 border-gray-100"><i class="fas fa-plus"></i></div></a>
-        <a href="register.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-user-plus text-xl"></i></a>
+        <a href="election.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-vote-yea text-xl"></i></a>
+        <a href="suggestion.html" class="flex flex-col items-center justify-center -mt-10"><div class="w-14 h-14 rounded-full bg-gradient-to-r from-primary to-red-600 text-white flex items-center justify-center text-2xl shadow-lg border-4 border-gray-100"><i class="fas fa-plus"></i></div></a>
         <a href="weekly-report.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-chart-bar text-xl"></i></a>
+        <a href="team.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-users text-xl"></i></a>
     </nav>
 
     <script>
-        const API_URL = 'https://school-council-26.onrender.com/api/scores';
-        const NEWS_API = 'https://school-council-26.onrender.com/api/news';
+        const API_URL = '/api/scores';
+        const NEWS_API = '/api/news';
 
         async function init() {
             try {
                 const [s, n] = await Promise.all([fetch(API_URL), fetch(NEWS_API)]);
                 const scores = await s.json();
                 
-                // --- FIX: ใช้ข้อมูลชุด 'dorm' สำหรับการ render ทั้ง Exercise และ Dorm ---
                 const dormData = scores.filter(d => d.type === 'dorm');
                 const classData = scores.filter(d => d.type === 'classroom');
 
@@ -210,43 +156,22 @@
 
         function renderPodium(id, data, color, txt) {
             const el = document.getElementById(`podium-${id}`);
-            // เลือก key ที่ถูกต้อง
             const scoreKey = id === 'exercise' ? 'points_exercise' : (id === 'dorm' ? 'points_dorm' : 'points_class');
-            
-            // เรียงลำดับจากมากไปน้อย
             data.sort((a,b) => (b[scoreKey]||0) - (a[scoreKey]||0));
             
-            if(!data.length) return el.innerHTML = '<span class="text-xs text-gray-400 w-full text-center">ไม่มีข้อมูล</span>';
+            if(!data.length) return el.innerHTML = '<span class="text-xs text-gray-400">ไม่มีข้อมูล</span>';
             
             let html = '';
-            // 2nd Place
-            if(data[1]) html += `<div class="w-1/3 flex flex-col items-center"><div class="w-full ${color} opacity-30 h-10 rounded-t-xl relative"></div><span class="text-[9px] font-bold mt-1 text-gray-400 truncate w-full text-center">${data[1].name}</span></div>`; 
-            else html += '<div class="w-1/3"></div>';
-            
-            // 1st Place
-            if(data[0]) html += `<div class="w-1/3 flex flex-col items-center z-10"><div class="w-full ${color} h-20 rounded-t-xl shadow-lg relative flex items-center justify-center shadow-md"><span class="text-white font-bold text-xl">${data[0][scoreKey]||0}</span></div><span class="text-xs font-bold mt-1 ${txt} truncate w-full text-center">${data[0].name}</span></div>`;
-            else html += '<div class="w-1/3"></div>';
-
-            // 3rd Place
-            if(data[2]) html += `<div class="w-1/3 flex flex-col items-center"><div class="w-full ${color} opacity-20 h-6 rounded-t-xl relative"></div><span class="text-[9px] font-bold mt-1 text-gray-400 truncate w-full text-center">${data[2].name}</span></div>`; 
-            else html += '<div class="w-1/3"></div>';
-            
+            if(data[1]) html += `<div class="w-1/3 flex flex-col items-center"><div class="w-full ${color} opacity-30 h-8 rounded-t-lg"></div><span class="text-[9px] mt-1 text-gray-400 truncate w-full text-center">${data[1].name}</span></div>`; 
+            if(data[0]) html += `<div class="w-1/3 flex flex-col items-center z-10"><div class="w-full ${color} h-16 rounded-t-lg shadow-lg flex items-center justify-center text-white font-bold">${data[0][scoreKey]||0}</div><span class="text-xs font-bold mt-1 ${txt} truncate w-full text-center">${data[0].name}</span></div>`;
+            if(data[2]) html += `<div class="w-1/3 flex flex-col items-center"><div class="w-full ${color} opacity-20 h-5 rounded-t-lg"></div><span class="text-[9px] mt-1 text-gray-400 truncate w-full text-center">${data[2].name}</span></div>`; 
             el.innerHTML = html;
         }
 
         function renderNews(data) {
             const el = document.getElementById('news-container');
-            if(!data.length) return el.innerHTML = '<div class="col-span-full text-center text-xs text-gray-400 py-4">ยังไม่มีข่าวประชาสัมพันธ์</div>';
-            el.innerHTML = data.map(n => `
-            <div class="glass-panel p-4 rounded-[25px] flex gap-4 items-center group cursor-pointer border border-transparent hover:border-white hover:bg-white transition">
-                <div class="w-20 h-20 rounded-2xl bg-gray-100 overflow-hidden flex-shrink-0">
-                    <img src="${n.image||'https://via.placeholder.com/150'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                </div>
-                <div class="flex-1 min-w-0">
-                    <h4 class="font-bold text-sm text-gray-800 line-clamp-2 mb-1 group-hover:text-primary transition">${n.title}</h4>
-                    <p class="text-[10px] text-gray-400">${new Date(n.date).toLocaleDateString('th-TH')}</p>
-                </div>
-            </div>`).join('');
+            if(!data.length) return el.innerHTML = '<div class="col-span-full text-center text-xs text-gray-400 py-4">ยังไม่มีข่าว</div>';
+            el.innerHTML = data.map(n => `<div class="bg-white p-4 rounded-2xl flex gap-4 items-center shadow-sm"><div class="w-16 h-16 rounded-xl bg-gray-100 flex-shrink-0"></div><div><h4 class="font-bold text-sm text-gray-800 line-clamp-1">${n.title}</h4><p class="text-[10px] text-gray-400 line-clamp-2">${n.content||''}</p></div></div>`).join('');
         }
         init();
     </script>

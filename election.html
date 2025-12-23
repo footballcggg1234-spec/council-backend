@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPK26 Election | เลือกตั้งสภานักเรียน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background: #0f172a; overflow-x: hidden; }
+        .party-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .party-card:hover { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .party-card.selected { border: 4px solid #f59e0b; transform: scale(1.02); }
+        .bg-grid { background-image: radial-gradient(#334155 1px, transparent 1px); background-size: 30px 30px; opacity: 0.1; }
+    </style>
+</head>
+<body class="min-h-screen relative text-white pb-24">
+
+    <div class="fixed inset-0 bg-grid z-0 pointer-events-none"></div>
+    <div class="fixed top-0 left-0 w-full h-1/2 bg-gradient-to-b from-blue-900/20 to-transparent z-0"></div>
+
+    <nav class="relative z-10 flex items-center justify-between p-6 max-w-7xl mx-auto">
+        <a href="index.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition">
+            <i class="fas fa-arrow-left"></i> หน้าหลัก
+        </a>
+        <div class="text-2xl font-black tracking-tighter">ELECTION <span class="text-blue-500">2026</span></div>
+        <div class="w-20"></div> 
+    </nav>
+
+    <div class="relative z-10 container mx-auto px-4 mt-4 text-center">
+        <h1 class="text-3xl md:text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
+            เลือกคนที่ใช่ เพื่อโรงเรียนของเรา
+        </h1>
+        <p class="text-slate-400 mb-12 text-lg">1 สิทธิ์ 1 เสียง ร่วมกำหนดอนาคต RPK26</p>
+
+        <div id="voting-area" class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            
+            <div class="party-card bg-slate-800 rounded-3xl overflow-hidden border border-slate-700 cursor-pointer group relative" onclick="selectParty(1)">
+                <div class="h-40 bg-gradient-to-br from-red-500 to-rose-700 flex items-center justify-center relative">
+                    <span class="text-8xl font-black text-white/20 absolute -right-4 -bottom-4">01</span>
+                    <div class="w-24 h-24 rounded-full bg-white border-4 border-white shadow-xl overflow-hidden relative z-10">
+                        <img src="https://ui-avatars.com/api/?name=P1&background=random" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-1">เบอร์ 1</h2>
+                    <p class="text-red-400 font-bold mb-4">พรรคพลังราชประชา</p>
+                    <p class="text-slate-400 text-sm">"เน้นกิจกรรม สร้างความสามัคคี"</p>
+                    <div class="mt-6 w-full py-3 rounded-xl bg-slate-700 text-slate-300 font-bold group-hover:bg-red-600 group-hover:text-white transition check-btn">เลือกเบอร์นี้</div>
+                </div>
+            </div>
+
+            <div class="party-card bg-slate-800 rounded-3xl overflow-hidden border border-slate-700 cursor-pointer group relative" onclick="selectParty(2)">
+                <div class="h-40 bg-gradient-to-br from-blue-500 to-indigo-700 flex items-center justify-center relative">
+                    <span class="text-8xl font-black text-white/20 absolute -right-4 -bottom-4">02</span>
+                    <div class="w-24 h-24 rounded-full bg-white border-4 border-white shadow-xl overflow-hidden relative z-10">
+                        <img src="https://ui-avatars.com/api/?name=P2&background=random" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-1">เบอร์ 2</h2>
+                    <p class="text-blue-400 font-bold mb-4">พรรคก้าวไกลการเรียน</p>
+                    <p class="text-slate-400 text-sm">"วิชาการเป็นเลิศ ทันสมัย"</p>
+                    <div class="mt-6 w-full py-3 rounded-xl bg-slate-700 text-slate-300 font-bold group-hover:bg-blue-600 group-hover:text-white transition check-btn">เลือกเบอร์นี้</div>
+                </div>
+            </div>
+
+            <div class="party-card bg-slate-800 rounded-3xl overflow-hidden border border-slate-700 cursor-pointer group relative" onclick="selectParty(3)">
+                <div class="h-40 bg-gradient-to-br from-emerald-500 to-green-700 flex items-center justify-center relative">
+                    <span class="text-8xl font-black text-white/20 absolute -right-4 -bottom-4">03</span>
+                    <div class="w-24 h-24 rounded-full bg-white border-4 border-white shadow-xl overflow-hidden relative z-10">
+                        <img src="https://ui-avatars.com/api/?name=P3&background=random" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-1">เบอร์ 3</h2>
+                    <p class="text-emerald-400 font-bold mb-4">พรรคราชประชาสามัคคี</p>
+                    <p class="text-slate-400 text-sm">"โปร่งใส ตรวจสอบได้"</p>
+                    <div class="mt-6 w-full py-3 rounded-xl bg-slate-700 text-slate-300 font-bold group-hover:bg-emerald-600 group-hover:text-white transition check-btn">เลือกเบอร์นี้</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="fixed bottom-0 left-0 w-full p-4 bg-slate-900/90 backdrop-blur border-t border-slate-700 transform translate-y-full transition duration-300 z-50 flex justify-center items-center gap-4" id="submit-bar">
+            <div class="text-white font-bold hidden md:block">คุณเลือก: <span class="text-yellow-400" id="selected-text">-</span></div>
+            <button onclick="confirmVote()" class="bg-gradient-to-r from-yellow-500 to-orange-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-orange-500/20 active:scale-95 transition w-full md:w-auto">
+                ยืนยันการลงคะแนน
+            </button>
+        </div>
+
+        <div id="voted-msg" class="hidden flex-col items-center justify-center py-20 animate-fade-in">
+            <div class="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center text-3xl text-white mb-6 shadow-2xl shadow-green-500/50">
+                <i class="fas fa-check"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-white mb-2">ขอบคุณที่ใช้สิทธิ์!</h2>
+            <p class="text-slate-400">ระบบบันทึกคะแนนแล้ว</p>
+            <a href="index.html" class="mt-8 px-6 py-2 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-800 transition">กลับหน้าหลัก</a>
+        </div>
+    </div>
+
+    <script>
+        let selectedParty = null;
+        if(localStorage.getItem('hasVoted')) showVotedState();
+
+        function selectParty(num) {
+            if(localStorage.getItem('hasVoted')) return;
+            selectedParty = num;
+            document.querySelectorAll('.party-card').forEach((card, idx) => {
+                const btn = card.querySelector('.check-btn');
+                if (idx + 1 === num) {
+                    card.classList.add('selected', 'ring-4', 'ring-yellow-500/30');
+                    btn.innerHTML = '<i class="fas fa-check"></i> เลือกแล้ว';
+                    btn.className = 'mt-6 w-full py-3 rounded-xl bg-yellow-500 text-black font-bold transition check-btn';
+                } else {
+                    card.classList.remove('selected', 'ring-4', 'ring-yellow-500/30');
+                    card.style.opacity = '0.5';
+                    btn.innerHTML = 'เลือกเบอร์นี้';
+                    btn.className = 'mt-6 w-full py-3 rounded-xl bg-slate-700 text-slate-300 font-bold group-hover:bg-gray-600 transition check-btn';
+                }
+            });
+            document.getElementById('submit-bar').classList.remove('translate-y-full');
+            document.getElementById('selected-text').innerText = `เบอร์ ${num}`;
+        }
+
+        async function confirmVote() {
+            if (!selectedParty || !confirm(`ยืนยันเลือกเบอร์ ${selectedParty}?`)) return;
+            try {
+                const res = await fetch('/api/vote', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ party: selectedParty })
+                });
+                if (res.ok) {
+                    localStorage.setItem('hasVoted', 'true');
+                    showVotedState();
+                } else alert('Error!');
+            } catch (err) { alert('Connection Failed'); }
+        }
+
+        function showVotedState() {
+            document.getElementById('voting-area').style.display = 'none';
+            document.getElementById('submit-bar').style.display = 'none';
+            document.getElementById('voted-msg').classList.remove('hidden');
+            document.getElementById('voted-msg').classList.add('flex');
+        }
+    </script>
+</body>
+</html>

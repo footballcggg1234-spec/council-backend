@@ -3,21 +3,20 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const session = require('express-session'); // ต้องมี session สำหรับ Login
+const session = require('express-session');
 
 const app = express();
 
 // --- 1. Middleware ---
-app.use(cors({ origin: true, credentials: true })); // อนุญาต Cookie ข้ามโดเมน
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '/'))); // ให้เข้าถึงไฟล์ html ได้
+app.use(express.static(path.join(__dirname, '/')));
 
-// ตั้งค่า Session (สำหรับการ Login)
 app.use(session({
     secret: 'school_council_secret_key_2025',
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 } // อยู่ได้ 1 วัน
+    cookie: { maxAge: 24 * 60 * 60 * 1000 }
 }));
 
 // --- 2. Database Connection ---
@@ -25,33 +24,42 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://admin:rungradit@cluster
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch(err => console.error('❌ MongoDB Error:', err));
 
-// --- 3. Import Models ---
-// (ถ้าไฟล์อยู่คนละที่ แก้ path ให้ถูกนะครับ แต่นี่คือ path มาตรฐาน)
-let News, Score, Suggestion;
+// --- 3. Import Models & Create Schemas ---
+let News, Score, Suggestion, Vote;
 try {
+    // พยายามโหลดจากไฟล์ (ถ้ามี)
     News = require('./models/News');
     Score = require('./models/Score');
     Suggestion = require('./models/Suggestion');
+    Vote = require('./models/Vote');
 } catch (e) {
-    console.log('⚠️ Warning: Models not found, creating temporary schemas...');
-    // สร้าง Schema สำรองกัน Error ถ้าหาไฟล์ไม่เจอ
+    console.log('⚠️ Models not found, using inline schemas...');
+    
     const anySchema = new mongoose.Schema({}, { strict: false });
+    
+    // Schema สำหรับระบบเลือกตั้ง
+    const voteSchema = new mongoose.Schema({
+        party: Number, // เบอร์ 1, 2, 3
+        timestamp: { type: Date, default: Date.now },
+        ip: String     // เก็บ IP (Optional)
+    });
+
     News = mongoose.models.News || mongoose.model('News', anySchema);
     Score = mongoose.models.Score || mongoose.model('Score', anySchema);
     Suggestion = mongoose.models.Suggestion || mongoose.model('Suggestion', anySchema);
+    Vote = mongoose.models.Vote || mongoose.model('Vote', voteSchema);
 }
 
 // ==========================================
-// 🚀 4. API ROUTES (ส่วนที่หายไป ผมเติมให้แล้ว)
+// 🚀 API ROUTES
 // ==========================================
 
-// --- A. ระบบ Login (สำคัญมาก!) ---
+// --- A. ระบบ Login ---
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    // ตั้งรหัสผ่านตรงนี้ (admin / 123456)
     if (username === 'admin' && password === '123456') {
         req.session.user = { username: 'admin', role: 'admin' };
-        req.session.save(); // บันทึก session
+        req.session.save();
         return res.json({ success: true });
     }
     res.status(401).json({ success: false, message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
@@ -71,7 +79,6 @@ app.get('/api/scores', async (req, res) => {
     try {
         let scores = await Score.find();
         if (scores.length === 0) {
-            // สร้างข้อมูลเริ่มต้นถ้ายังไม่มี
             const initialData = [];
             for(let i=1; i<=8; i++) initialData.push({ name: `หอพักชายที่ ${i}`, type: 'dorm', gender: 'male' });
             for(let i=9; i<=17; i++) initialData.push({ name: `หอพักหญิงที่ ${i}`, type: 'dorm', gender: 'female' });
@@ -86,10 +93,11 @@ app.get('/api/scores', async (req, res) => {
 
 app.put('/api/scores', async (req, res) => {
     try {
-        const updates = req.body; // รับเป็น Array
+        const updates = req.body;
         for (const item of updates) {
             const updateObj = {};
             updateObj[item.field] = item.value;
+            if(item.reason !== undefined) updateObj['last_reason'] = item.reason;
             await Score.findByIdAndUpdate(item._id, updateObj);
         }
         res.json({ success: true });
@@ -120,7 +128,31 @@ app.put('/api/suggestions/:id', async (req, res) => {
     res.json({ success: true });
 });
 
-// ==========================================
+// --- E. ระบบเลือกตั้ง (ELECTION) --- 
+app.post('/api/vote', async (req, res) => {
+    try {
+        const { party } = req.body;
+        if (![1, 2, 3].includes(party)) return res.status(400).json({ error: 'Invalid Party' });
+        
+        await new Vote({ party, ip: req.ip }).save();
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/election-results', async (req, res) => {
+    try {
+        const total = await Vote.countDocuments();
+        const p1 = await Vote.countDocuments({ party: 1 });
+        const p2 = await Vote.countDocuments({ party: 2 });
+        const p3 = await Vote.countDocuments({ party: 3 });
+        
+        res.json({ total, results: [p1, p2, p3] });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
