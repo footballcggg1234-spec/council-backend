@@ -3,176 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Student Council</title>
-    
+    <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
-        .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: #4b5563; border-radius: 0.75rem; transition: all 200ms ease; cursor: pointer; font-weight: 500; text-decoration: none; }
-        .sidebar-link:hover { background-color: #eff6ff; color: #2563eb; }
-        .sidebar-link.active { background-color: #2563eb; color: #ffffff; box-shadow: 0 10px 15px -3px rgba(37,99,235,0.12); }
-        .card { background-color: #ffffff; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #f3f4f6; }
+        .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: #4b5563; border-radius: 0.75rem; cursor: pointer; transition: 0.2s; }
+        .sidebar-link:hover, .sidebar-link.active { background-color: #eff6ff; color: #2563eb; }
+        .sidebar-link.active { box-shadow: 0 4px 6px -1px rgba(37,99,235,0.1); }
+        .card { background: white; border-radius: 1rem; padding: 1.5rem; border: 1px solid #f3f4f6; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
     <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 flex flex-col p-6 z-20 flex-shrink-0">
-        <div class="mb-8 text-center">
-            <h1 class="text-xl font-black text-slate-800">RPK26 ADMIN</h1>
-        </div>
+        <h1 class="text-xl font-black text-slate-800 text-center mb-8">RPK26 ADMIN</h1>
         <nav class="flex-1 space-y-2">
-            <a onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-link active"><i class="fas fa-chart-pie w-6 text-center"></i> Dashboard</a>
-            <a onclick="switchTab('scores')" id="nav-scores" class="sidebar-link"><i class="fas fa-edit w-6 text-center"></i> กรอกคะแนน</a>
-            <a onclick="switchTab('suggestions')" id="nav-suggestions" class="sidebar-link"><i class="fas fa-inbox w-6 text-center"></i> ความคิดเห็น</a>
-            <a onclick="switchTab('news')" id="nav-news" class="sidebar-link"><i class="fas fa-bullhorn w-6 text-center"></i> ข่าวสาร</a>
-            <a onclick="switchTab('election')" id="nav-election" class="sidebar-link"><i class="fas fa-vote-yea w-6 text-center"></i> ผลเลือกตั้ง</a>
+            <a onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-link active"><i class="fas fa-chart-pie w-6"></i> Dashboard</a>
+            <a onclick="switchTab('scores')" id="nav-scores" class="sidebar-link"><i class="fas fa-edit w-6"></i> กรอกคะแนน</a>
+            <a onclick="switchTab('suggestions')" id="nav-suggestions" class="sidebar-link"><i class="fas fa-inbox w-6"></i> ความคิดเห็น</a>
+            <a onclick="switchTab('news')" id="nav-news" class="sidebar-link"><i class="fas fa-bullhorn w-6"></i> ข่าวสาร</a>
+            <a onclick="switchTab('election')" id="nav-election" class="sidebar-link"><i class="fas fa-vote-yea w-6"></i> ผลเลือกตั้ง</a>
         </nav>
-        <button onclick="location.href='index.html'" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl mt-auto transition font-bold text-sm">
+        <button onclick="location.href='index.html'" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl mt-auto font-bold text-sm">
             <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
         </button>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50 relative w-full">
-        <header class="bg-white border-b h-16 flex items-center justify-between px-6 shadow-sm z-10">
-            <h2 class="text-lg font-bold text-gray-700">ระบบจัดการสภานักเรียน</h2>
-            <div class="text-sm font-bold text-gray-500">Admin Mode</div>
+    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50">
+        <header class="bg-white border-b h-16 flex items-center justify-between px-6 shadow-sm">
+            <h2 class="font-bold text-gray-700">ระบบจัดการสภานักเรียน</h2>
+            <div class="text-sm font-bold text-green-600">● Online</div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 relative">
+        <div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
             
             <div id="tab-dashboard" class="tab-content block space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="card border-l-4 border-blue-500"><p class="text-gray-400 text-xs font-bold uppercase">คะแนนหอ</p><h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-dorm-score">0</h3></div>
-                    <div class="card border-l-4 border-green-500"><p class="text-gray-400 text-xs font-bold uppercase">คะแนนห้อง</p><h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-class-score">0</h3></div>
-                    <div class="card border-l-4 border-purple-500"><p class="text-gray-400 text-xs font-bold uppercase">เรื่องร้องเรียน</p><h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-sug-count">0</h3></div>
-                    <div class="card border-l-4 border-orange-500"><p class="text-gray-400 text-xs font-bold uppercase">ข่าวสาร</p><h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-news-count">0</h3></div>
+                    <div class="card border-l-4 border-blue-500"><p class="text-gray-400 text-xs font-bold">DORM SCORE</p><h3 class="text-3xl font-black mt-1" id="stat-dorm">0</h3></div>
+                    <div class="card border-l-4 border-green-500"><p class="text-gray-400 text-xs font-bold">CLASS SCORE</p><h3 class="text-3xl font-black mt-1" id="stat-class">0</h3></div>
+                    <div class="card border-l-4 border-purple-500"><p class="text-gray-400 text-xs font-bold">ISSUES</p><h3 class="text-3xl font-black mt-1" id="stat-sug">0</h3></div>
+                    <div class="card border-l-4 border-orange-500"><p class="text-gray-400 text-xs font-bold">NEWS</p><h3 class="text-3xl font-black mt-1" id="stat-news">0</h3></div>
                 </div>
             </div>
 
             <div id="tab-scores" class="tab-content hidden space-y-6">
                 <div class="card">
-                    <div class="border-b pb-4 mb-4 flex flex-wrap gap-3">
-                        <button onclick="loadScoreInputs('exercise')" class="px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-blue-100 text-blue-700 font-bold transition">ตรวจออกกาย</button>
-                        <button onclick="loadScoreInputs('dorm')" class="px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-purple-100 text-purple-700 font-bold transition">ตรวจหอนอน</button>
-                        <button onclick="loadScoreInputs('classroom')" class="px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-green-100 text-green-700 font-bold transition">ตรวจห้องเรียน</button>
+                    <div class="flex gap-2 mb-4">
+                        <button onclick="loadScoreInputs('exercise')" class="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-bold hover:bg-blue-100">ออกกาย</button>
+                        <button onclick="loadScoreInputs('dorm')" class="px-4 py-2 bg-purple-50 text-purple-600 rounded-lg font-bold hover:bg-purple-100">หอนอน</button>
+                        <button onclick="loadScoreInputs('classroom')" class="px-4 py-2 bg-green-50 text-green-600 rounded-lg font-bold hover:bg-green-100">ห้องเรียน</button>
                     </div>
-                    <h3 id="score-title" class="text-xl font-bold text-gray-700 mb-4">เลือกหมวดหมู่</h3>
+                    <h3 id="score-title" class="text-xl font-bold mb-4">เลือกหมวดหมู่</h3>
                     <form onsubmit="saveScores(event)">
-                        <div id="admin-score-container" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[60vh] overflow-y-auto p-2"></div>
-                        <button type="submit" class="mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700">บันทึกทั้งหมด</button>
+                        <div id="score-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[50vh] overflow-y-auto p-1"></div>
+                        <button type="submit" class="mt-4 w-full bg-blue-600 text-white py-3 rounded-xl font-bold">บันทึก</button>
                     </form>
                 </div>
             </div>
 
-            <div id="tab-suggestions" class="tab-content hidden"><div class="card"><h2 class="text-xl font-bold mb-4">กล่องความคิดเห็น</h2><table class="w-full text-left"><thead><tr class="bg-gray-50 border-b"><th>หัวข้อ</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="suggestion-tbody"></tbody></table></div></div>
-            
-            <div id="tab-news" class="tab-content hidden space-y-6"><div class="card"><h3 class="text-lg font-bold mb-4">โพสต์ข่าว</h3><form onsubmit="postNews(event)" class="space-y-4"><input id="news-title" class="w-full p-3 bg-gray-50 border rounded-xl" placeholder="หัวข้อ" required><textarea id="news-content" class="w-full p-3 bg-gray-50 border rounded-xl" placeholder="เนื้อหา"></textarea><button class="px-8 py-2 bg-blue-600 text-white rounded-lg font-bold">โพสต์</button></form></div></div>
-
             <div id="tab-election" class="tab-content hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="card bg-gradient-to-br from-indigo-600 to-blue-700 text-white border-none">
-                        <h3 class="text-blue-100 font-bold uppercase text-xs mb-2">จำนวนผู้ใช้สิทธิ์</h3>
-                        <div class="flex items-end gap-4"><h2 class="text-5xl font-black" id="total-votes">0</h2><span class="text-blue-200 mb-2">คน</span></div>
+                        <p class="text-blue-200 text-xs font-bold uppercase">จำนวนผู้ใช้สิทธิ์</p>
+                        <div class="flex items-end gap-2"><h2 class="text-5xl font-black" id="total-votes">0</h2><span>คน</span></div>
                     </div>
-                    <div class="card flex flex-col justify-center items-center cursor-pointer hover:bg-gray-50 transition" onclick="updateElectionStats()">
-                        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xl mb-2"><i class="fas fa-sync-alt"></i></div>
-                        <h3 class="font-bold text-gray-700">รีเฟรช</h3>
+                    <div class="card flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50" onclick="updateElectionStats()">
+                        <i class="fas fa-sync-alt text-2xl text-blue-500 mb-2"></i>
+                        <span class="font-bold text-gray-600">รีเฟรชข้อมูล</span>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="card lg:col-span-2"><h3 class="font-bold mb-4">ผลคะแนน (Bar)</h3><div class="h-64"><canvas id="voteBarChart"></canvas></div></div>
-                    <div class="card"><h3 class="font-bold mb-4">สัดส่วน (Pie)</h3><div class="h-64"><canvas id="votePieChart"></canvas></div></div>
+                    <div class="card lg:col-span-2"><h3 class="font-bold mb-4">ผลคะแนน</h3><div class="h-64"><canvas id="voteBar"></canvas></div></div>
+                    <div class="card"><h3 class="font-bold mb-4">สัดส่วน</h3><div class="h-64"><canvas id="votePie"></canvas></div></div>
+                </div>
+
+                <div class="card border-l-4 border-red-500 bg-red-50 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-red-700"><i class="fas fa-exclamation-triangle mr-2"></i>โซนอันตราย</h3>
+                        <p class="text-xs text-red-500">ล้างคะแนนโหวตทั้งหมด (ใช้เมื่อเริ่มการเลือกตั้งใหม่)</p>
+                    </div>
+                    <button onclick="resetElection()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-700 shadow-lg">
+                        <i class="fas fa-trash-alt mr-2"></i> ล้างคะแนน
+                    </button>
                 </div>
             </div>
 
+            <div id="tab-news" class="tab-content hidden"><div class="card"><h3 class="font-bold mb-4">โพสต์ข่าว</h3><form onsubmit="postNews(event)" class="space-y-4"><input id="nt" class="w-full p-3 border rounded-lg" placeholder="หัวข้อ"><textarea id="nc" class="w-full p-3 border rounded-lg" placeholder="เนื้อหา"></textarea><button class="bg-blue-600 text-white px-6 py-2 rounded-lg">โพสต์</button></form></div></div>
+            <div id="tab-suggestions" class="tab-content hidden"><div class="card"><h3 class="font-bold mb-4">ร้องเรียน</h3><table class="w-full"><tbody id="sug-body"></tbody></table></div></div>
         </div>
     </main>
 
     <script>
-        const API_BASE = '/api';
-        let allScoreData = [];
-        let currentAdminMode = '';
-        let voteBarChart = null, votePieChart = null;
-
-        async function initDashboard() {
-            try {
-                const [sc, sg, nw] = await Promise.all([fetch(`${API_BASE}/scores`), fetch(`${API_BASE}/suggestions`), fetch(`${API_BASE}/news`)]);
-                allScoreData = await sc.json();
-                const sugs = await sg.json();
-                const news = await nw.json();
-                
-                document.getElementById('stat-dorm-score').innerText = allScoreData.filter(d=>d.type==='dorm').reduce((a,b)=>a+(b.points_exercise||0)+(b.points_dorm||0),0);
-                document.getElementById('stat-class-score').innerText = allScoreData.filter(d=>d.type==='classroom').reduce((a,b)=>a+(b.points_class||0),0);
-                document.getElementById('stat-sug-count').innerText = sugs.length;
-                document.getElementById('stat-news-count').innerText = news.length;
-
-                renderSuggestions(sugs);
-            } catch (e) { console.error(e); }
-        }
+        const API = '/api';
+        let allScores = [], mode = '', vBar = null, vPie = null;
 
         function switchTab(t) {
-            document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden')); document.getElementById(`tab-${t}`).classList.remove('hidden');
-            document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active')); document.getElementById(`nav-${t}`).classList.add('active');
-            if(t==='election') updateElectionStats();
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${t}`).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-${t}`).classList.add('active');
+            if(t === 'election') updateElectionStats();
+            else if(t === 'dashboard') init();
         }
 
-        // --- Scores Logic ---
+        async function init() {
+            const [s, sg, nw] = await Promise.all([fetch(`${API}/scores`), fetch(`${API}/suggestions`), fetch(`${API}/news`)]);
+            allScores = await s.json();
+            const sugs = await sg.json();
+            const news = await nw.json();
+            
+            document.getElementById('stat-dorm').innerText = allScores.filter(d=>d.type==='dorm').reduce((a,b)=>a+(b.points_exercise||0)+(b.points_dorm||0),0);
+            document.getElementById('stat-class').innerText = allScores.filter(d=>d.type==='classroom').reduce((a,b)=>a+(b.points_class||0),0);
+            document.getElementById('stat-sug').innerText = sugs.length;
+            document.getElementById('stat-news').innerText = news.length;
+            
+            document.getElementById('sug-body').innerHTML = sugs.map(i => `<tr class="border-b"><td class="p-3">${i.topic}</td><td class="p-3 font-bold ${i.status==='resolved'?'text-green-500':'text-yellow-500'}">${i.status}</td><td class="p-3"><button onclick="solve('${i._id}')" class="text-blue-500">จบงาน</button></td></tr>`).join('');
+        }
+
+        async function solve(id) { await fetch(`${API}/suggestions/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:'resolved'})}); init(); }
+        async function postNews(e) { e.preventDefault(); await fetch(`${API}/news`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({title:document.getElementById('nt').value, content:document.getElementById('nc').value})}); alert('Posted'); init(); }
+
         function loadScoreInputs(m) {
-            currentAdminMode=m; const con=document.getElementById('admin-score-container'); document.getElementById('score-title').innerText = m.toUpperCase();
-            const filtered = allScoreData.filter(d => (m==='classroom' ? d.type==='classroom' : d.type==='dorm'));
-            filtered.sort((a,b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
-            
+            mode = m; document.getElementById('score-title').innerText = m.toUpperCase();
+            const data = allScores.filter(d => (m==='classroom' ? d.type==='classroom' : d.type==='dorm')).sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
             const field = m==='classroom'?'points_class':(m==='exercise'?'points_exercise':'points_dorm');
-            
-            con.innerHTML = filtered.map(i => `
-                <div class="bg-white p-4 rounded-xl border">
-                    <div class="font-bold mb-2 text-gray-700">${i.name}</div>
-                    <input type="number" class="score-input w-full bg-gray-50 border rounded-lg p-2 text-center font-bold text-blue-600 mb-2" data-id="${i._id}" value="${i[field]||0}">
-                    <input type="text" class="reason-input w-full bg-gray-50 border rounded-lg px-2 py-1 text-sm" placeholder="เหตุผล..." value="${i.last_reason||''}">
-                </div>`).join('');
+            document.getElementById('score-container').innerHTML = data.map(i => `<div class="bg-gray-50 p-3 rounded border"><div class="font-bold text-gray-700">${i.name}</div><input type="number" class="score-inp w-full p-2 border rounded mt-1 text-center font-bold text-blue-600" data-id="${i._id}" value="${i[field]||0}"></div>`).join('');
         }
 
         async function saveScores(e) {
             e.preventDefault();
-            const field = currentAdminMode==='classroom'?'points_class':(currentAdminMode==='exercise'?'points_exercise':'points_dorm');
-            const updates = Array.from(document.querySelectorAll('.score-input')).map(inp => ({
-                _id: inp.dataset.id, field: field, value: parseInt(inp.value), reason: inp.nextElementSibling.value
-            }));
-            await fetch(`${API_BASE}/scores`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(updates)});
-            alert('Saved!'); initDashboard();
+            const field = mode==='classroom'?'points_class':(mode==='exercise'?'points_exercise':'points_dorm');
+            const body = Array.from(document.querySelectorAll('.score-inp')).map(inp => ({ _id: inp.dataset.id, field, value: parseInt(inp.value) }));
+            await fetch(`${API}/scores`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+            alert('บันทึกแล้ว'); init();
         }
 
-        // --- Suggestion & News ---
-        function renderSuggestions(d) { document.getElementById('suggestion-tbody').innerHTML=d.map(s=>`<tr class="border-b"><td class="p-3 font-bold">${s.topic}</td><td class="p-3">${s.status}</td><td class="p-3"><button onclick="updSug('${s._id}')" class="text-green-600 font-bold">จบงาน</button></td></tr>`).join(''); }
-        async function updSug(id) { await fetch(`${API_BASE}/suggestions/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:'resolved'})}); initDashboard(); }
-        async function postNews(e) { e.preventDefault(); await fetch(`${API_BASE}/news`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({title:document.getElementById('news-title').value, content:document.getElementById('news-content').value})}); alert('Posted'); initDashboard(); }
-
-        // --- Election Logic ---
+        // --- ELECTION LOGIC ---
         async function updateElectionStats() {
-            const res = await fetch('/api/election-results');
+            const res = await fetch(`${API}/election-results`);
             const data = await res.json();
             document.getElementById('total-votes').innerText = data.total;
 
-            const labels = ['เบอร์ 1', 'เบอร์ 2', 'เบอร์ 3'];
-            const colors = ['#ef4444', '#3b82f6', '#10b981'];
-
-            if(voteBarChart) voteBarChart.destroy();
-            voteBarChart = new Chart(document.getElementById('voteBarChart'), {
-                type: 'bar', data: { labels, datasets: [{ label: 'คะแนน', data: data.results, backgroundColor: colors, borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-
-            if(votePieChart) votePieChart.destroy();
-            votePieChart = new Chart(document.getElementById('votePieChart'), {
-                type: 'doughnut', data: { labels, datasets: [{ data: data.results, backgroundColor: colors, borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+            const cfg = { labels:['เบอร์ 1','เบอร์ 2','เบอร์ 3'], datasets:[{data:data.results, backgroundColor:['#ef4444','#3b82f6','#10b981']}] };
+            
+            if(vBar) vBar.destroy();
+            vBar = new Chart(document.getElementById('voteBar'), { type:'bar', data:cfg, options:{plugins:{legend:{display:false}}} });
+            
+            if(vPie) vPie.destroy();
+            vPie = new Chart(document.getElementById('votePie'), { type:'doughnut', data:cfg });
         }
 
-        initDashboard();
+        async function resetElection() {
+            if(confirm('⚠️ ยืนยันล้างคะแนนทั้งหมด? (กู้คืนไม่ได้)')) {
+                await fetch(`${API}/election-reset`, {method:'DELETE'});
+                alert('ล้างคะแนนแล้ว'); updateElectionStats();
+            }
+        }
+
+        init();
     </script>
 </body>
 </html>
