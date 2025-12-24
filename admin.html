@@ -99,13 +99,26 @@
 
     <script>
         const API = '/api';
-        let allScores=[], currentAdminMode='', vBar=null, vPie=null;
+        let allScores = [], currentAdminMode = '';
+        
+        // ตัวแปรเก็บกราฟ (ไว้สำหรับลบค่าเก่าก่อนสร้างใหม่)
+        let voteBarChart = null;
+        let votePieChart = null;
+        let dashboardBarChart = null;
+        let dashboardDonutChart = null;
 
-        function switchTab(t) {
-            document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden')); document.getElementById(`tab-${t}`).classList.remove('hidden');
-            document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active','bg-blue-600','text-white')); document.getElementById(`nav-${t}`).classList.add('active');
-            if(t==='election') updateElectionStats(); else if(t==='dashboard') init(); else if(t==='scores') setAutoDate();
-        }
+        function toggleSidebar() { const s = document.getElementById('sidebar'); s.classList.toggle('hidden'); }
+        function toggleFullScreen() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); } else { if (document.exitFullscreen) document.exitFullscreen(); } }
+
+        // เริ่มต้นทำงาน
+        init();
+        
+        // ตั้งค่าวันปัจจุบันให้ Dropdown
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().getDay();
+            if(today >= 1 && today <= 5) document.getElementById('day-selector').value = today;
+            else document.getElementById('day-selector').value = 1;
+        });
 
         async function init() {
             try {
@@ -119,27 +132,95 @@
                 
                 // Auto Date Init
                 setAutoDate();
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error("Init Error:", e); }
+        }
+
+        function switchTab(t) {
+            document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden')); 
+            document.getElementById(`tab-${t}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active')); 
+            document.getElementById(`nav-${t}`).classList.add('active');
+
+            if(t === 'election') updateElectionStats();
+            if(t === 'dashboard') renderCharts(allScores); // วาดกราฟใหม่เมื่อกลับมาหน้า Dashboard
+        }
+
+        // --- Helper: คำนวณคะแนนรวมรายวัน (จ-ศ) ---
+        function getSum(item, field) {
+            let sum = item[field] || 0; // คะแนนเดิม (ถ้ามี)
+            for(let i=1; i<=5; i++) sum += (item[`${field}_${i}`] || 0); // บวกคะแนน จ-ศ
+            return sum;
         }
 
         function updateStats(scores, sugs, news, elec) {
-            document.getElementById('stat-dorm').innerText = scores.filter(d=>d.type==='dorm').length;
-            document.getElementById('stat-class').innerText = scores.filter(d=>d.type==='classroom').length;
+            // คำนวณคะแนนรวมทั้งหมด
+            const tDorm = scores.filter(s=>s.type==='dorm').reduce((a,b)=>a + getSum(b, 'points_exercise') + getSum(b, 'points_dorm'), 0);
+            const tClass = scores.filter(s=>s.type==='classroom').reduce((a,b)=>a + getSum(b, 'points_class'), 0);
+            
+            document.getElementById('stat-dorm').innerText = tDorm.toLocaleString();
+            document.getElementById('stat-class').innerText = tClass.toLocaleString();
             document.getElementById('stat-vote').innerText = elec.total;
             document.getElementById('stat-sug').innerText = sugs.length;
         }
 
         function renderCharts(data) {
-            // (Same chart logic)
-            const dorms = data.filter(d=>d.type==='dorm').sort((a,b)=>(b.points_exercise+b.points_dorm)-(a.points_exercise+a.points_dorm)).slice(0,5);
-            new Chart(document.getElementById('barChart'), { 
-                type:'bar', data:{labels:dorms.map(d=>d.name), datasets:[{label:'คะแนน', data:dorms.map(d=>(d.points_exercise||0)+(d.points_dorm||0)), backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#3b82f6', '#3b82f6'], borderRadius:6}]}, 
-                options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}} 
+            // --- 1. กราฟแท่ง (5 อันดับหอพัก) ---
+            const dorms = data.filter(d=>d.type==='dorm');
+            // คำนวณคะแนนรวมแต่ละหอ
+            dorms.forEach(d => {
+                d.totalScore = getSum(d, 'points_exercise') + getSum(d, 'points_dorm');
             });
-            const tEx = data.filter(d=>d.type==='dorm').reduce((a,b)=>a+(b.points_exercise||0),0);
-            const tDo = data.filter(d=>d.type==='dorm').reduce((a,b)=>a+(b.points_dorm||0),0);
-            const tCl = data.filter(d=>d.type==='classroom').reduce((a,b)=>a+(b.points_class||0),0);
-            new Chart(document.getElementById('donutChart'), { type:'doughnut', data:{labels:['ออกกาย','หอนอน','ห้องเรียน'], datasets:[{data:[tEx,tDo,tCl], backgroundColor:['#3b82f6','#a855f7','#f59e0b'], borderWidth:0, hoverOffset:5}]}, options:{cutout:'75%', plugins:{legend:{display:false}}} });
+            // เรียงลำดับ
+            dorms.sort((a,b) => b.totalScore - a.totalScore);
+            const top5 = dorms.slice(0, 5);
+
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+            if (dashboardBarChart) dashboardBarChart.destroy(); // ⚠️ สำคัญ: ลบกราฟเก่าก่อนสร้างใหม่
+            
+            dashboardBarChart = new Chart(ctxBar, { 
+                type:'bar', 
+                data:{
+                    labels: top5.map(d=>d.name), 
+                    datasets:[{
+                        label:'คะแนนรวม', 
+                        data: top5.map(d=>d.totalScore), 
+                        backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899'], 
+                        borderRadius:6
+                    }]
+                }, 
+                options:{
+                    responsive:true, 
+                    maintainAspectRatio:false, 
+                    plugins:{legend:{display:false}}, 
+                    scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}
+                } 
+            });
+
+            // --- 2. กราฟโดนัท (สัดส่วนคะแนน) ---
+            const tEx = data.filter(d=>d.type==='dorm').reduce((a,b)=>a + getSum(b, 'points_exercise'), 0);
+            const tDo = data.filter(d=>d.type==='dorm').reduce((a,b)=>a + getSum(b, 'points_dorm'), 0);
+            const tCl = data.filter(d=>d.type==='classroom').reduce((a,b)=>a + getSum(b, 'points_class'), 0);
+
+            const ctxDonut = document.getElementById('donutChart').getContext('2d');
+            if (dashboardDonutChart) dashboardDonutChart.destroy(); // ⚠️ ลบกราฟเก่า
+
+            dashboardDonutChart = new Chart(ctxDonut, { 
+                type:'doughnut', 
+                data:{
+                    labels:['ออกกาย','หอนอน','ห้องเรียน'], 
+                    datasets:[{
+                        data: [tEx, tDo, tCl], 
+                        backgroundColor:['#3b82f6','#a855f7','#f59e0b'], 
+                        borderWidth:0, 
+                        hoverOffset:5
+                    }]
+                }, 
+                options:{
+                    cutout:'70%', 
+                    plugins:{legend:{position:'bottom', labels:{usePointStyle:true}}}
+                } 
+            });
         }
 
         // --- 📅 AUTO DATE LOGIC ---
@@ -152,14 +233,12 @@
             const btnSave = document.getElementById('btn-save');
 
             if(dayNum >= 1 && dayNum <= 5) {
-                // วันธรรมดา: ล็อควันให้เลย
                 selector.value = dayNum;
                 display.innerText = "วัน" + dayNames[dayNum];
                 display.className = "text-sm font-black text-blue-800";
                 btnSave.disabled = false;
                 btnSave.innerHTML = `<i class="fas fa-save mr-2"></i> บันทึกคะแนน (ประจำวัน${dayNames[dayNum]})`;
             } else {
-                // เสาร์-อาทิตย์: แจ้งเตือน + Default เป็นจันทร์ (เผื่อมาเก็บตกงาน)
                 selector.value = 1;
                 display.innerText = "วันหยุด (" + dayNames[dayNum] + ")";
                 display.className = "text-sm font-black text-red-500";
@@ -170,13 +249,8 @@
 
         function toggleManualDate() {
             const sel = document.getElementById('day-selector');
-            if(sel.classList.contains('hidden')) {
-                sel.classList.remove('hidden');
-                alert('เปิดโหมดแก้ไขวันเอง (Manual Override) เผื่อต้องการแก้คะแนนย้อนหลัง');
-            } else {
-                sel.classList.add('hidden');
-                setAutoDate(); // Reset กลับเป็น Auto
-            }
+            sel.classList.toggle('hidden');
+            if(!sel.classList.contains('hidden')) alert('เปิดโหมดแก้ไขวันเอง (Manual Override)');
         }
 
         function loadScoreInputs(m) {
@@ -204,13 +278,14 @@
                 if(m === 'classroom') {
                     con.innerHTML += `<div class="bg-white p-4 rounded-xl border shadow-sm"><div class="font-bold text-gray-700 mb-2">${i.name}</div><input type="number" class="score-inp w-full p-2 border rounded text-center font-bold text-green-600 text-xl" data-id="${i._id}" value="${val||''}" placeholder="0-10" min="0" max="10"></div>`;
                 } else {
+                    const isGreen = val==3; const isYellow = val==2; const isRed = val==1;
                     con.innerHTML += `
                     <div class="bg-white p-4 rounded-xl border shadow-sm group">
                         <div class="flex justify-between mb-2"><span class="font-bold text-gray-700">${i.name}</span>${val?`<span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded"><i class="fas fa-check"></i> ${val}</span>`:''}</div>
                         <div class="grid grid-cols-3 gap-2 mb-2">
-                            <button type="button" onclick="setScore(this,3)" class="py-2 rounded font-bold border ${val==3?'bg-green-500 text-white':'bg-white text-gray-400'}">3</button>
-                            <button type="button" onclick="setScore(this,2)" class="py-2 rounded font-bold border ${val==2?'bg-yellow-400 text-white':'bg-white text-gray-400'}">2</button>
-                            <button type="button" onclick="setScore(this,1)" class="py-2 rounded font-bold border ${val==1?'bg-red-500 text-white':'bg-white text-gray-400'}">1</button>
+                            <button type="button" onclick="setScore(this,3)" class="py-2 rounded font-bold border ${isGreen?'bg-green-500 text-white':'bg-white text-gray-400'}">3</button>
+                            <button type="button" onclick="setScore(this,2)" class="py-2 rounded font-bold border ${isYellow?'bg-yellow-400 text-white':'bg-white text-gray-400'}">2</button>
+                            <button type="button" onclick="setScore(this,1)" class="py-2 rounded font-bold border ${isRed?'bg-red-500 text-white':'bg-white text-gray-400'}">1</button>
                         </div>
                         <input type="hidden" class="score-inp" data-id="${i._id}" value="${val}">
                         <input type="text" class="reason-inp w-full text-xs p-2 border rounded" placeholder="หมายเหตุ..." value="${reason}">
@@ -260,19 +335,22 @@
 
         // --- Other Functions ---
         async function solve(id) { await fetch(`${API}/suggestions/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:'resolved'})}); init(); }
-        async function postNews(e) { e.preventDefault(); await fetch(`${API}/news`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({title:document.getElementById('nt').value, content:document.getElementById('nc').value})}); alert('Posted'); }
+        async function postNews(e) { e.preventDefault(); await fetch(`${API}/news`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({title:document.getElementById('news-title').value, content:document.getElementById('nc').value})}); alert('Posted'); }
         async function updateElectionStats() {
             const res = await fetch(`${API}/election-results`); const d = await res.json();
             document.getElementById('total-votes').innerText = d.total;
             const cfg = {labels:['เบอร์ 1','เบอร์ 2','เบอร์ 3'], datasets:[{data:d.results, backgroundColor:['#ef4444','#3b82f6','#10b981']}]};
-            if(vBar) vBar.destroy(); vBar=new Chart(document.getElementById('voteBar'),{type:'bar',data:cfg,options:{plugins:{legend:{display:false}}}});
-            if(vPie) vPie.destroy(); vPie=new Chart(document.getElementById('votePie'),{type:'doughnut',data:cfg});
+            
+            const ctxBar = document.getElementById('voteBarChart').getContext('2d');
+            if(voteBarChart) voteBarChart.destroy();
+            voteBarChart = new Chart(ctxBar, { type:'bar', data:{labels:['เบอร์ 1','เบอร์ 2','เบอร์ 3'], datasets:[{label:'คะแนน', data:d.results, backgroundColor:['#ef4444','#3b82f6','#10b981']}]}, options:{scales:{y:{beginAtZero:true}}} });
+
+            const ctxPie = document.getElementById('votePieChart').getContext('2d');
+            if(votePieChart) votePieChart.destroy();
+            votePieChart = new Chart(ctxPie, { type:'doughnut', data:cfg });
         }
         async function resetElection() { if(confirm('ล้างผลโหวต?')) { await fetch(`${API}/election-reset`,{method:'DELETE'}); updateElectionStats(); } }
-        function toggleSidebar() { const s = document.getElementById('sidebar'); s.classList.toggle('hidden'); }
-        function toggleFullScreen() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); } else { if (document.exitFullscreen) document.exitFullscreen(); } }
-
-        init();
+        async function delNews(id) { if(confirm('ลบข่าวนี้?')) { await fetch(`${API}/news/${id}`, {method:'DELETE'}); init(); } }
     </script>
 </body>
 </html>
