@@ -3,66 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Score Report</title>
+    <title>รายงานคะแนนหอพักประจำสัปดาห์ | Student Council</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>body { font-family: 'Sarabun', sans-serif; background: #f8fafc; } .badge-green{background:#dcfce7;color:#166534} .badge-yellow{background:#fef9c3;color:#854d0e} .badge-red{background:#fee2e2;color:#991b1b}</style>
+
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; }
+        .table-header { @apply px-2 py-3 text-center text-xs font-bold uppercase tracking-wider border-b-2; }
+        .table-cell { @apply px-2 py-3 text-center border-b border-gray-100 text-sm font-medium align-top; } 
+        .badge-green { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-yellow { background-color: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+        .badge-red { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .badge-gray { background-color: #f3f4f6; color: #9ca3af; border: 1px solid #e5e7eb; }
+        .total-cell { font-weight: 800; font-size: 1.1rem; vertical-align: middle; }
+    </style>
 </head>
-<body class="p-6">
-    <div class="max-w-7xl mx-auto space-y-8">
-        <div class="flex justify-between items-center">
-            <div><h1 class="text-3xl font-black text-gray-800">รายงานคะแนนหอพัก</h1><p class="text-gray-500">ประจำสัปดาห์</p></div>
-            <button onclick="fetchData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow font-bold"><i class="fas fa-sync-alt"></i> อัปเดต</button>
+<body class="p-4 md:p-8 min-h-screen">
+
+    <div class="max-w-[1600px] mx-auto space-y-8">
+        
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-2">
+            <div>
+                <h1 class="text-3xl font-extrabold text-gray-800">รายงานคะแนนหอพัก</h1>
+                <p class="text-gray-500 font-medium mt-1">
+                    <i class="far fa-calendar-alt mr-2"></i>อัปเดตแบบ Real-time (จันทร์ - ศุกร์)
+                </p>
+            </div>
+            
+            <div class="flex flex-col items-end gap-2">
+                <div class="flex gap-2 text-xs font-bold bg-white px-3 py-2 rounded-lg shadow-sm border">
+                    <span class="text-gray-500 mr-1">เกณฑ์:</span>
+                    <span class="text-green-700"><span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-1"></span>3 ผ่าน</span>
+                    <span class="text-yellow-700"><span class="w-2 h-2 rounded-full bg-yellow-500 inline-block mr-1"></span>2 ปรับปรุง</span>
+                    <span class="text-red-700"><span class="w-2 h-2 rounded-full bg-red-500 inline-block mr-1"></span>1 ไม่ผ่าน</span>
+                </div>
+                <div class="flex gap-2">
+                     <a href="classroom-weekly.html" class="px-4 py-2 bg-white text-green-600 border border-green-200 rounded-lg shadow hover:bg-green-50 font-bold transition flex items-center gap-2">
+                        <i class="fas fa-chalkboard"></i> ดูคะแนนห้องเรียน
+                    </a>
+                     <button onclick="fetchAndRender()" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 font-bold transition flex items-center gap-2">
+                        <i class="fas fa-sync-alt"></i> อัปเดต
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                <div class="p-4 bg-blue-50 border-b border-blue-100 font-bold text-blue-700 flex items-center gap-2"><i class="fas fa-running"></i> ตรวจออกกาย</div>
-                <div class="overflow-x-auto"><table class="w-full text-sm text-center"><thead class="bg-gray-50 text-gray-500 font-bold"><tr><th class="p-3 text-left">หอพัก</th><th>จ.</th><th>อ.</th><th>พ.</th><th>พฤ.</th><th>ศ.</th></tr></thead><tbody id="tb-ex"></tbody></table></div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-blue-100 overflow-hidden">
+                <div class="p-5 bg-blue-50 border-b border-blue-100 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-xl"><i class="fas fa-running"></i></div>
+                        <h2 class="text-xl font-bold text-gray-800">ตรวจออกกายบริหาร</h2>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-blue-600 uppercase bg-blue-50/50 border-b border-blue-100 w-24">หอพัก</th>
+                                <th class="table-header text-gray-500 day-col-1">จ.</th>
+                                <th class="table-header text-gray-500 day-col-2">อ.</th>
+                                <th class="table-header text-gray-500 day-col-3">พ.</th>
+                                <th class="table-header text-gray-500 day-col-4">พฤ.</th>
+                                <th class="table-header text-gray-500 day-col-5">ศ.</th>
+                                <th class="table-header text-blue-600 bg-blue-50 w-16">รวม</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-exercise">
+                            <tr><td colspan="7" class="p-4 text-center text-gray-400">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                <div class="p-4 bg-purple-50 border-b border-purple-100 font-bold text-purple-700 flex items-center gap-2"><i class="fas fa-bed"></i> ตรวจหอนอน</div>
-                <div class="overflow-x-auto"><table class="w-full text-sm text-center"><thead class="bg-gray-50 text-gray-500 font-bold"><tr><th class="p-3 text-left">หอพัก</th><th>จ.</th><th>อ.</th><th>พ.</th><th>พฤ.</th><th>ศ.</th></tr></thead><tbody id="tb-dorm"></tbody></table></div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-purple-100 overflow-hidden">
+                <div class="p-5 bg-purple-50 border-b border-purple-100 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 text-xl"><i class="fas fa-bed"></i></div>
+                        <h2 class="text-xl font-bold text-gray-800">ตรวจหอนอน</h2>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-purple-600 uppercase bg-purple-50/50 border-b border-purple-100 w-24">หอพัก</th>
+                                <th class="table-header text-gray-500 day-col-1">จ.</th>
+                                <th class="table-header text-gray-500 day-col-2">อ.</th>
+                                <th class="table-header text-gray-500 day-col-3">พ.</th>
+                                <th class="table-header text-gray-500 day-col-4">พฤ.</th>
+                                <th class="table-header text-gray-500 day-col-5">ศ.</th>
+                                <th class="table-header text-purple-600 bg-purple-50 w-16">รวม</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-dorm">
+                            <tr><td colspan="7" class="p-4 text-center text-gray-400">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
         </div>
     </div>
 
     <script>
-        const API = 'https://school-council-26.onrender.com/api/scores'; // แก้ URL ให้ตรง
-        const today = new Date().getDay();
+        const API_URL = '/api/scores';
+        const today = new Date().getDay(); // 1=Mon, 5=Fri
 
-        async function fetchData() {
+        async function fetchAndRender() {
             try {
-                const res = await fetch(API);
-                const data = await res.json();
-                const dorms = data.filter(d => d.type === 'dorm').sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
-                renderTable('tb-ex', dorms, 'points_exercise');
-                renderTable('tb-dorm', dorms, 'points_dorm');
-            } catch(e) { console.error(e); }
+                const res = await fetch(API_URL);
+                const allData = await res.json();
+                
+                // กรองและเรียงลำดับ
+                const dormData = allData.filter(d => d.type === 'dorm');
+                dormData.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
+
+                renderTable('tbody-exercise', dormData, 'points_exercise', 'blue');
+                renderTable('tbody-dorm', dormData, 'points_dorm', 'purple');
+
+                // ไฮไลท์หัวตารางวันปัจจุบัน
+                if(today >= 1 && today <= 5) {
+                    document.querySelectorAll(`.day-col-${today}`).forEach(el => {
+                        el.classList.add('bg-yellow-100', 'text-yellow-700');
+                        el.innerHTML += ' <i class="fas fa-caret-down"></i>';
+                    });
+                }
+            } catch (error) { console.error('Error:', error); }
         }
 
-        function renderTable(id, data, keyPrefix) {
-            document.getElementById(id).innerHTML = data.map((d, idx) => {
-                let days = '';
-                for(let i=1; i<=5; i++) {
-                    const score = d[`${keyPrefix}_${i}`];
-                    const reason = d[`reason_${keyPrefix}_${i}`];
-                    let cellContent = '<span class="text-gray-300">-</span>';
+        function renderTable(elementId, data, keyPrefix, colorTheme) {
+            const tbody = document.getElementById(elementId);
+            const totalColor = colorTheme === 'blue' ? 'text-blue-600 bg-blue-50' : 'text-purple-600 bg-purple-50';
+
+            tbody.innerHTML = data.map((item, index) => {
+                const rowBg = index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50';
+                let daysHtml = '';
+                let totalScore = 0;
+
+                // ลูปสร้างช่อง 5 วัน (จันทร์-ศุกร์)
+                for (let i = 1; i <= 5; i++) {
+                    let dayScore = item[`${keyPrefix}_${i}`];
+                    let dayReason = item[`reason_${keyPrefix}_${i}`] || "";
+                    const isTodayClass = (i === today) ? 'bg-yellow-50' : '';
                     
-                    if(score) {
-                        let color = score==3?'badge-green':(score==2?'badge-yellow':'badge-red');
-                        let tooltip = reason ? `<div class="group relative inline-block ml-1"><i class="fas fa-info-circle text-gray-400 text-[10px]"></i><div class="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs p-1 rounded whitespace-nowrap z-10">${reason}</div></div>` : '';
-                        cellContent = `<span class="${color} px-2 py-0.5 rounded font-bold text-xs">${score}</span>${tooltip}`;
+                    if (dayScore) {
+                        totalScore += parseInt(dayScore); // รวมคะแนน
+                        let reasonHtml = '';
+                        if (dayReason) {
+                            reasonHtml = `<div class="mt-1 group relative cursor-help"><div class="hidden group-hover:block absolute z-10 bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[150px] bg-black/80 text-white text-xs p-2 rounded shadow-lg backdrop-blur">${dayReason}</div><i class="fas fa-comment-dots text-yellow-500 text-xs"></i></div>`;
+                        } else reasonHtml = `<div class="mt-1 h-4"></div>`;
+
+                        daysHtml += `<td class="table-cell px-2 align-top min-w-[60px] ${isTodayClass}"><div class="flex flex-col items-center"><span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold shadow-sm ${getBadgeColor(dayScore)}">${dayScore}</span>${reasonHtml}</div></td>`;
+                    } else {
+                        daysHtml += `<td class="table-cell text-gray-300 align-middle ${isTodayClass}">-</td>`;
                     }
-                    
-                    const isToday = i===today ? 'bg-yellow-50' : '';
-                    days += `<td class="p-3 border-b ${isToday}">${cellContent}</td>`;
                 }
-                return `<tr class="hover:bg-gray-50"><td class="p-3 text-left font-bold text-gray-700 border-b">${d.name}</td>${days}</tr>`;
+
+                return `<tr class="${rowBg} hover:bg-gray-100 transition"><td class="px-4 py-3 text-sm font-bold text-gray-700 text-left border-b border-gray-100 align-middle">${item.name}</td>${daysHtml}<td class="table-cell total-cell ${totalColor} border-l border-gray-100 align-middle">${totalScore}</td></tr>`;
             }).join('');
         }
-        fetchData();
+
+        function getBadgeColor(score) {
+            score = parseInt(score);
+            if (score === 3) return 'badge-green';
+            if (score === 2) return 'badge-yellow';
+            return 'badge-red';
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchAndRender);
     </script>
 </body>
 </html>
