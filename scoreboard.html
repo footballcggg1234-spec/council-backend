@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Voter Count</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background: #0f172a; color: white; overflow: hidden; }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 80px rgba(0, 0, 0, 0.4);
+        }
+
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.4;
+            animation: float 10s infinite ease-in-out;
+        }
+        .orb-1 { top: -10%; left: -10%; width: 60vw; height: 60vw; background: #3b82f6; animation-delay: 0s; }
+        .orb-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: #8b5cf6; animation-delay: -5s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+        }
+
+        .count-up { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* Font Shadow เพื่อให้อ่านง่ายขึ้นบนพื้นหลังเข้ม */
+        .text-glow { text-shadow: 0 0 40px rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="h-screen flex flex-col items-center justify-center relative">
+
+    <div class="fixed inset-0 -z-10 overflow-hidden">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="absolute inset-0 bg-slate-900/40"></div>
+    </div>
+
+    <div class="absolute top-10 left-10 flex items-center gap-5 opacity-90">
+        <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center font-bold text-2xl border border-white/10 shadow-lg">26</div>
+        <div>
+            <h1 class="font-bold text-2xl tracking-widest text-blue-200">RPK26 ELECTION</h1>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                <span class="text-sm text-green-400 font-bold tracking-widest">LIVE SYSTEM</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-panel p-16 w-full max-w-[90vw] h-[80vh] rounded-[60px] flex flex-col items-center justify-center relative overflow-hidden border border-white/10">
+        
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-white/5 rounded-full animate-[spin_20s_linear_infinite]"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[750px] border border-white/5 rounded-full animate-[spin_25s_linear_infinite_reverse]"></div>
+
+        <h2 class="text-4xl md:text-6xl font-extrabold text-blue-200 uppercase tracking-widest mb-4 drop-shadow-lg">
+            จำนวนผู้ใช้สิทธิ์แล้ว
+        </h2>
+        
+        <div class="relative z-10">
+            <span id="total-votes" class="text-[15rem] md:text-[25rem] font-black leading-none text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-slate-400 drop-shadow-2xl count-up text-glow tabular-nums block -mt-8 md:-mt-16">
+                0
+            </span>
+        </div>
+
+        <div class="mt-8 px-10 py-3 rounded-full bg-white/10 border border-white/20 backdrop-blur-md">
+            <span class="text-2xl text-slate-300 font-bold tracking-widest"><i class="fas fa-user-check mr-3"></i>VOTES COUNTED</span>
+        </div>
+
+    </div>
+
+    <script>
+        const API_URL = '/api/election-results';
+
+        async function updateCounter() {
+            try {
+                const res = await fetch(API_URL);
+                if(res.ok) {
+                    const data = await res.json();
+                    const el = document.getElementById('total-votes');
+                    const currentVal = parseInt(el.innerText.replace(/,/g, ''));
+                    
+                    if (currentVal !== data.total) {
+                        // Animation Effect
+                        el.style.transform = "scale(1.05)";
+                        el.style.opacity = "0.8";
+                        el.style.color = "#4ade80"; // สีเขียวชั่วขณะเมื่อเลขเปลี่ยน
+                        
+                        setTimeout(() => {
+                            el.innerText = data.total.toLocaleString();
+                            el.style.transform = "scale(1)";
+                            el.style.opacity = "1";
+                            el.style.color = ""; // กลับเป็นสีเดิม
+                        }, 200);
+                    }
+                }
+            } catch(e) { console.error("API Error"); }
+        }
+
+        // เริ่มทำงาน + เช็คยอดทุก 2 วินาที
+        updateCounter();
+        setInterval(updateCounter, 2000);
+    </script>
+</body>
+</html>
