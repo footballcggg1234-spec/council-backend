@@ -29,6 +29,10 @@
             <a onclick="switchTab('suggestions')" id="nav-suggestions" class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-blue-50 text-gray-600 sidebar-link"><i class="fas fa-inbox w-6"></i> ความคิดเห็น</a>
             <a onclick="switchTab('news')" id="nav-news" class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-blue-50 text-gray-600 sidebar-link"><i class="fas fa-bullhorn w-6"></i> ข่าวสาร</a>
             <a onclick="switchTab('election')" id="nav-election" class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-blue-50 text-gray-600 sidebar-link"><i class="fas fa-vote-yea w-6"></i> ผลเลือกตั้ง</a>
+            
+            <a href="weekly-report.html" target="_blank" class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-green-50 text-green-700 sidebar-link mt-4 border border-green-100">
+                <i class="fas fa-external-link-alt w-6"></i> ดูคะแนนสภา
+            </a>
         </nav>
         <button onclick="location.href='index.html'" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl mt-auto font-bold text-sm"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</button>
     </aside>
@@ -40,14 +44,23 @@
             <div id="tab-dashboard" class="tab-content block">
                 <h2 class="text-2xl font-bold mb-4">ภาพรวมวันนี้</h2>
                 <div class="grid grid-cols-4 gap-4">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500"><h3 class="text-gray-500 text-xs font-bold">คะแนนหอ (รวม)</h3><p class="text-3xl font-black mt-2" id="stat-dorm">0</p></div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-green-500"><h3 class="text-gray-500 text-xs font-bold">คะแนนห้อง (รวม)</h3><p class="text-3xl font-black mt-2" id="stat-class">0</p></div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500"><h3 class="text-gray-500 text-xs font-bold">หอพัก</h3><p class="text-3xl font-black mt-2" id="stat-dorm">0</p></div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-green-500"><h3 class="text-gray-500 text-xs font-bold">ห้องเรียน</h3><p class="text-3xl font-black mt-2" id="stat-class">0</p></div>
                     <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-indigo-500"><h3 class="text-gray-500 text-xs font-bold">เลือกตั้ง</h3><p class="text-3xl font-black mt-2" id="stat-vote">0</p></div>
                     <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-orange-500"><h3 class="text-gray-500 text-xs font-bold">ร้องเรียน</h3><p class="text-3xl font-black mt-2" id="stat-sug">0</p></div>
                 </div>
-                <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm"><h3 class="font-bold mb-4">5 อันดับหอพักสูงสุด (สะสม)</h3><canvas id="barChart" height="200"></canvas></div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center"><h3 class="font-bold mb-4 w-full text-left">สัดส่วนคะแนน</h3><div class="h-64 w-64"><canvas id="donutChart"></canvas></div></div>
+                
+                <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6"> <div class="bg-white p-6 rounded-xl shadow-sm lg:col-span-2">
+                        <h3 class="font-bold mb-4">5 อันดับหอพักสูงสุด (สะสม)</h3>
+                        <div class="relative h-64 w-full">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center">
+                        <h3 class="font-bold mb-4 w-full text-left">สัดส่วนคะแนน</h3>
+                        <div class="relative h-56 w-56"> <canvas id="donutChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -89,7 +102,37 @@
                 </div>
             </div>
 
-            <div id="tab-election" class="tab-content hidden"><div class="grid grid-cols-2 gap-6 mb-6"><div class="bg-indigo-600 text-white p-6 rounded-2xl shadow-lg"><h3 class="font-bold text-indigo-200 text-sm">ผู้ใช้สิทธิ์ทั้งหมด</h3><p class="text-5xl font-black mt-2" id="total-votes">0</p></div><div onclick="updateElectionStats()" class="bg-white p-6 rounded-2xl shadow-sm flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50"><i class="fas fa-sync-alt text-3xl text-blue-500 mb-2"></i><span class="font-bold text-gray-500">รีเฟรชกราฟ</span></div></div><div class="grid grid-cols-3 gap-6"><div class="col-span-2 bg-white p-6 rounded-2xl shadow-sm"><canvas id="voteBar" height="250"></canvas></div><div class="bg-white p-6 rounded-2xl shadow-sm"><canvas id="votePie"></canvas></div></div><div class="mt-6 bg-red-50 p-4 rounded-xl border border-red-100 flex justify-between items-center"><span class="text-red-600 font-bold"><i class="fas fa-exclamation-triangle mr-2"></i>โซนอันตราย</span><button onclick="resetElection()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold">ล้างคะแนนโหวต</button></div></div>
+            <div id="tab-election" class="tab-content hidden">
+                <div class="grid grid-cols-2 gap-6 mb-6">
+                    <div class="bg-indigo-600 text-white p-6 rounded-2xl shadow-lg">
+                        <h3 class="font-bold text-indigo-200 text-sm">ผู้ใช้สิทธิ์ทั้งหมด</h3>
+                        <p class="text-5xl font-black mt-2" id="total-votes">0</p>
+                    </div>
+                    <div onclick="updateElectionStats()" class="bg-white p-6 rounded-2xl shadow-sm flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50">
+                        <i class="fas fa-sync-alt text-3xl text-blue-500 mb-2"></i>
+                        <span class="font-bold text-gray-500">รีเฟรชกราฟ</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="card lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm">
+                        <h3 class="font-bold text-gray-800 mb-4">คะแนนรายพรรค</h3>
+                        <div class="relative h-64 w-full">
+                            <canvas id="voteBarChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card bg-white p-6 rounded-2xl shadow-sm flex justify-center">
+                        <div class="relative h-64 w-full flex justify-center">
+                            <canvas id="votePieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 bg-red-50 p-4 rounded-xl border border-red-100 flex justify-between items-center">
+                    <span class="text-red-600 font-bold"><i class="fas fa-exclamation-triangle mr-2"></i>โซนอันตราย</span>
+                    <button onclick="resetElection()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold">ล้างคะแนนโหวต</button>
+                </div>
+            </div>
 
             <div id="tab-news" class="tab-content hidden"><div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4">โพสต์ข่าว</h3><form onsubmit="postNews(event)" class="space-y-4"><input id="nt" class="w-full p-3 border rounded-lg" placeholder="หัวข้อ"><textarea id="nc" class="w-full p-3 border rounded-lg" placeholder="เนื้อหา"></textarea><button class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold">โพสต์</button></form></div></div>
             <div id="tab-suggestions" class="tab-content hidden"><div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4">ข้อร้องเรียน</h3><table class="w-full"><tbody id="sug-body"></tbody></table></div></div>
@@ -100,7 +143,6 @@
         const API = '/api';
         let allScores = [], currentAdminMode = '';
         
-        // --- 1. ประกาศตัวแปรเก็บ Chart เพื่อใช้ลบก่อนสร้างใหม่ ---
         let dashboardBarChart = null;
         let dashboardDonutChart = null;
         let voteBarChart = null;
@@ -111,12 +153,11 @@
         // เริ่มต้นทำงาน
         init();
         
-        // ตั้งค่าวันปัจจุบันให้ Dropdown (Auto Select)
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().getDay();
             const selector = document.getElementById('day-selector');
             if(today >= 1 && today <= 5) selector.value = today;
-            else selector.value = 1; // เสาร์อาทิตย์ให้เป็นจันทร์
+            else selector.value = 1; 
         });
 
         async function init() {
@@ -127,12 +168,10 @@
                 const news = await nw.json(); 
                 const elec = await el.json();
                 
-                // Dashboard Logic
                 updateStats(allScores, sugs, news, elec);
                 renderCharts(allScores);
                 document.getElementById('sug-body').innerHTML = sugs.map(i=>`<tr class="border-b"><td class="p-3 font-bold">${i.topic}</td><td class="p-3 text-sm">${i.status}</td><td class="p-3 text-right"><button onclick="solve('${i._id}')" class="text-blue-600 font-bold text-sm">จบงาน</button></td></tr>`).join('');
                 
-                // Auto Date Init
                 setAutoDate();
             } catch(e) { console.error("Init Error:", e); }
         }
@@ -145,12 +184,11 @@
             document.getElementById(`nav-${t}`).classList.add('active');
 
             if(t === 'election') updateElectionStats();
-            if(t === 'dashboard') renderCharts(allScores); // วาดกราฟใหม่เมื่อกลับมาหน้า Dashboard
+            if(t === 'dashboard') renderCharts(allScores);
         }
 
-        // --- Helper: ฟังก์ชันรวมคะแนน 5 วัน ---
         function getWeeklyScore(item, field) {
-            let sum = item[field] || 0; // คะแนนเดิม
+            let sum = item[field] || 0;
             for(let i=1; i<=5; i++) sum += (item[`${field}_${i}`] || 0);
             return sum;
         }
@@ -166,9 +204,7 @@
         }
 
         function renderCharts(data) {
-            // --- 1. กราฟแท่ง (5 อันดับหอพัก) ---
             const dorms = data.filter(d=>d.type==='dorm');
-            // คำนวณคะแนนรวม
             dorms.forEach(d => {
                 d.totalScore = getWeeklyScore(d, 'points_exercise') + getWeeklyScore(d, 'points_dorm');
             });
@@ -176,8 +212,6 @@
             const top5 = dorms.slice(0, 5);
 
             const ctxBar = document.getElementById('barChart').getContext('2d');
-            
-            // 🔥 ลบกราฟเก่าทิ้งก่อนสร้างใหม่ (แก้ปัญหากราฟซ้อน) 🔥
             if (dashboardBarChart) dashboardBarChart.destroy();
             
             dashboardBarChart = new Chart(ctxBar, { 
@@ -192,13 +226,13 @@
                     }]
                 }, 
                 options:{
-                    responsive:true, maintainAspectRatio:false, 
+                    responsive:true, 
+                    maintainAspectRatio:false, // ✨ สำคัญ: ให้กราฟยืดหดตาม Container Div
                     plugins:{legend:{display:false}}, 
                     scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}
                 } 
             });
 
-            // --- 2. กราฟโดนัท ---
             const tEx = data.filter(d=>d.type==='dorm').reduce((a,b)=>a + getWeeklyScore(b,'points_exercise'), 0);
             const tDo = data.filter(d=>d.type==='dorm').reduce((a,b)=>a + getWeeklyScore(b,'points_dorm'), 0);
             const tCl = data.filter(d=>d.type==='classroom').reduce((a,b)=>a + getWeeklyScore(b,'points_class'), 0);
@@ -223,7 +257,7 @@
         // --- 📅 AUTO DATE LOGIC ---
         function setAutoDate() {
             const today = new Date();
-            const dayNum = today.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+            const dayNum = today.getDay();
             const dayNames = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"];
             const display = document.getElementById('auto-date-display');
             const selector = document.getElementById('day-selector');
@@ -255,7 +289,6 @@
             const day = document.getElementById('day-selector').value;
             const dayText = document.getElementById('day-selector').options[document.getElementById('day-selector').selectedIndex].text;
             
-            // Highlight Buttons
             document.querySelectorAll('#tab-scores button[id^="btn-mode"]').forEach(b=>b.className='px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-bold hover:bg-gray-200 transition');
             document.getElementById(`btn-mode-${m}`).className = `px-4 py-2 rounded-lg font-bold text-white shadow-md transition ${m==='exercise'?'bg-blue-600':(m==='dorm'?'bg-purple-600':'bg-green-600')}`;
 
@@ -334,17 +367,31 @@
         async function postNews(e) { e.preventDefault(); await fetch(`${API}/news`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({title:document.getElementById('nt').value, content:document.getElementById('nc').value})}); alert('Posted'); }
         
         async function updateElectionStats() {
-            const res = await fetch(`${API}/election-results`); const d = await res.json();
-            document.getElementById('total-votes').innerText = d.total;
-            const cfg = {labels:['เบอร์ 1','เบอร์ 2','เบอร์ 3'], datasets:[{data:d.results, backgroundColor:['#ef4444','#3b82f6','#10b981']}]};
-            
-            const ctxBar = document.getElementById('voteBarChart').getContext('2d');
-            if (voteBarChart) voteBarChart.destroy();
-            voteBarChart = new Chart(ctxBar, { type:'bar', data:{labels:['เบอร์ 1','เบอร์ 2','เบอร์ 3'], datasets:[{label:'คะแนน', data:d.results, backgroundColor:['#ef4444','#3b82f6','#10b981']}]}, options:{scales:{y:{beginAtZero:true}}} });
+            try {
+                const res = await fetch(`${API}/election-results`); const d = await res.json();
+                document.getElementById('total-votes').innerText = d.total;
+                const labels = ['เบอร์ 1', 'เบอร์ 2', 'เบอร์ 3'];
+                const colors = ['#ef4444', '#3b82f6', '#10b981'];
 
-            const ctxPie = document.getElementById('votePieChart').getContext('2d');
-            if (votePieChart) votePieChart.destroy();
-            votePieChart = new Chart(ctxPie, { type:'doughnut', data:cfg });
+                const ctxBar = document.getElementById('voteBarChart').getContext('2d');
+                if (voteBarChart) voteBarChart.destroy();
+                voteBarChart = new Chart(ctxBar, { 
+                    type:'bar', 
+                    data:{ labels: labels, datasets: [{ label: 'คะแนน', data: d.results, backgroundColor: colors, borderRadius: 8 }] },
+                    options:{
+                        responsive:true, maintainAspectRatio:false, 
+                        scales:{y:{beginAtZero:true}}
+                    } 
+                });
+
+                const ctxPie = document.getElementById('votePieChart').getContext('2d');
+                if (votePieChart) votePieChart.destroy();
+                votePieChart = new Chart(ctxPie, { 
+                    type:'doughnut', 
+                    data: { labels: labels, datasets: [{ data: d.results, backgroundColor: colors, borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            } catch(e) { console.error(e); }
         }
         async function resetElection() { if(confirm('ล้างผลโหวต?')) { await fetch(`${API}/election-reset`,{method:'DELETE'}); updateElectionStats(); } }
     </script>
