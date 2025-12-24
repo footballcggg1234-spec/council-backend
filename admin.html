@@ -3,273 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Student Council</title>
-    
+    <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
-        .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: #4b5563; border-radius: 0.75rem; transition: all 200ms ease; cursor: pointer; font-weight: 500; text-decoration: none; }
-        .sidebar-link:hover { background-color: #eff6ff; color: #2563eb; }
-        .sidebar-link.active { background-color: #2563eb; color: #ffffff; box-shadow: 0 10px 15px -3px rgba(37,99,235,0.12); }
-        .card { background-color: #ffffff; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #f3f4f6; }
-        #sidebar { transition: all 0.3s ease-in-out; }
-    </style>
+    <style>body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; } .sidebar-link.active { background-color: #2563eb; color: white; }</style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 flex flex-col p-6 z-20 flex-shrink-0 relative">
+    <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 flex flex-col p-6 z-20 flex-shrink-0">
         <div class="flex flex-col items-center justify-center mb-8 pb-6 border-b border-gray-100">
-            <div class="w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center mb-3 overflow-hidden border-4 border-pink-100 relative group cursor-pointer p-1">
-                <img src="RPK26 Logo.jfif" alt="RPK26 Logo" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" onerror="this.src='https://ui-avatars.com/api/?name=Admin'">
+            <div class="w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center mb-3 overflow-hidden border-4 border-blue-100 relative group cursor-pointer p-1">
+                <img src="RPK26 Logo.jfif" 
+                     class="w-full h-full object-cover group-hover:scale-110 transition duration-500" 
+                     onerror="this.src='https://ui-avatars.com/api/?name=Admin&background=random&color=fff&size=128'"> 
             </div>
-            <h1 class="text-lg font-extrabold text-pink-800 tracking-wide text-center leading-tight">ราชประชานุเคราะห์ ๒๖</h1>
-            <p class="text-xs text-gray-400 font-medium bg-gray-100 px-2 py-1 rounded-full mt-2">Admin Panel</p>
+            <h1 class="text-lg font-extrabold text-slate-800 tracking-wide text-center">RPK26 ADMIN</h1>
+            <p class="text-xs text-gray-400 font-bold bg-gray-100 px-3 py-1 rounded-full mt-2">Admin Panel</p>
         </div>
 
         <nav class="flex-1 space-y-2">
-            <a onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-link active">
-                <i class="fas fa-chart-pie w-6 text-center"></i> Dashboard
-            </a>
-            <a onclick="switchTab('election')" id="nav-election" class="sidebar-link">
-               <i class="fas fa-vote-yea w-6 text-center"></i> ผลเลือกตั้ง
-            </a>
-            <a onclick="switchTab('scores')" id="nav-scores" class="sidebar-link">
-                <i class="fas fa-edit w-6 text-center"></i> กรอกคะแนน
-            </a>
-            <a onclick="switchTab('suggestions')" id="nav-suggestions" class="sidebar-link">
-                <i class="fas fa-inbox w-6 text-center"></i> ความคิดเห็น
-            </a>
-            <a onclick="switchTab('news')" id="nav-news" class="sidebar-link">
-                <i class="fas fa-bullhorn w-6 text-center"></i> ข่าวสาร
-            </a>
+            <a onclick="switchTab('dashboard')" id="nav-dashboard" class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-blue-50 text-gray-600 sidebar-link active"><i class="fas fa-chart-pie w-6"></i> Dashboard</a>
+            <a onclick="switchTab('scores')" id="nav-scores" class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-blue-50 text-gray-600 sidebar-link"><i class="fas fa-edit w-6"></i> กรอกคะแนน</a>
+            <a onclick="switchTab('suggestions')" id="nav-suggestions" class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-blue-50 text-gray-600 sidebar-link"><i class="fas fa-inbox w-6"></i> ความคิดเห็น</a>
+            <a onclick="switchTab('news')" id="nav-news" class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-blue-50 text-gray-600 sidebar-link"><i class="fas fa-bullhorn w-6"></i> ข่าวสาร</a>
+            <a onclick="switchTab('election')" id="nav-election" class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-blue-50 text-gray-600 sidebar-link"><i class="fas fa-vote-yea w-6"></i> ผลเลือกตั้ง</a>
         </nav>
-
-        <button onclick="logout()" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl mt-auto transition font-bold text-sm">
-            <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
-        </button>
+        <button onclick="location.href='index.html'" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl mt-auto font-bold text-sm"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</button>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50 relative w-full">
-        
-        <header class="bg-white border-b h-16 flex items-center justify-between px-6 shadow-sm z-10">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar()" class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-                <h2 class="text-lg font-bold text-gray-700 hidden md:block">ระบบจัดการสภานักเรียน</h2>
-            </div>
-            <div class="flex items-center gap-3">
-                <button onclick="toggleFullScreen()" class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition"><i id="fullscreen-icon" class="fas fa-expand text-xl"></i></button>
-                <div class="flex items-center gap-3 pl-4 border-l">
-                    <div class="text-right hidden md:block"><p class="text-sm font-bold text-gray-700">ผู้ดูแลระบบ</p><p class="text-xs text-green-500">● กำลังใช้งาน</p></div>
-                    <div class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center overflow-hidden border-2 border-white shadow-sm"><img src="https://upload.wikimedia.org/wikipedia/th/f/f8/%E0%B8%95%E0%B8%A3%E0%B8%B2%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%88%E0%B8%B3%E0%B9%82%E0%B8%A3%E0%B8%87%E0%B9%80%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%A3%E0%B8%A2%E0%B8%B0%E0%B8%9E%E0%B8%B0%E0%B9%80%E0%B8%A2%E0%B8%B2.png" class="w-full h-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=Admin'"></div>
-                </div>
-            </div>
-        </header>
-
-        <div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 relative">
+    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50">
+        <header class="bg-white border-b h-16 flex items-center justify-between px-6 shadow-sm"><h2 class="font-bold text-gray-700">ระบบจัดการสภานักเรียน</h2><div class="text-sm text-green-600 font-bold">● Online</div></header>
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
             
-            <div id="tab-dashboard" class="tab-content block space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="card hover:shadow-md transition border-l-4 border-blue-500"><p class="text-gray-400 text-xs font-bold uppercase">คะแนนรวม (หอพัก)</p><h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-dorm-score">0</h3></div>
-                    <div class="card hover:shadow-md transition border-l-4 border-green-500"><p class="text-gray-400 text-xs font-bold uppercase">คะแนนรวม (ห้องเรียน)</p><h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-class-score">0</h3></div>
-                    <div class="card hover:shadow-md transition border-l-4 border-purple-500 cursor-pointer" onclick="switchTab('suggestions')"><p class="text-gray-400 text-xs font-bold uppercase">เรื่องร้องเรียน</p><h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-sug-count">0</h3></div>
-                    <div class="card hover:shadow-md transition border-l-4 border-orange-500 cursor-pointer" onclick="switchTab('news')"><p class="text-gray-400 text-xs font-bold uppercase">ข่าวประชาสัมพันธ์</p><h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-news-count">0</h3></div>
+            <div id="tab-dashboard" class="tab-content block">
+                <h2 class="text-2xl font-bold mb-4">ภาพรวมวันนี้</h2>
+                <div class="grid grid-cols-4 gap-4">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500"><h3 class="text-gray-500 text-xs font-bold">หอพัก</h3><p class="text-3xl font-black mt-2" id="stat-dorm">0</p></div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-green-500"><h3 class="text-gray-500 text-xs font-bold">ห้องเรียน</h3><p class="text-3xl font-black mt-2" id="stat-class">0</p></div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-indigo-500"><h3 class="text-gray-500 text-xs font-bold">เลือกตั้ง</h3><p class="text-3xl font-black mt-2" id="stat-vote">0</p></div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-orange-500"><h3 class="text-gray-500 text-xs font-bold">ร้องเรียน</h3><p class="text-3xl font-black mt-2" id="stat-sug">0</p></div>
                 </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="card col-span-1 lg:col-span-2">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <i class="fas fa-trophy text-yellow-500"></i> 5 อันดับหอพักสูงสุด
-                        </h3>
-                        <div class="relative h-72 w-full"><canvas id="barChart"></canvas></div>
-                    </div>
-                    <div class="card col-span-1 flex flex-col items-center justify-center">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 self-start">องค์ประกอบคะแนน</h3>
-                        <div class="relative h-56 w-56"><canvas id="donutChart"></canvas></div>
-                    </div>
+                <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm"><h3 class="font-bold mb-4">5 อันดับหอพักสูงสุด</h3><canvas id="barChart" height="200"></canvas></div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center"><h3 class="font-bold mb-4 w-full text-left">สัดส่วนคะแนน</h3><div class="h-64 w-64"><canvas id="donutChart"></canvas></div></div>
                 </div>
             </div>
 
-            <div id="tab-election" class="tab-content hidden space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="card bg-gradient-to-br from-indigo-600 to-blue-700 text-white border-none shadow-lg">
-                        <h3 class="text-blue-100 font-bold uppercase text-xs mb-2">จำนวนผู้ใช้สิทธิ์ทั้งหมด</h3>
-                        <div class="flex items-end gap-4">
-                            <h2 class="text-5xl font-black" id="total-votes">0</h2>
-                            <span class="text-blue-200 mb-2 text-lg">คน</span>
+            <div id="tab-scores" class="tab-content hidden">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b pb-4">
+                        <div class="flex gap-2">
+                            <button onclick="loadScoreInputs('exercise')" id="btn-mode-exercise" class="px-4 py-2 rounded-lg bg-gray-100 text-blue-700 font-bold hover:bg-blue-100">ออกกาย</button>
+                            <button onclick="loadScoreInputs('dorm')" id="btn-mode-dorm" class="px-4 py-2 rounded-lg bg-gray-100 text-purple-700 font-bold hover:bg-purple-100">หอนอน</button>
+                            <button onclick="loadScoreInputs('classroom')" id="btn-mode-classroom" class="px-4 py-2 rounded-lg bg-gray-100 text-green-700 font-bold hover:bg-green-100">ห้องเรียน</button>
+                        </div>
+                        
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-2 bg-blue-50 p-2 px-4 rounded-lg border border-blue-200 shadow-sm">
+                                <i class="far fa-calendar-check text-blue-600 text-xl"></i>
+                                <div>
+                                    <p class="text-[10px] font-bold text-blue-400 uppercase leading-none">TODAY</p>
+                                    <p class="text-sm font-black text-blue-800" id="auto-date-display">กำลังโหลด...</p>
+                                </div>
+                            </div>
+                            <button onclick="toggleManualDate()" class="text-gray-400 hover:text-gray-600 transition" title="แก้ไขวันเอง"><i class="fas fa-pen-square text-lg"></i></button>
+                            
+                            <select id="day-selector" class="hidden bg-white border border-gray-300 text-sm rounded-lg p-1" onchange="loadScoreInputs(currentAdminMode)">
+                                <option value="1">วันจันทร์</option><option value="2">วันอังคาร</option><option value="3">วันพุธ</option><option value="4">วันพฤหัสบดี</option><option value="5">วันศุกร์</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="card flex flex-col justify-center items-center cursor-pointer hover:bg-gray-50 transition border-2 border-dashed border-gray-300 group" onclick="updateElectionStats()">
-                        <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-2xl mb-3 shadow-sm group-hover:scale-110 transition">
-                            <i class="fas fa-sync-alt group-hover:rotate-180 transition duration-700"></i>
-                        </div>
-                        <h3 class="font-bold text-gray-700">รีเฟรชข้อมูลล่าสุด</h3>
-                    </div>
-                </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="card lg:col-span-2">
-                        <h3 class="font-bold text-gray-800 mb-6 flex items-center gap-2"><i class="fas fa-chart-bar text-blue-500"></i> คะแนนรายพรรค</h3>
-                        <div class="relative h-80 w-full"><canvas id="voteBarChart"></canvas></div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 id="score-title" class="text-xl font-bold text-gray-700">กรุณาเลือกหมวดหมู่</h3>
+                        <button onclick="startNewWeek()" class="text-xs bg-red-100 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-200 font-bold border border-red-200 transition"><i class="fas fa-trash-alt mr-1"></i> เริ่มสัปดาห์ใหม่</button>
                     </div>
-                    <div class="card">
-                        <h3 class="font-bold text-gray-800 mb-6 flex items-center gap-2"><i class="fas fa-chart-pie text-purple-500"></i> สัดส่วนคะแนน</h3>
-                        <div class="relative h-64 w-full flex justify-center"><canvas id="votePieChart"></canvas></div>
-                    </div>
-                </div>
 
-                <div class="card border-l-4 border-red-500 bg-red-50 flex justify-between items-center">
-                    <div>
-                        <h3 class="font-bold text-red-700"><i class="fas fa-exclamation-triangle mr-2"></i>โซนอันตราย</h3>
-                        <p class="text-xs text-red-500">ล้างคะแนนโหวตทั้งหมด (กู้คืนไม่ได้)</p>
-                    </div>
-                    <button onclick="resetElection()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-700 shadow-lg">
-                        <i class="fas fa-trash-alt mr-2"></i> ล้างคะแนน
-                    </button>
-                </div>
-            </div>
-
-            <div id="tab-scores" class="tab-content hidden space-y-6">
-                <div class="card">
-                    <div class="border-b pb-4 mb-4 flex flex-wrap gap-3">
-                        <button onclick="loadScoreInputs('exercise')" id="btn-mode-exercise" class="px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-blue-100 text-blue-700 font-bold transition flex items-center gap-2"><i class="fas fa-running"></i> ตรวจออกกาย</button>
-                        <button onclick="loadScoreInputs('dorm')" id="btn-mode-dorm" class="px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-purple-100 text-purple-700 font-bold transition flex items-center gap-2"><i class="fas fa-bed"></i> ตรวจหอนอน</button>
-                        <button onclick="loadScoreInputs('classroom')" id="btn-mode-classroom" class="px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-green-100 text-green-700 font-bold transition flex items-center gap-2"><i class="fas fa-chalkboard"></i> ตรวจห้องเรียน</button>
-                    </div>
-                    <h3 id="score-title" class="text-xl font-bold text-gray-700 mb-4">กรุณาเลือกหมวดหมู่ด้านบน</h3>
                     <form onsubmit="saveScores(event)">
-                        <div id="admin-score-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-h-[65vh] overflow-y-auto p-2"></div>
-                        <div id="action-buttons" class="hidden flex flex-col md:flex-row gap-4 mt-6">
-                            <button type="button" onclick="resetScores()" class="w-full md:w-auto px-6 py-3 rounded-xl font-bold bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition flex items-center justify-center gap-2"><i class="fas fa-undo"></i> รีเซ็ตเป็น 0</button>
-                            <button id="btn-save-score" type="submit" class="flex-1 w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition flex items-center justify-center gap-2"><i class="fas fa-save"></i> บันทึกคะแนนทั้งหมด</button>
-                        </div>
+                        <div id="score-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[55vh] overflow-y-auto p-1"></div>
+                        <button type="submit" class="mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition transform active:scale-95" id="btn-save">
+                            <i class="fas fa-save mr-2"></i> บันทึกคะแนน (อัตโนมัติ)
+                        </button>
                     </form>
                 </div>
             </div>
 
-            <div id="tab-suggestions" class="tab-content hidden"><div class="card"><h2 class="text-xl font-bold mb-4">กล่องความคิดเห็น</h2><div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-gray-50 border-b"><th class="p-4 rounded-tl-lg">หัวข้อ</th><th class="p-4">หมวดหมู่</th><th class="p-4">สถานะ</th><th class="p-4 rounded-tr-lg">จัดการ</th></tr></thead><tbody id="suggestion-tbody" class="divide-y divide-gray-100"></tbody></table></div></div></div>
-            <div id="tab-news" class="tab-content hidden space-y-6"><div class="card"><h3 class="text-lg font-bold mb-4">โพสต์ข่าวประชาสัมพันธ์</h3><form onsubmit="postNews(event)" class="space-y-4"><input id="news-title" class="w-full p-3 bg-gray-50 border rounded-xl" placeholder="หัวข้อข่าว" required><textarea id="news-content" rows="3" class="w-full p-3 bg-gray-50 border rounded-xl" placeholder="รายละเอียด..." required></textarea><input id="news-image" class="w-full p-3 bg-gray-50 border rounded-xl" placeholder="URL รูปภาพ (ถ้ามี)"><button class="px-8 py-2 bg-blue-600 text-white rounded-lg font-bold">โพสต์</button></form></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="news-grid-admin"></div></div>
+            <div id="tab-election" class="tab-content hidden"><div class="grid grid-cols-2 gap-6 mb-6"><div class="bg-indigo-600 text-white p-6 rounded-2xl shadow-lg"><h3 class="font-bold text-indigo-200 text-sm">ผู้ใช้สิทธิ์ทั้งหมด</h3><p class="text-5xl font-black mt-2" id="total-votes">0</p></div><div onclick="updateElectionStats()" class="bg-white p-6 rounded-2xl shadow-sm flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50"><i class="fas fa-sync-alt text-3xl text-blue-500 mb-2"></i><span class="font-bold text-gray-500">รีเฟรชกราฟ</span></div></div><div class="grid grid-cols-3 gap-6"><div class="col-span-2 bg-white p-6 rounded-2xl shadow-sm"><canvas id="voteBar" height="250"></canvas></div><div class="bg-white p-6 rounded-2xl shadow-sm"><canvas id="votePie"></canvas></div></div><div class="mt-6 bg-red-50 p-4 rounded-xl border border-red-100 flex justify-between items-center"><span class="text-red-600 font-bold"><i class="fas fa-exclamation-triangle mr-2"></i>โซนอันตราย</span><button onclick="resetElection()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold">ล้างคะแนนโหวต</button></div></div>
+
+            <div id="tab-news" class="tab-content hidden"><div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4">โพสต์ข่าว</h3><form onsubmit="postNews(event)" class="space-y-4"><input id="nt" class="w-full p-3 border rounded-lg" placeholder="หัวข้อ"><textarea id="nc" class="w-full p-3 border rounded-lg" placeholder="เนื้อหา"></textarea><button class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold">โพสต์</button></form></div></div>
+            <div id="tab-suggestions" class="tab-content hidden"><div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4">ข้อร้องเรียน</h3><table class="w-full"><tbody id="sug-body"></tbody></table></div></div>
         </div>
     </main>
 
     <script>
-        const API_BASE = 'https://school-council-26.onrender.com/api'; // แก้ URL ตรงนี้ให้ตรงกับ Server จริงของคุณ
-        let allScoreData = [];
-        let currentAdminMode = '';
-        
-        // ตัวแปรสำหรับ Chart เลือกตั้ง
-        let voteBarChart = null;
-        let votePieChart = null;
+        const API = '/api';
+        let allScores=[], currentAdminMode='', vBar=null, vPie=null;
 
-        function toggleSidebar() { const s = document.getElementById('sidebar'); s.classList.toggle('hidden'); }
-        function toggleFullScreen() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); document.getElementById('fullscreen-icon').classList.replace('fa-expand', 'fa-compress'); } else { if (document.exitFullscreen) document.exitFullscreen(); document.getElementById('fullscreen-icon').classList.replace('fa-compress', 'fa-expand'); } }
-
-        initDashboard();
-
-        async function initDashboard() {
-            try {
-                const [scRes, sgRes, nwRes] = await Promise.all([fetch(`${API_BASE}/scores`), fetch(`${API_BASE}/suggestions`), fetch(`${API_BASE}/news`)]);
-                if (scRes.ok) allScoreData = await scRes.json();
-                else allScoreData = []; 
-                const suggestions = sgRes.ok ? await sgRes.json() : [];
-                const news = nwRes.ok ? await nwRes.json() : [];
-                updateStats(allScoreData, suggestions, news);
-                renderCharts(allScoreData);
-                renderSuggestions(suggestions);
-                renderNews(news);
-            } catch (error) { console.error("Init Error:", error); renderCharts([]); }
-        }
-
-        // ฟังก์ชันสลับ Tab และเรียกดูข้อมูลเลือกตั้ง
         function switchTab(t) {
-            document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden')); 
-            document.getElementById(`tab-${t}`).classList.remove('hidden');
-            
-            document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active')); 
-            document.getElementById(`nav-${t}`).classList.add('active');
-
-            // ถ้ากด Tab เลือกตั้ง ให้ดึงข้อมูลกราฟทันที
-            if(t === 'election') updateElectionStats();
+            document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden')); document.getElementById(`tab-${t}`).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active','bg-blue-600','text-white')); document.getElementById(`nav-${t}`).classList.add('active');
+            if(t==='election') updateElectionStats(); else if(t==='dashboard') init(); else if(t==='scores') setAutoDate();
         }
 
-        // ฟังก์ชันดึงข้อมูลเลือกตั้ง
-        async function updateElectionStats() {
+        async function init() {
             try {
-                // ถ้า Server ยังไม่มี API นี้อาจจะ Error ได้ (ต้องแก้ server.js ด้วยนะ)
-                const res = await fetch(`${API_BASE}/election-results`);
-                if(!res.ok) throw new Error('API Error');
+                const [s, sg, nw, el] = await Promise.all([fetch(`${API}/scores`), fetch(`${API}/suggestions`), fetch(`${API}/news`), fetch(`${API}/election-results`)]);
+                allScores = await s.json(); const sugs=await sg.json(); const news=await nw.json(); const elec=await el.json();
                 
-                const data = await res.json();
-                document.getElementById('total-votes').innerText = data.total;
-
-                const labels = ['เบอร์ 1', 'เบอร์ 2', 'เบอร์ 3'];
-                const colors = ['#ef4444', '#3b82f6', '#10b981'];
-
-                // Update Bar Chart
-                const ctxBar = document.getElementById('voteBarChart').getContext('2d');
-                if (voteBarChart) voteBarChart.destroy();
-                voteBarChart = new Chart(ctxBar, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'คะแนนเสียง',
-                            data: data.results,
-                            backgroundColor: colors,
-                            borderRadius: 8
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
-                });
-
-                // Update Pie Chart
-                const ctxPie = document.getElementById('votePieChart').getContext('2d');
-                if (votePieChart) votePieChart.destroy();
-                votePieChart = new Chart(ctxPie, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: data.results,
-                            backgroundColor: colors,
-                            borderWidth: 0
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false }
-                });
-            } catch (err) {
-                console.error('Election API not found:', err);
-            }
-        }
-        
-        // ฟังก์ชันล้างคะแนน
-        async function resetElection() {
-            if(confirm('⚠️ ยืนยันล้างคะแนนทั้งหมด? (กู้คืนไม่ได้)')) {
-                try {
-                    await fetch(`${API_BASE}/election-reset`, {method:'DELETE'});
-                    alert('ล้างคะแนนแล้ว'); 
-                    updateElectionStats();
-                } catch(e) { alert('Error Resetting'); }
-            }
+                // Dashboard Logic
+                updateStats(allScores, sugs, news, elec);
+                renderCharts(allScores);
+                document.getElementById('sug-body').innerHTML = sugs.map(i=>`<tr class="border-b"><td class="p-3 font-bold">${i.topic}</td><td class="p-3 text-sm">${i.status}</td><td class="p-3 text-right"><button onclick="solve('${i._id}')" class="text-blue-600 font-bold text-sm">จบงาน</button></td></tr>`).join('');
+                
+                // Auto Date Init
+                setAutoDate();
+            } catch(e) { console.error(e); }
         }
 
-        async function logout() { location.href='index.html'; }
-
-        function updateStats(scores, sugs, news) {
-            const tDorm = scores.filter(s=>s.type==='dorm').reduce((a,b)=>a+(b.points_exercise||0)+(b.points_dorm||0),0);
-            const tClass = scores.filter(s=>s.type==='classroom').reduce((a,b)=>a+(b.points_class||0),0);
-            document.getElementById('stat-dorm-score').innerText = tDorm.toLocaleString();
-            document.getElementById('stat-class-score').innerText = tClass.toLocaleString();
-            document.getElementById('stat-sug-count').innerText = sugs.length;
-            document.getElementById('stat-news-count').innerText = news.length;
+        function updateStats(scores, sugs, news, elec) {
+            document.getElementById('stat-dorm').innerText = scores.filter(d=>d.type==='dorm').length;
+            document.getElementById('stat-class').innerText = scores.filter(d=>d.type==='classroom').length;
+            document.getElementById('stat-vote').innerText = elec.total;
+            document.getElementById('stat-sug').innerText = sugs.length;
         }
 
         function renderCharts(data) {
+            // (Same chart logic)
             const dorms = data.filter(d=>d.type==='dorm').sort((a,b)=>(b.points_exercise+b.points_dorm)-(a.points_exercise+a.points_dorm)).slice(0,5);
             new Chart(document.getElementById('barChart'), { 
                 type:'bar', data:{labels:dorms.map(d=>d.name), datasets:[{label:'คะแนน', data:dorms.map(d=>(d.points_exercise||0)+(d.points_dorm||0)), backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#3b82f6', '#3b82f6'], borderRadius:6}]}, 
@@ -281,79 +142,137 @@
             new Chart(document.getElementById('donutChart'), { type:'doughnut', data:{labels:['ออกกาย','หอนอน','ห้องเรียน'], datasets:[{data:[tEx,tDo,tCl], backgroundColor:['#3b82f6','#a855f7','#f59e0b'], borderWidth:0, hoverOffset:5}]}, options:{cutout:'75%', plugins:{legend:{display:false}}} });
         }
 
-        function loadScoreInputs(m) {
-            currentAdminMode=m; const con=document.getElementById('admin-score-container'); const tit=document.getElementById('score-title');
-            document.querySelectorAll('#tab-scores button').forEach(b=>b.classList.remove('ring-2','ring-offset-2','bg-white','shadow-md'));
-            document.getElementById(`btn-mode-${m}`).classList.add('ring-2','ring-offset-2','bg-white','shadow-md');
-            
-            let fil=[], fld=''; 
-            
-            if(m==='classroom'){ 
-                fil=allScoreData.filter(d=>d.type==='classroom'); fld='points_class'; tit.innerHTML='<i class="fas fa-chalkboard text-green-600"></i> กรอกคะแนนห้องเรียน (เต็ม 10)'; 
-                fil.sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
-                con.innerHTML=''; 
-                fil.forEach(i=>{ 
-                    con.innerHTML+=`<div class="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition group"><div class="flex justify-between items-center mb-3"><label class="text-lg font-bold text-gray-700">${i.name}</label></div><div class="mb-2"><input type="number" class="score-input w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-center font-bold text-xl text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" data-id="${i._id}" value="${i[fld]||0}" max="10" min="0"></div><div><input type="text" class="reason-input w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200 transition" placeholder="ระบุเหตุผล (ถ้ามี)..." value="${i.last_reason || ''}"></div></div>`; 
-                });
-            } else { 
-                fld=m==='exercise'?'points_exercise':'points_dorm'; tit.innerHTML=m==='exercise'?'<i class="fas fa-running text-blue-600"></i> กรอกคะแนนตรวจออกกาย':'<i class="fas fa-bed text-purple-600"></i> กรอกคะแนนตรวจหอนอน'; 
-                con.innerHTML=''; 
-                const targetList = [{ max: 7, label: 'หอพักชาย', keyword: 'ชาย' }, { max: 10, label: 'หอพักหญิง', keyword: 'หญิง' }];
-                targetList.forEach(group => {
-                    for(let i=1; i<=group.max; i++) {
-                        let item = allScoreData.find(d => d.type === 'dorm' && d.name.replace(/ที่|\s/g, '') === `${group.label}${i}`.replace(/\s/g, ''));
-                        if (!item) item = { _id: 'temp_' + Math.random(), name: `${group.label} ${i}`, [fld]: 0, last_reason: '' };
-                        const s = item[fld] || 0;
-                        const isGreen = s===3; const isYellow = s===2; const isRed = s===1;
-                        con.innerHTML+=`<div class="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition group"><div class="flex justify-between items-center mb-3"><label class="text-lg font-bold text-gray-700 flex items-center">${item.name}</label><span class="text-xs bg-gray-100 px-2 py-1 rounded">เดิม: ${s}</span></div><div class="grid grid-cols-3 gap-2 mb-3"><button type="button" onclick="selectStatus(this, '${item._id}', 3)" class="py-2 rounded-lg font-bold border transition ${isGreen?'bg-green-500 text-white shadow-inner':'bg-white text-green-600 border-green-200'}">3</button><button type="button" onclick="selectStatus(this, '${item._id}', 2)" class="py-2 rounded-lg font-bold border transition ${isYellow?'bg-yellow-400 text-black shadow-inner':'bg-white text-yellow-600 border-yellow-200'}">2</button><button type="button" onclick="selectStatus(this, '${item._id}', 1)" class="py-2 rounded-lg font-bold border transition ${isRed?'bg-red-500 text-white shadow-inner':'bg-white text-red-600 border-red-200'}">1</button></div><input type="hidden" class="score-input" data-id="${item._id}" value="${s}"><input type="text" class="reason-input w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700" placeholder="เหตุผล..." value="${item.last_reason||''}"></div>`;
-                    }
-                });
+        // --- 📅 AUTO DATE LOGIC ---
+        function setAutoDate() {
+            const today = new Date();
+            const dayNum = today.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+            const dayNames = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"];
+            const display = document.getElementById('auto-date-display');
+            const selector = document.getElementById('day-selector');
+            const btnSave = document.getElementById('btn-save');
+
+            if(dayNum >= 1 && dayNum <= 5) {
+                // วันธรรมดา: ล็อควันให้เลย
+                selector.value = dayNum;
+                display.innerText = "วัน" + dayNames[dayNum];
+                display.className = "text-sm font-black text-blue-800";
+                btnSave.disabled = false;
+                btnSave.innerHTML = `<i class="fas fa-save mr-2"></i> บันทึกคะแนน (ประจำวัน${dayNames[dayNum]})`;
+            } else {
+                // เสาร์-อาทิตย์: แจ้งเตือน + Default เป็นจันทร์ (เผื่อมาเก็บตกงาน)
+                selector.value = 1;
+                display.innerText = "วันหยุด (" + dayNames[dayNum] + ")";
+                display.className = "text-sm font-black text-red-500";
+                btnSave.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i> บันทึกย้อนหลัง (วันจันทร์)`;
             }
-            document.getElementById('action-buttons').classList.remove('hidden');
+            if(currentAdminMode) loadScoreInputs(currentAdminMode);
         }
 
-        function selectStatus(btn, id, score) {
-            const container = btn.parentElement;
-            const buttons = container.querySelectorAll('button');
-            buttons[0].className = 'py-2 rounded-lg font-bold border transition bg-white text-green-600 border-green-200';
-            buttons[1].className = 'py-2 rounded-lg font-bold border transition bg-white text-yellow-600 border-yellow-200';
-            buttons[2].className = 'py-2 rounded-lg font-bold border transition bg-white text-red-600 border-red-200';
-            if (score === 3) btn.className = 'py-2 rounded-lg font-bold border transition bg-green-500 text-white shadow-inner transform scale-105';
-            else if (score === 2) btn.className = 'py-2 rounded-lg font-bold border transition bg-yellow-400 text-black shadow-inner transform scale-105';
-            else if (score === 1) btn.className = 'py-2 rounded-lg font-bold border transition bg-red-500 text-white shadow-inner transform scale-105';
-            container.nextElementSibling.value = score;
+        function toggleManualDate() {
+            const sel = document.getElementById('day-selector');
+            if(sel.classList.contains('hidden')) {
+                sel.classList.remove('hidden');
+                alert('เปิดโหมดแก้ไขวันเอง (Manual Override) เผื่อต้องการแก้คะแนนย้อนหลัง');
+            } else {
+                sel.classList.add('hidden');
+                setAutoDate(); // Reset กลับเป็น Auto
+            }
         }
 
-        async function saveScores(e) { 
-            e.preventDefault(); 
-            const upds=[]; let fld=currentAdminMode==='classroom'?'points_class':(currentAdminMode==='exercise'?'points_exercise':'points_dorm'); 
-            document.querySelectorAll('#admin-score-container > div').forEach(div => {
-                const scoreInp = div.querySelector('.score-input'); const reasonInp = div.querySelector('.reason-input');
-                if(scoreInp && !scoreInp.dataset.id.startsWith('temp_')) upds.push({_id: scoreInp.dataset.id, field:fld, value: parseInt(scoreInp.value), reason: reasonInp.value });
+        function loadScoreInputs(m) {
+            if(!m) return; currentAdminMode=m;
+            const day = document.getElementById('day-selector').value;
+            const dayText = document.getElementById('day-selector').options[document.getElementById('day-selector').selectedIndex].text;
+            
+            // UI Button Active State
+            document.querySelectorAll('#tab-scores button[id^="btn-mode"]').forEach(b=>b.className='px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-bold hover:bg-gray-200 transition');
+            document.getElementById(`btn-mode-${m}`).className = `px-4 py-2 rounded-lg font-bold text-white shadow-md transition ${m==='exercise'?'bg-blue-600':(m==='dorm'?'bg-purple-600':'bg-green-600')}`;
+
+            document.getElementById('score-title').innerHTML = `${m.toUpperCase()} <span class="text-gray-300 mx-2">|</span> <span class="text-blue-600 bg-blue-50 px-2 py-1 rounded">${dayText}</span>`;
+            
+            const field = m==='classroom'?'points_class':(m==='exercise'?'points_exercise':'points_dorm');
+            const key = `${field}_${day}`;
+            const reasonKey = `reason_${field}_${day}`;
+
+            const data = allScores.filter(d => (m==='classroom' ? d.type==='classroom' : d.type==='dorm')).sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
+            const con = document.getElementById('score-container'); con.innerHTML = '';
+
+            data.forEach(i => {
+                const val = i[key] || 0;
+                const reason = i[reasonKey] || '';
+                
+                if(m === 'classroom') {
+                    con.innerHTML += `<div class="bg-white p-4 rounded-xl border shadow-sm"><div class="font-bold text-gray-700 mb-2">${i.name}</div><input type="number" class="score-inp w-full p-2 border rounded text-center font-bold text-green-600 text-xl" data-id="${i._id}" value="${val||''}" placeholder="0-10" min="0" max="10"></div>`;
+                } else {
+                    con.innerHTML += `
+                    <div class="bg-white p-4 rounded-xl border shadow-sm group">
+                        <div class="flex justify-between mb-2"><span class="font-bold text-gray-700">${i.name}</span>${val?`<span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded"><i class="fas fa-check"></i> ${val}</span>`:''}</div>
+                        <div class="grid grid-cols-3 gap-2 mb-2">
+                            <button type="button" onclick="setScore(this,3)" class="py-2 rounded font-bold border ${val==3?'bg-green-500 text-white':'bg-white text-gray-400'}">3</button>
+                            <button type="button" onclick="setScore(this,2)" class="py-2 rounded font-bold border ${val==2?'bg-yellow-400 text-white':'bg-white text-gray-400'}">2</button>
+                            <button type="button" onclick="setScore(this,1)" class="py-2 rounded font-bold border ${val==1?'bg-red-500 text-white':'bg-white text-gray-400'}">1</button>
+                        </div>
+                        <input type="hidden" class="score-inp" data-id="${i._id}" value="${val}">
+                        <input type="text" class="reason-inp w-full text-xs p-2 border rounded" placeholder="หมายเหตุ..." value="${reason}">
+                    </div>`;
+                }
             });
-            try {
-                const res = await fetch(`${API_BASE}/scores`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(upds)});
-                if(!res.ok) throw new Error('Save Failed');
-                alert('บันทึกเรียบร้อย ✅'); initDashboard(); 
-            } catch(err) { alert('บันทึกไม่สำเร็จ!'); }
         }
 
-        async function resetScores() {
-            if(!confirm(`⚠️ คุณแน่ใจหรือไม่ที่จะ "รีเซ็ตคะแนน" ของหมวดนี้ทั้งหมดเป็น 0?`)) return;
-            let fld = currentAdminMode === 'classroom' ? 'points_class' : (currentAdminMode === 'exercise' ? 'points_exercise' : 'points_dorm');
-            let targets = currentAdminMode === 'classroom' ? allScoreData.filter(d => d.type === 'classroom') : allScoreData.filter(d => d.type === 'dorm');
-            const upds = targets.filter(item => !item._id.toString().startsWith('temp_')).map(item => ({ _id: item._id, field: fld, value: 0, reason: "" }));
-            try {
-                await fetch(`${API_BASE}/scores`, {method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(upds)});
-                alert('✅ รีเซ็ตคะแนนเรียบร้อย'); initDashboard(); loadScoreInputs(currentAdminMode);
-            } catch (error) { alert('❌ เกิดข้อผิดพลาด'); }
+        function setScore(btn, v) {
+            const p = btn.parentElement; p.querySelectorAll('button').forEach(b=>b.className='py-2 rounded font-bold border bg-white text-gray-400');
+            btn.className = `py-2 rounded font-bold border text-white shadow ${v==3?'bg-green-500':(v==2?'bg-yellow-400':'bg-red-500')}`;
+            p.nextElementSibling.value = v;
         }
-        
-        function renderSuggestions(d) { document.getElementById('suggestion-tbody').innerHTML=d.map(s=>`<tr class="border-b hover:bg-gray-50"><td class="p-4 font-bold text-gray-700">${s.topic}</td><td class="p-4 text-sm text-gray-500">${s.category}</td><td class="p-4"><span class="px-2 py-1 rounded-md text-xs font-bold ${s.status==='resolved'?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'}">${s.status}</span></td><td class="p-4">${s.status!=='resolved'?`<button onclick="updSug('${s._id}','resolved')" class="text-green-600 hover:bg-green-50 px-3 py-1 rounded font-bold text-sm transition">จบงาน</button>`:'<i class="fas fa-check-circle text-green-500 text-lg"></i>'}</td></tr>`).join(''); }
-        async function updSug(id,st) { await fetch(`${API_BASE}/suggestions/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:st})}); initDashboard(); }
-        function renderNews(d) { document.getElementById('news-grid-admin').innerHTML=d.map(n=>`<div class="bg-white p-4 rounded-xl border shadow-sm relative group hover:shadow-md transition"><button onclick="delNews('${n._id}')" class="absolute top-2 right-2 bg-red-50 text-red-500 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"><i class="fas fa-trash"></i></button><h4 class="font-bold text-gray-800 mb-2">${n.title}</h4><p class="text-sm text-gray-500 truncate">${n.content}</p></div>`).join(''); }
-        async function postNews(e) { e.preventDefault(); await fetch(`${API_BASE}/news`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({title:document.getElementById('news-title').value, content:document.getElementById('news-content').value, image:document.getElementById('news-image').value})}); alert('โพสต์แล้ว'); initDashboard(); }
-        async function delNews(id) { if(confirm('ลบ?')) { await fetch(`${API_BASE}/news/${id}`, {method:'DELETE'}); initDashboard(); } }
+
+        async function saveScores(e) {
+            e.preventDefault();
+            const day = document.getElementById('day-selector').value;
+            const field = currentAdminMode==='classroom'?'points_class':(currentAdminMode==='exercise'?'points_exercise':'points_dorm');
+            const key = `${field}_${day}`;
+            const rKey = `reason_${field}_${day}`;
+            
+            const upds = [];
+            document.querySelectorAll('.score-inp').forEach(inp => {
+                const div = inp.closest('div, .bg-white');
+                const rInp = div.querySelector('.reason-inp');
+                upds.push({ _id: inp.dataset.id, field: key, value: parseInt(inp.value)||0 });
+                if(rInp) upds.push({ _id: inp.dataset.id, field: rKey, value: rInp.value });
+            });
+
+            const btn = document.getElementById('btn-save');
+            const oldHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
+            
+            try {
+                await fetch(`${API}/scores`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(upds)});
+                alert('บันทึกเรียบร้อย ✅'); 
+                init();
+            } catch { alert('Error!'); } finally { btn.innerHTML = oldHtml; }
+        }
+
+        async function startNewWeek() {
+            if(confirm('⚠️ ต้องการ "เริ่มสัปดาห์ใหม่" หรือไม่?\nคะแนนย้อนหลังของสัปดาห์นี้ทั้งหมดจะถูกลบเป็น 0')) {
+                await fetch(`${API}/scores/reset-weekly`, {method:'POST'});
+                alert('รีเซ็ตข้อมูลแล้ว เริ่มสัปดาห์ใหม่ได้เลย'); init(); loadScoreInputs(currentAdminMode);
+            }
+        }
+
+        // --- Other Functions ---
+        async function solve(id) { await fetch(`${API}/suggestions/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:'resolved'})}); init(); }
+        async function postNews(e) { e.preventDefault(); await fetch(`${API}/news`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({title:document.getElementById('nt').value, content:document.getElementById('nc').value})}); alert('Posted'); }
+        async function updateElectionStats() {
+            const res = await fetch(`${API}/election-results`); const d = await res.json();
+            document.getElementById('total-votes').innerText = d.total;
+            const cfg = {labels:['เบอร์ 1','เบอร์ 2','เบอร์ 3'], datasets:[{data:d.results, backgroundColor:['#ef4444','#3b82f6','#10b981']}]};
+            if(vBar) vBar.destroy(); vBar=new Chart(document.getElementById('voteBar'),{type:'bar',data:cfg,options:{plugins:{legend:{display:false}}}});
+            if(vPie) vPie.destroy(); vPie=new Chart(document.getElementById('votePie'),{type:'doughnut',data:cfg});
+        }
+        async function resetElection() { if(confirm('ล้างผลโหวต?')) { await fetch(`${API}/election-reset`,{method:'DELETE'}); updateElectionStats(); } }
+        function toggleSidebar() { const s = document.getElementById('sidebar'); s.classList.toggle('hidden'); }
+        function toggleFullScreen() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); } else { if (document.exitFullscreen) document.exitFullscreen(); } }
+
+        init();
     </script>
 </body>
 </html>

@@ -24,18 +24,18 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://admin:rungradit@cluster
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch(err => console.error('❌ MongoDB Error:', err));
 
-// --- 3. Schemas & Models ---
+// --- 3. Schema & Models ---
+// ใช้ Schema แบบยืดหยุ่น (Strict: false) เพื่อให้เก็บฟิลด์รายวันได้ (เช่น points_dorm_1, points_dorm_2)
+const anySchema = new mongoose.Schema({}, { strict: false });
+
+const voteSchema = new mongoose.Schema({
+    party: Number,
+    timestamp: { type: Date, default: Date.now },
+    ip: String
+});
+
 let News, Score, Suggestion, Vote;
 try {
-    const anySchema = new mongoose.Schema({}, { strict: false });
-    
-    // Schema สำหรับระบบเลือกตั้ง
-    const voteSchema = new mongoose.Schema({
-        party: Number, // เบอร์ 1, 2, 3
-        timestamp: { type: Date, default: Date.now },
-        ip: String     // เก็บ IP (เผื่อเช็ค Spam)
-    });
-
     News = mongoose.models.News || mongoose.model('News', anySchema);
     Score = mongoose.models.Score || mongoose.model('Score', anySchema);
     Suggestion = mongoose.models.Suggestion || mongoose.model('Suggestion', anySchema);
@@ -60,7 +60,7 @@ app.post('/api/login', (req, res) => {
 app.post('/api/logout', (req, res) => { req.session.destroy(); res.json({ success: true }); });
 app.get('/api/check-auth', (req, res) => { res.json({ authenticated: !!req.session.user }); });
 
-// --- B. Scores ---
+// --- B. Scores System (ระบบคะแนน) ---
 app.get('/api/scores', async (req, res) => {
     try {
         let scores = await Score.find();
@@ -81,11 +81,35 @@ app.put('/api/scores', async (req, res) => {
         for (const item of updates) {
             const updateObj = {};
             updateObj[item.field] = item.value;
-            if(item.reason !== undefined) updateObj['last_reason'] = item.reason;
             await Score.findByIdAndUpdate(item._id, updateObj);
         }
         res.json({ success: true });
     } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// 🌟 API ใหม่: ล้างคะแนนรายสัปดาห์ (Reset Weekly)
+app.post('/api/scores/reset-weekly', async (req, res) => {
+    try {
+        // สร้างรายการฟิลด์ที่จะลบ (จันทร์-อาทิตย์, ทุกประเภท)
+        const unsetFields = {};
+        const days = [1, 2, 3, 4, 5, 6, 7]; // 1=จันทร์ ...
+        const types = ['points_exercise', 'points_dorm', 'points_class'];
+        
+        days.forEach(d => {
+            types.forEach(t => {
+                unsetFields[`${t}_${d}`] = "";          // ลบคะแนน
+                unsetFields[`reason_${t}_${d}`] = "";   // ลบเหตุผล
+            });
+        });
+
+        // ลบฟิลด์เหล่านั้นออกจากทุก Document
+        await Score.updateMany({}, { $unset: unsetFields });
+        
+        console.log('🗑️ Weekly scores reset!');
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // --- C. News & Suggestions ---
@@ -96,8 +120,7 @@ app.delete('/api/news/:id', async (req, res) => { await News.findByIdAndDelete(r
 app.get('/api/suggestions', async (req, res) => { const data = await Suggestion.find().sort({ createdAt: -1 }); res.json(data); });
 app.put('/api/suggestions/:id', async (req, res) => { await Suggestion.findByIdAndUpdate(req.params.id, req.body); res.json({ success: true }); });
 
-// --- D. ELECTION SYSTEM (ระบบเลือกตั้ง) ---
-// 1. ลงคะแนน
+// --- D. Election ---
 app.post('/api/vote', async (req, res) => {
     try {
         const { party } = req.body;
@@ -107,7 +130,6 @@ app.post('/api/vote', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 2. ดูผลคะแนน
 app.get('/api/election-results', async (req, res) => {
     try {
         const total = await Vote.countDocuments();
@@ -118,11 +140,9 @@ app.get('/api/election-results', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 3. ⚠️ ล้างคะแนนทั้งหมด (Reset)
 app.delete('/api/election-reset', async (req, res) => {
     try {
         await Vote.deleteMany({});
-        console.log('🗑️ Election Reset!');
         res.json({ success: true });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
