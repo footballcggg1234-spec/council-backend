@@ -118,17 +118,14 @@
                 const res = await fetch(API_URL);
                 const allData = await res.json();
                 
-                // กรองและเรียงลำดับ
                 const dormData = allData.filter(d => d.type === 'dorm');
                 
-                // เรียงลำดับ (Custom sort for หอนอนชาย/หญิง)
+                // เรียงลำดับ หอชายมาก่อนหอหญิง แล้วเรียงตามเลข
                 dormData.sort((a, b) => {
-                     // แยกประเภท ช/ญ
                      const typeA = a.name.includes('ชาย') ? 1 : 2;
                      const typeB = b.name.includes('ชาย') ? 1 : 2;
                      if(typeA !== typeB) return typeA - typeB;
                      
-                     // แยกเลข
                      const numA = parseInt(a.name.match(/\d+/)) || 0;
                      const numB = parseInt(b.name.match(/\d+/)) || 0;
                      return numA - numB;
@@ -137,7 +134,6 @@
                 renderTable('tbody-exercise', dormData, 'points_exercise', 'blue');
                 renderTable('tbody-dorm', dormData, 'points_dorm', 'purple');
 
-                // ไฮไลท์หัวตารางวันปัจจุบัน
                 if(today >= 1 && today <= 5) {
                     document.querySelectorAll(`.day-col-${today}`).forEach(el => {
                         el.classList.add('bg-yellow-100', 'text-yellow-700');
@@ -156,16 +152,15 @@
                 let daysHtml = '';
                 let totalScore = 0;
 
-                // ลูปสร้างช่อง 5 วัน (จันทร์-ศุกร์)
                 for (let i = 1; i <= 5; i++) {
                     let dayScore = item[`${keyPrefix}_${i}`];
                     let dayReason = item[`reason_${keyPrefix}_${i}`] || "";
                     const isTodayClass = (i === today) ? 'bg-yellow-50' : '';
                     
                     if (dayScore) {
-                        totalScore += parseInt(dayScore); // รวมคะแนน
+                        totalScore += parseInt(dayScore);
                         
-                        // 🔥 แก้ไข Tooltip ให้ออกด้านขวา (z-50 left-full)
+                        // 🔥 Tooltip ด้านขวา
                         let reasonHtml = '';
                         if (dayReason) {
                             reasonHtml = `
