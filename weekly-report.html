@@ -159,10 +159,10 @@
                     if (dayScore) {
                         totalScore += parseInt(dayScore);
                         
-                        // 🔥 แก้ไขตรงนี้: แสดงหมายเหตุข้างๆ เลย
+                        // 🔥 แก้ไข: ตัวหนังสือใหญ่ขึ้น (text-xs) หนาขึ้น (font-bold) สีเข้มขึ้น (text-gray-700)
                         let reasonHtml = '';
                         if (dayReason) {
-                            reasonHtml = `<span class="ml-2 text-[10px] text-gray-500 font-normal text-left break-words max-w-[80px] leading-tight">${dayReason}</span>`;
+                            reasonHtml = `<span class="ml-2 text-xs text-gray-700 font-bold text-left break-words max-w-[100px] leading-tight">${dayReason}</span>`;
                         }
 
                         daysHtml += `<td class="table-cell px-2 align-middle min-w-[60px] ${isTodayClass}">

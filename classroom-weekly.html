@@ -98,10 +98,10 @@
                         totalScore += parseInt(score);
                         let cls = score===10 ? 'badge-green' : (score>=8 ? 'badge-yellow' : 'badge-red');
                         
-                        // 🔥 แก้ไขตรงนี้: ให้ข้อความแสดงต่อท้ายเลย
+                        // 🔥 แก้ไข: ตัวหนังสือใหญ่ขึ้น (text-xs) หนาขึ้น (font-bold) สีเข้มขึ้น (text-gray-700)
                         let reasonHtml = '';
                         if(reason) {
-                            reasonHtml = `<span class="ml-2 text-[10px] text-gray-500 font-normal text-left break-words max-w-[80px] leading-tight">${reason}</span>`;
+                            reasonHtml = `<span class="ml-2 text-xs text-gray-700 font-bold text-left break-words max-w-[100px] leading-tight">${reason}</span>`;
                         }
 
                         cellContent = `
