@@ -3,295 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>รายงานคะแนนห้องเรียน | Student Council</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; } .sidebar-link.active { background-color: #2563eb; color: white; }</style>
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f0fdf4; }
+        .table-header { @apply px-4 py-4 text-center text-sm font-bold text-gray-600 uppercase tracking-wider bg-green-50 border-b-2 border-green-100; }
+        .table-cell { @apply px-2 py-4 text-center border-b border-gray-100 text-sm font-medium; }
+        .badge-green { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-yellow { background-color: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+        .badge-red { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .current-day-col { background-color: #f0fdf4; color: #15803d; border-bottom-color: #16a34a; }
+        .total-cell { font-weight: 800; font-size: 1.1rem; }
+    </style>
 </head>
-<body class="flex h-screen overflow-hidden">
+<body class="p-4 md:p-8 min-h-screen">
 
-    <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 flex flex-col p-6 z-20 flex-shrink-0">
-        <div class="flex flex-col items-center justify-center mb-8 pb-6 border-b border-gray-100">
-            <div class="w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center mb-3 overflow-hidden border-4 border-blue-100 relative group cursor-pointer p-1">
-                <img src="RPK26 Logo.jfif" 
-                     class="w-full h-full object-cover group-hover:scale-110 transition duration-500" 
-                     onerror="this.src='https://ui-avatars.com/api/?name=Admin&background=random&color=fff&size=128'"> 
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <div class="bg-white rounded-2xl shadow-sm border border-green-100 p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600 shadow-sm"><i class="fas fa-chalkboard text-3xl"></i></div>
+                <div><h1 class="text-2xl font-extrabold text-gray-800">รายงานห้องเรียน</h1><p class="text-gray-500 font-medium">คะแนนความสะอาดรายวัน</p></div>
             </div>
-            <h1 class="text-lg font-extrabold text-slate-800 tracking-wide text-center">RPK26 ADMIN</h1>
-            <p class="text-xs text-gray-400 font-bold bg-gray-100 px-3 py-1 rounded-full mt-2">Admin Panel</p>
-        </div>
-
-        <nav class="flex-1 space-y-2">
-            <a onclick="switchTab('dashboard')" id="nav-dashboard" class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-blue-50 text-gray-600 sidebar-link active"><i class="fas fa-chart-pie w-6"></i> Dashboard</a>
-            <a onclick="switchTab('scores')" id="nav-scores" class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-blue-50 text-gray-600 sidebar-link"><i class="fas fa-edit w-6"></i> กรอกคะแนน</a>
-            <a onclick="switchTab('suggestions')" id="nav-suggestions" class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-blue-50 text-gray-600 sidebar-link"><i class="fas fa-inbox w-6"></i> ความคิดเห็น</a>
-            <a onclick="switchTab('news')" id="nav-news" class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-blue-50 text-gray-600 sidebar-link"><i class="fas fa-bullhorn w-6"></i> ข่าวสาร</a>
-        </nav>
-        <button onclick="location.href='index.html'" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl mt-auto font-bold text-sm"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</button>
-    </aside>
-
-    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50">
-        <header class="bg-white border-b h-16 flex items-center justify-between px-6 shadow-sm"><h2 class="font-bold text-gray-700">ระบบจัดการสภานักเรียน</h2><div class="text-sm text-green-600 font-bold">● Online</div></header>
-        <div class="flex-1 overflow-y-auto p-6 space-y-6">
             
-            <div id="tab-dashboard" class="tab-content block">
-                <h2 class="text-2xl font-bold mb-4">ภาพรวมวันนี้</h2>
-                <div class="grid grid-cols-3 gap-4">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500"><h3 class="text-gray-500 text-xs font-bold">หอพัก</h3><p class="text-3xl font-black mt-2" id="stat-dorm">0</p></div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-green-500"><h3 class="text-gray-500 text-xs font-bold">ห้องเรียน</h3><p class="text-3xl font-black mt-2" id="stat-class">0</p></div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-orange-500"><h3 class="text-gray-500 text-xs font-bold">ร้องเรียน</h3><p class="text-3xl font-black mt-2" id="stat-sug">0</p></div>
-                </div>
-                
-                <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6"> <div class="bg-white p-6 rounded-xl shadow-sm lg:col-span-2">
-                        <h3 class="font-bold mb-4">5 อันดับหอพักสูงสุด (สะสม)</h3>
-                        <div class="relative h-64 w-full">
-                            <canvas id="barChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center">
-                        <h3 class="font-bold mb-4 w-full text-left">สัดส่วนคะแนน</h3>
-                        <div class="relative h-56 w-56"> <canvas id="donutChart"></canvas>
-                        </div>
-                    </div>
-                </div>
+            <div class="flex gap-2 items-center">
+                <button onclick="showSummary()" class="h-10 px-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg shadow-lg hover:shadow-green-500/30 hover:-translate-y-0.5 font-bold transition flex items-center gap-2">
+                    <i class="fas fa-medal text-yellow-300"></i> สรุปผลประจำเดือน
+                </button>
+                <a href="weekly-report.html" class="h-10 px-4 bg-white text-green-600 border border-green-200 rounded-lg shadow hover:bg-green-50 font-bold transition flex items-center gap-2"><i class="fas fa-bed"></i> ดูหอพัก</a>
             </div>
-
-            <div id="tab-scores" class="tab-content hidden">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b pb-4">
-                        <div class="flex gap-2">
-                            <button onclick="loadScoreInputs('exercise')" id="btn-mode-exercise" class="px-4 py-2 rounded-lg bg-gray-100 text-blue-700 font-bold hover:bg-blue-100">ออกกาย</button>
-                            <button onclick="loadScoreInputs('dorm')" id="btn-mode-dorm" class="px-4 py-2 rounded-lg bg-gray-100 text-purple-700 font-bold hover:bg-purple-100">หอนอน</button>
-                            <button onclick="loadScoreInputs('classroom')" id="btn-mode-classroom" class="px-4 py-2 rounded-lg bg-gray-100 text-green-700 font-bold hover:bg-green-100">ห้องเรียน</button>
-                        </div>
-                        
-                        <div class="flex items-center gap-3">
-                            <div class="flex items-center gap-2 bg-blue-50 p-2 px-4 rounded-lg border border-blue-200 shadow-sm">
-                                <i class="far fa-calendar-check text-blue-600 text-xl"></i>
-                                <div>
-                                    <p class="text-[10px] font-bold text-blue-400 uppercase leading-none">TODAY</p>
-                                    <p class="text-sm font-black text-blue-800" id="auto-date-display">...</p>
-                                </div>
-                            </div>
-                            <button onclick="toggleManualDate()" class="text-gray-400 hover:text-gray-600" title="แก้ไขวันเอง"><i class="fas fa-pen-square text-lg"></i></button>
-                            <select id="day-selector" class="hidden bg-white border border-gray-300 text-sm rounded-lg p-1" onchange="loadScoreInputs(currentAdminMode)">
-                                <option value="1">วันจันทร์</option><option value="2">วันอังคาร</option><option value="3">วันพุธ</option><option value="4">วันพฤหัสบดี</option><option value="5">วันศุกร์</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 id="score-title" class="text-xl font-bold text-gray-700">กรุณาเลือกหมวดหมู่</h3>
-                        <div class="flex gap-2">
-                            <button onclick="startNewWeek()" class="text-xs bg-white text-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-50 font-bold border border-blue-200 transition"><i class="fas fa-calendar-week mr-1"></i> จบสัปดาห์</button>
-                            <button onclick="startNewMonth()" class="text-xs bg-red-100 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-200 font-bold border border-red-200 transition"><i class="fas fa-trash-alt mr-1"></i> เริ่มเดือนใหม่</button>
-                        </div>
-                    </div>
-
-                    <form onsubmit="saveScores(event)">
-                        <div id="score-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[55vh] overflow-y-auto p-1"></div>
-                        <button type="submit" class="mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition transform active:scale-95" id="btn-save">
-                            <i class="fas fa-save mr-2"></i> บันทึกคะแนน
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <div id="tab-news" class="tab-content hidden"><div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4">โพสต์ข่าว</h3><form onsubmit="postNews(event)" class="space-y-4"><input id="nt" class="w-full p-3 border rounded-lg" placeholder="หัวข้อ"><textarea id="nc" class="w-full p-3 border rounded-lg" placeholder="เนื้อหา"></textarea><button class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold">โพสต์</button></form></div></div>
-            <div id="tab-suggestions" class="tab-content hidden"><div class="bg-white p-6 rounded-2xl shadow-sm"><h3 class="font-bold mb-4">ข้อร้องเรียน</h3><table class="w-full"><tbody id="sug-body"></tbody></table></div></div>
         </div>
-    </main>
+
+        <div class="bg-white rounded-2xl shadow-lg border border-green-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-4 text-left text-sm font-bold text-gray-600 uppercase tracking-wider bg-green-50 border-b-2 border-green-100 w-32">ห้องเรียน</th>
+                            <th class="table-header day-col-1">จันทร์</th>
+                            <th class="table-header day-col-2">อังคาร</th>
+                            <th class="table-header day-col-3">พุธ</th>
+                            <th class="table-header day-col-4">พฤหัส</th>
+                            <th class="table-header day-col-5">ศุกร์</th>
+                            <th class="table-header text-green-700 bg-green-100 border-green-200">สัปดาห์</th>
+                            <th class="table-header text-white bg-green-600">สะสม</th>
+                        </tr>
+                    </thead>
+                    <tbody id="classroom-tbody" class="bg-white divide-y divide-gray-50"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="class-summary-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 transition-all" id="modal-box">
+                <div class="bg-green-600 p-5 text-white flex justify-between items-center">
+                    <h2 class="text-xl font-bold"><i class="fas fa-crown mr-2 text-yellow-300"></i>Top Classrooms</h2>
+                    <button onclick="closeSummary()" class="hover:text-green-200"><i class="fas fa-times text-xl"></i></button>
+                </div>
+                <div class="p-6 bg-gradient-to-b from-green-50 to-white">
+                    <div id="top-class-list" class="space-y-3"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 
     <script>
-        const API = '/api';
-        let allScores = [], currentAdminMode = '';
-        
-        let dashboardBarChart = null;
-        let dashboardDonutChart = null;
+        const API_URL = '/api/scores';
+        const today = new Date().getDay();
+        let classData = [];
 
-        function toggleSidebar() { const s = document.getElementById('sidebar'); s.classList.toggle('hidden'); }
-        
-        init();
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().getDay();
-            const selector = document.getElementById('day-selector');
-            if(today >= 1 && today <= 5) selector.value = today;
-            else selector.value = 1; 
-        });
-
-        async function init() {
+        async function fetchAndRender() {
             try {
-                const [s, sg, nw] = await Promise.all([fetch(`${API}/scores`), fetch(`${API}/suggestions`), fetch(`${API}/news`)]);
-                allScores = await s.json(); 
-                const sugs = await sg.json(); 
-                const news = await nw.json(); 
+                const res = await fetch(API_URL);
+                const allData = await res.json();
+                classData = allData.filter(d => d.type === 'classroom');
                 
-                updateStats(allScores, sugs, news);
-                renderCharts(allScores);
-                document.getElementById('sug-body').innerHTML = sugs.map(i=>`<tr class="border-b"><td class="p-3 font-bold">${i.topic}</td><td class="p-3 text-sm">${i.status}</td><td class="p-3 text-right"><button onclick="solve('${i._id}')" class="text-blue-600 font-bold text-sm">จบงาน</button></td></tr>`).join('');
-                
-                setAutoDate();
-            } catch(e) { console.error("Init Error:", e); }
-        }
+                // Sort by name for main table
+                classData.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
 
-        function switchTab(t) {
-            document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden')); 
-            document.getElementById(`tab-${t}`).classList.remove('hidden');
-            document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active')); 
-            document.getElementById(`nav-${t}`).classList.add('active');
-            if(t === 'dashboard') renderCharts(allScores);
-        }
+                renderTable(classData);
 
-        function getWeeklyScore(item, field) {
-            let sum = item[field] || 0;
-            for(let i=1; i<=5; i++) sum += (item[`${field}_${i}`] || 0);
-            return sum;
-        }
-
-        function updateStats(scores, sugs, news) {
-            const tDorm = scores.filter(s=>s.type==='dorm').reduce((a,b)=>a + getWeeklyScore(b,'points_exercise') + getWeeklyScore(b,'points_dorm'), 0);
-            const tClass = scores.filter(s=>s.type==='classroom').reduce((a,b)=>a + getWeeklyScore(b,'points_class'), 0);
-            document.getElementById('stat-dorm').innerText = tDorm.toLocaleString();
-            document.getElementById('stat-class').innerText = tClass.toLocaleString();
-            document.getElementById('stat-sug').innerText = sugs.length;
-        }
-
-        function renderCharts(data) {
-            const dorms = data.filter(d=>d.type==='dorm');
-            dorms.forEach(d => { d.totalScore = getWeeklyScore(d, 'points_exercise') + getWeeklyScore(d, 'points_dorm'); });
-            dorms.sort((a,b) => b.totalScore - a.totalScore);
-            const top5 = dorms.slice(0, 5);
-
-            const ctxBar = document.getElementById('barChart').getContext('2d');
-            if (dashboardBarChart) dashboardBarChart.destroy();
-            dashboardBarChart = new Chart(ctxBar, { type:'bar', data:{ labels: top5.map(d=>d.name), datasets:[{ label:'คะแนนสะสม', data: top5.map(d=>d.totalScore), backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899'], borderRadius:6 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}} } });
-
-            const tEx = data.filter(d=>d.type==='dorm').reduce((a,b)=>a + getWeeklyScore(b,'points_exercise'), 0);
-            const tDo = data.filter(d=>d.type==='dorm').reduce((a,b)=>a + getWeeklyScore(b,'points_dorm'), 0);
-            const tCl = data.filter(d=>d.type==='classroom').reduce((a,b)=>a + getWeeklyScore(b,'points_class'), 0);
-
-            const ctxDonut = document.getElementById('donutChart').getContext('2d');
-            if (dashboardDonutChart) dashboardDonutChart.destroy();
-            dashboardDonutChart = new Chart(ctxDonut, { type:'doughnut', data:{ labels:['ออกกาย','หอนอน','ห้องเรียน'], datasets:[{ data: [tEx, tDo, tCl], backgroundColor:['#3b82f6','#a855f7','#f59e0b'], borderWidth:0, hoverOffset:5 }] }, options:{ cutout:'70%', plugins:{legend:{position:'bottom', labels:{usePointStyle:true}}} } });
-        }
-
-        function setAutoDate() {
-            const today = new Date();
-            const dayNum = today.getDay();
-            const dayNames = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"];
-            const display = document.getElementById('auto-date-display');
-            const selector = document.getElementById('day-selector');
-            const btnSave = document.getElementById('btn-save');
-
-            if(dayNum >= 1 && dayNum <= 5) {
-                selector.value = dayNum;
-                display.innerText = "วัน" + dayNames[dayNum];
-                display.className = "text-sm font-black text-blue-800";
-                btnSave.disabled = false;
-                btnSave.innerHTML = `<i class="fas fa-save mr-2"></i> บันทึกคะแนน (ประจำวัน${dayNames[dayNum]})`;
-            } else {
-                selector.value = 1;
-                display.innerText = "วันหยุด (" + dayNames[dayNum] + ")";
-                display.className = "text-sm font-black text-red-500";
-                btnSave.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i> บันทึกย้อนหลัง (วันจันทร์)`;
-            }
-            if(currentAdminMode) loadScoreInputs(currentAdminMode);
-        }
-
-        function toggleManualDate() {
-            const sel = document.getElementById('day-selector');
-            sel.classList.toggle('hidden');
-            if(!sel.classList.contains('hidden')) alert('เปิดโหมดแก้ไขวันเอง (Manual Override)');
-        }
-
-        function loadScoreInputs(m) {
-            if(!m) return; currentAdminMode=m;
-            const day = document.getElementById('day-selector').value;
-            const dayText = document.getElementById('day-selector').options[document.getElementById('day-selector').selectedIndex].text;
-            
-            document.querySelectorAll('#tab-scores button[id^="btn-mode"]').forEach(b=>b.className='px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-bold hover:bg-gray-200 transition');
-            document.getElementById(`btn-mode-${m}`).className = `px-4 py-2 rounded-lg font-bold text-white shadow-md transition ${m==='exercise'?'bg-blue-600':(m==='dorm'?'bg-purple-600':'bg-green-600')}`;
-
-            document.getElementById('score-title').innerHTML = `${m.toUpperCase()} <span class="text-gray-300 mx-2">|</span> <span class="text-blue-600 bg-blue-50 px-2 py-1 rounded">${dayText}</span>`;
-            
-            const field = m==='classroom'?'points_class':(m==='exercise'?'points_exercise':'points_dorm');
-            const key = `${field}_${day}`;
-            const reasonKey = `reason_${field}_${day}`;
-
-            const data = allScores.filter(d => (m==='classroom' ? d.type==='classroom' : d.type==='dorm')).sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
-            const con = document.getElementById('score-container'); con.innerHTML = '';
-
-            data.forEach(i => {
-                const val = i[key] || 0;
-                const reason = i[reasonKey] || '';
-                
-                if(m === 'classroom') {
-                    con.innerHTML += `<div class="bg-white p-4 rounded-xl border shadow-sm"><div class="font-bold text-gray-700 mb-2">${i.name}</div><input type="number" class="score-inp w-full p-2 border rounded text-center font-bold text-green-600 text-xl mb-2" data-id="${i._id}" value="${val||''}" placeholder="0-10" min="0" max="10"><input type="text" class="reason-inp w-full text-xs p-2 border rounded bg-gray-50" placeholder="หมายเหตุ (ถ้ามี)..." value="${reason}"></div>`;
-                } else {
-                    const isGreen = val==3; const isYellow = val==2; const isRed = val==1;
-                    con.innerHTML += `
-                    <div class="bg-white p-4 rounded-xl border shadow-sm group">
-                        <div class="flex justify-between mb-2"><span class="font-bold text-gray-700">${i.name}</span>${val?`<span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded"><i class="fas fa-check"></i> ${val}</span>`:''}</div>
-                        <div class="grid grid-cols-3 gap-2 mb-2">
-                            <button type="button" onclick="setScore(this,3)" class="py-2 rounded font-bold border ${isGreen?'bg-green-500 text-white':'bg-white text-gray-400'}">3</button>
-                            <button type="button" onclick="setScore(this,2)" class="py-2 rounded font-bold border ${isYellow?'bg-yellow-400 text-white':'bg-white text-gray-400'}">2</button>
-                            <button type="button" onclick="setScore(this,1)" class="py-2 rounded font-bold border ${isRed?'bg-red-500 text-white':'bg-white text-gray-400'}">1</button>
-                        </div>
-                        <input type="hidden" class="score-inp" data-id="${i._id}" value="${val}"><input type="text" class="reason-inp w-full text-xs p-2 border rounded" placeholder="หมายเหตุ..." value="${reason}">
-                    </div>`;
+                if(today >= 1 && today <= 5) {
+                    document.querySelectorAll(`.day-col-${today}`).forEach(el => {
+                        el.classList.add('current-day-col');
+                        el.innerHTML += ' <i class="fas fa-caret-down ml-1"></i>';
+                    });
                 }
+            } catch (err) { console.error(err); }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('classroom-tbody');
+            tbody.innerHTML = data.map((item, index) => {
+                const rowClass = index % 2 === 0 ? 'bg-white' : 'bg-green-50/30';
+                let daysHtml = '';
+                let weeklyTotal = 0;
+
+                for (let i = 1; i <= 5; i++) {
+                    const score = item[`points_class_${i}`];
+                    const reason = item[`reason_points_class_${i}`] || '';
+                    const isToday = i === today ? 'bg-green-50/50' : '';
+
+                    if(score !== undefined && score !== null) {
+                        weeklyTotal += parseInt(score);
+                        let cls = score===10 ? 'badge-green' : (score>=8 ? 'badge-yellow' : 'badge-red');
+                        let reasonHtml = reason ? `<span class="ml-2 text-xs text-gray-700 font-bold text-left break-words max-w-[80px] leading-tight">${reason}</span>` : '';
+                        daysHtml += `<td class="table-cell ${isToday} align-middle"><div class="flex items-center justify-center min-h-[40px]"><span class="${cls} inline-flex flex-shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold shadow-sm">${score}</span>${reasonHtml}</div></td>`;
+                    } else {
+                        daysHtml += `<td class="table-cell ${isToday} align-middle"><span class="text-gray-300 font-light">-</span></td>`;
+                    }
+                }
+
+                // Calculate Grand Total (Accumulated + Weekly)
+                const grandTotal = (item.accumulated_score || 0) + weeklyTotal;
+
+                return `<tr class="${rowClass} hover:bg-green-50 transition duration-150"><td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-700 text-left border-b border-gray-100 align-middle">${item.name}</td>${daysHtml}<td class="table-cell total-cell text-green-700 border-l border-green-100 align-middle">${weeklyTotal}</td><td class="table-cell total-cell text-white bg-green-600 align-middle shadow-sm">${grandTotal}</td></tr>`;
+            }).join('');
+        }
+
+        function showSummary() {
+            const list = document.getElementById('top-class-list');
+            list.innerHTML = '';
+
+            // Calculate totals for ranking
+            const ranking = classData.map(c => {
+                let w = 0;
+                for(let i=1; i<=5; i++) w += (parseInt(c[`points_class_${i}`]) || 0);
+                return { name: c.name, total: (c.accumulated_score || 0) + w };
+            }).sort((a,b) => b.total - a.total).slice(0, 5); // Take top 5
+
+            ranking.forEach((r, i) => {
+                let badge = i===0 ? '🥇' : (i===1 ? '🥈' : (i===2 ? '🥉' : `#${i+1}`));
+                let style = i===0 ? 'bg-green-600 text-white ring-4 ring-green-100 scale-105' : 'bg-white text-gray-700 border border-green-100';
+                
+                list.innerHTML += `
+                    <div class="flex items-center justify-between p-4 rounded-xl shadow-sm ${style} transition">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl w-8 text-center">${badge}</span>
+                            <span class="font-bold text-lg">${r.name}</span>
+                        </div>
+                        <span class="font-black text-xl">${r.total}</span>
+                    </div>
+                `;
             });
+
+            const m = document.getElementById('class-summary-modal');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+            setTimeout(() => document.getElementById('modal-box').classList.remove('scale-95'), 10);
         }
 
-        function setScore(btn, v) {
-            const p = btn.parentElement; p.querySelectorAll('button').forEach(b=>b.className='py-2 rounded font-bold border bg-white text-gray-400');
-            btn.className = `py-2 rounded font-bold border text-white shadow ${v==3?'bg-green-500':(v==2?'bg-yellow-400':'bg-red-500')}`;
-            p.nextElementSibling.value = v;
+        function closeSummary() {
+            const m = document.getElementById('class-summary-modal');
+            document.getElementById('modal-box').classList.add('scale-95');
+            setTimeout(() => { m.classList.add('hidden'); m.classList.remove('flex'); }, 150);
         }
 
-        async function saveScores(e) {
-            e.preventDefault();
-            const day = document.getElementById('day-selector').value;
-            const field = currentAdminMode==='classroom'?'points_class':(currentAdminMode==='exercise'?'points_exercise':'points_dorm');
-            const key = `${field}_${day}`;
-            const rKey = `reason_${field}_${day}`;
-            
-            const upds = [];
-            document.querySelectorAll('.score-inp').forEach(inp => {
-                const div = inp.closest('div, .bg-white');
-                const rInp = div.querySelector('.reason-inp');
-                upds.push({ _id: inp.dataset.id, field: key, value: parseInt(inp.value)||0 });
-                if(rInp) upds.push({ _id: inp.dataset.id, field: rKey, value: rInp.value });
-            });
-
-            const btn = document.getElementById('btn-save');
-            const oldHtml = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
-            try {
-                await fetch(`${API}/scores`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(upds)});
-                alert('บันทึกเรียบร้อย ✅'); init();
-            } catch { alert('Error!'); } finally { btn.innerHTML = oldHtml; }
-        }
-
-        async function startNewWeek() {
-            if(confirm('✅ ยืนยัน "จบสัปดาห์นี้" หรือไม่?\n- คะแนนปัจจุบันจะถูกเก็บเข้า "ยอดสะสมรายเดือน"\n- ตารางรายวันจะถูกรีเซ็ตเป็น 0')) {
-                await fetch(`${API}/scores/reset-weekly`, {method:'POST'});
-                alert('รวมคะแนนเข้ายอดสะสมเรียบร้อย! เริ่มสัปดาห์ใหม่ได้'); init(); loadScoreInputs(currentAdminMode);
-            }
-        }
-
-        async function startNewMonth() {
-            if(confirm('⚠️ ยืนยัน "เริ่มเดือนใหม่" หรือไม่?\n- คะแนนสะสมทั้งหมดจะถูกล้างเป็น 0\n- ประวัติเดือนนี้จะถูกบันทึกเก็บไว้')) {
-                await fetch(`${API}/scores/reset-monthly`, {method:'POST'});
-                alert('ขึ้นเดือนใหม่เรียบร้อย! ข้อมูลทั้งหมดเป็น 0'); init(); loadScoreInputs(currentAdminMode);
-            }
-        }
-
-        async function solve(id) { await fetch(`${API}/suggestions/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:'resolved'})}); init(); }
-        async function postNews(e) { e.preventDefault(); await fetch(`${API}/news`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({title:document.getElementById('nt').value, content:document.getElementById('nc').value})}); alert('Posted'); }
+        document.addEventListener('DOMContentLoaded', fetchAndRender);
     </script>
 </body>
 </html>
