@@ -27,11 +27,11 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://admin:rungradit@cluster
 // --- 3. Schema & Models ---
 const anySchema = new mongoose.Schema({}, { strict: false });
 
-// 🆕 Schema สำหรับเก็บประวัติย้อนหลัง
 const HistorySchema = new mongoose.Schema({
-    label: String,         // ชื่อช่วงเวลา เช่น "มกราคม สัปดาห์ที่ 2"
+    label: String,
+    type: String, // 'weekly' or 'monthly'
     timestamp: { type: Date, default: Date.now },
-    data: Array            // เก็บข้อมูลคะแนนทั้งหมด ณ ตอนนั้น
+    data: Array
 });
 
 const voteSchema = new mongoose.Schema({
@@ -67,14 +67,14 @@ app.post('/api/login', (req, res) => {
 app.post('/api/logout', (req, res) => { req.session.destroy(); res.json({ success: true }); });
 app.get('/api/check-auth', (req, res) => { res.json({ authenticated: !!req.session.user }); });
 
-// --- B. Scores System (ระบบคะแนน) ---
+// --- B. Scores System ---
 app.get('/api/scores', async (req, res) => {
     try {
         let scores = await Score.find();
         if (scores.length === 0) {
             const initialData = [];
-            for(let i=1; i<=8; i++) initialData.push({ name: `หอพักชายที่ ${i}`, type: 'dorm', gender: 'male' });
-            for(let i=9; i<=17; i++) initialData.push({ name: `หอพักหญิงที่ ${i}`, type: 'dorm', gender: 'female' });
+            for(let i=1; i<=7; i++) initialData.push({ name: `หอนอนชาย ${i}`, type: 'dorm', gender: 'male' });
+            for(let i=1; i<=10; i++) initialData.push({ name: `หอนอนหญิง ${i}`, type: 'dorm', gender: 'female' });
             ['ม.1','ม.2','ม.3','ม.4','ม.5','ม.6'].forEach(l => { for(let r=1; r<=3; r++) initialData.push({ name: `${l}/${r}`, type: 'classroom' }); });
             scores = await Score.insertMany(initialData);
         }
@@ -94,93 +94,91 @@ app.put('/api/scores', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 🔥 API: เริ่มสัปดาห์ใหม่ (Backup ข้อมูลเก่า -> แล้วค่อยลบ)
+// 🔥 API: จบสัปดาห์ (เก็บคะแนนเข้า 'สะสมรายเดือน' แล้วลบคะแนนรายวัน)
 app.post('/api/scores/reset-weekly', async (req, res) => {
     try {
-        // 1. ดึงข้อมูลปัจจุบันมา backup ก่อน
-        const currentScores = await Score.find();
-        
-        // สร้างชื่อประวัติจากวันที่ (เช่น "10 ม.ค. 67")
+        const scores = await Score.find();
         const date = new Date();
-        const thMonth = date.toLocaleString('th-TH', { month: 'short' });
-        const label = `งวดวันที่ ${date.getDate()} ${thMonth} ${date.getFullYear() + 543}`;
+        const label = `สัปดาห์วันที่ ${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()+543}`;
 
-        // บันทึกลง History
-        if (currentScores.length > 0) {
-            await new History({ label: label, data: currentScores }).save();
-            console.log(`💾 Archived history: ${label}`);
+        // 1. Backup ประวัติ
+        if(scores.length > 0) await new History({ label, type: 'weekly', data: scores }).save();
+
+        // 2. คำนวณคะแนนสัปดาห์นี้ -> บวกเข้าคะแนนสะสม (accumulated_score)
+        const days = [1, 2, 3, 4, 5];
+        
+        for (const s of scores) {
+            let weeklySum = 0;
+            if(s.type === 'dorm') {
+                days.forEach(d => weeklySum += (parseInt(s[`points_exercise_${d}`]||0) + parseInt(s[`points_dorm_${d}`]||0)));
+            } else {
+                days.forEach(d => weeklySum += parseInt(s[`points_class_${d}`]||0));
+            }
+
+            const update = { 
+                $inc: { accumulated_score: weeklySum } // บวกเพิ่ม
+            };
+            
+            // ลบคะแนนรายวัน
+            const unsetFields = {};
+            days.forEach(d => {
+                unsetFields[`points_exercise_${d}`] = "";
+                unsetFields[`points_dorm_${d}`] = "";
+                unsetFields[`points_class_${d}`] = "";
+                unsetFields[`reason_points_exercise_${d}`] = "";
+                unsetFields[`reason_points_dorm_${d}`] = "";
+                unsetFields[`reason_points_class_${d}`] = "";
+            });
+            update.$unset = unsetFields;
+
+            await Score.findByIdAndUpdate(s._id, update);
         }
 
-        // 2. ลบข้อมูลคะแนนในตารางหลัก
-        const unsetFields = {};
-        const days = [1, 2, 3, 4, 5, 6, 7];
-        const types = ['points_exercise', 'points_dorm', 'points_class'];
+        console.log('✅ Weekly reset complete (Scores accumulated)');
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// 🚀 API: เริ่มเดือนใหม่ (ล้างคะแนนสะสมทั้งหมดเป็น 0)
+app.post('/api/scores/reset-monthly', async (req, res) => {
+    try {
+        const scores = await Score.find();
+        const date = new Date();
+        const label = `สรุปประจำเดือน ${date.getMonth()+1}/${date.getFullYear()+543}`;
         
-        days.forEach(d => {
-            types.forEach(t => {
-                unsetFields[`${t}_${d}`] = "";
-                unsetFields[`reason_${t}_${d}`] = "";
-            });
+        // Backup
+        if(scores.length > 0) await new History({ label, type: 'monthly', data: scores }).save();
+
+        // ล้างทุกอย่าง (รวมถึง accumulated_score)
+        const unsetFields = { accumulated_score: "" };
+        [1,2,3,4,5].forEach(d => {
+            unsetFields[`points_exercise_${d}`] = "";
+            unsetFields[`points_dorm_${d}`] = "";
+            unsetFields[`points_class_${d}`] = "";
         });
 
         await Score.updateMany({}, { $unset: unsetFields });
-        
-        res.json({ success: true, message: "Archived and Reset successfully" });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+        console.log('💥 Monthly reset complete (All cleared)');
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 🆕 API: ดึงรายการประวัติย้อนหลัง (List)
+// History APIs
 app.get('/api/history-list', async (req, res) => {
-    try {
-        const list = await History.find({}, 'label timestamp').sort({ timestamp: -1 });
-        res.json(list);
-    } catch (err) { res.status(500).json({ error: err.message }); }
+    const list = await History.find({}, 'label type timestamp').sort({ timestamp: -1 });
+    res.json(list);
 });
-
-// 🆕 API: ดึงข้อมูลประวัติระบุ ID
 app.get('/api/history/:id', async (req, res) => {
-    try {
-        const history = await History.findById(req.params.id);
-        res.json(history ? history.data : []);
-    } catch (err) { res.status(500).json({ error: err.message }); }
+    const h = await History.findById(req.params.id);
+    res.json(h ? h.data : []);
 });
 
-// --- C. News & Suggestions ---
+// --- News & Suggestions ---
 app.get('/api/news', async (req, res) => { const news = await News.find().sort({ date: -1 }); res.json(news); });
 app.post('/api/news', async (req, res) => { await new News(req.body).save(); res.json({ success: true }); });
 app.delete('/api/news/:id', async (req, res) => { await News.findByIdAndDelete(req.params.id); res.json({ success: true }); });
-
 app.get('/api/suggestions', async (req, res) => { const data = await Suggestion.find().sort({ createdAt: -1 }); res.json(data); });
 app.put('/api/suggestions/:id', async (req, res) => { await Suggestion.findByIdAndUpdate(req.params.id, req.body); res.json({ success: true }); });
-
-// --- D. Election ---
-app.post('/api/vote', async (req, res) => {
-    try {
-        const { party } = req.body;
-        if (![1, 2, 3].includes(party)) return res.status(400).json({ error: 'Invalid Party' });
-        await new Vote({ party, ip: req.ip }).save();
-        res.json({ success: true });
-    } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.get('/api/election-results', async (req, res) => {
-    try {
-        const total = await Vote.countDocuments();
-        const p1 = await Vote.countDocuments({ party: 1 });
-        const p2 = await Vote.countDocuments({ party: 2 });
-        const p3 = await Vote.countDocuments({ party: 3 });
-        res.json({ total, results: [p1, p2, p3] });
-    } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.delete('/api/election-reset', async (req, res) => {
-    try {
-        await Vote.deleteMany({});
-        res.json({ success: true });
-    } catch (err) { res.status(500).json({ error: err.message }); }
-});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
