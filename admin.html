@@ -262,7 +262,13 @@
                 const reason = i[reasonKey] || '';
                 
                 if(m === 'classroom') {
-                    con.innerHTML += `<div class="bg-white p-4 rounded-xl border shadow-sm"><div class="font-bold text-gray-700 mb-2">${i.name}</div><input type="number" class="score-inp w-full p-2 border rounded text-center font-bold text-green-600 text-xl" data-id="${i._id}" value="${val||''}" placeholder="0-10" min="0" max="10"></div>`;
+                    // 🔥 แก้ไขแล้ว: เพิ่มช่องหมายเหตุให้ห้องเรียน
+                    con.innerHTML += `
+                    <div class="bg-white p-4 rounded-xl border shadow-sm">
+                        <div class="font-bold text-gray-700 mb-2">${i.name}</div>
+                        <input type="number" class="score-inp w-full p-2 border rounded text-center font-bold text-green-600 text-xl mb-2" data-id="${i._id}" value="${val||''}" placeholder="0-10" min="0" max="10">
+                        <input type="text" class="reason-inp w-full text-xs p-2 border rounded bg-gray-50" placeholder="หมายเหตุ (ถ้ามี)..." value="${reason}">
+                    </div>`;
                 } else {
                     const isGreen = val==3; const isYellow = val==2; const isRed = val==1;
                     con.innerHTML += `
