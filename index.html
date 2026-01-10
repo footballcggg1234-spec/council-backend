@@ -97,14 +97,13 @@
             <div class="glass rounded-[32px] p-6">
                 <h3 class="font-bold text-gray-800 mb-4">ปฏิทิน</h3>
                 <div class="bg-white rounded-2xl p-4 shadow-sm text-center border border-gray-100">
-                    <div class="text-primary font-black text-xl mb-1">ธันวาคม</div>
-                    <div class="text-xs text-gray-400 font-bold mb-4">DECEMBER 2025</div>
-                    <div class="grid grid-cols-7 gap-2 text-xs font-bold text-gray-400 mb-2"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
-                    <div class="grid grid-cols-7 gap-2 text-sm font-semibold text-gray-600">
-                        <span class="text-gray-300">30</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
-                        <span>7</span><span>8</span><span>9</span><span class="bg-primary text-white rounded-lg shadow-md">10</span><span>11</span><span>12</span>
-                        <span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span>
+                    <div id="cal-month" class="text-primary font-black text-xl mb-1">...</div>
+                    <div id="cal-year" class="text-xs text-gray-400 font-bold mb-4">...</div>
+                    
+                    <div class="grid grid-cols-7 gap-2 text-xs font-bold text-gray-400 mb-2">
+                        <span>อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span>
                     </div>
+                    <div id="cal-days" class="grid grid-cols-7 gap-2 text-sm font-semibold text-gray-600"></div>
                 </div>
             </div>
         </aside>
@@ -123,6 +122,7 @@
         const NEWS_API = '/api/news';
 
         async function init() {
+            renderCalendar(); // เรียกฟังก์ชันสร้างปฏิทิน
             try {
                 const [s, n] = await Promise.all([fetch(API_URL), fetch(NEWS_API)]);
                 const scores = await s.json();
@@ -136,6 +136,39 @@
                 
                 renderNews(await n.json());
             } catch(e) { console.error(e); }
+        }
+
+        // 🔥 ฟังก์ชันสร้างปฏิทินอัตโนมัติ
+        function renderCalendar() {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            const today = date.getDate();
+
+            const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+                                "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+            
+            document.getElementById('cal-month').innerText = monthNames[month];
+            document.getElementById('cal-year').innerText = (year + 543); // พ.ศ.
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+            const daysContainer = document.getElementById('cal-days');
+            daysContainer.innerHTML = "";
+
+            // ช่องว่างก่อนวันที่ 1
+            for (let i = 0; i < firstDay; i++) {
+                daysContainer.innerHTML += `<span></span>`;
+            }
+
+            // รันวันที่ 1 ถึงสิ้นเดือน
+            for (let i = 1; i <= lastDate; i++) {
+                if (i === today) {
+                    daysContainer.innerHTML += `<span class="bg-primary text-white rounded-lg shadow-md flex items-center justify-center w-7 h-7 mx-auto cursor-pointer">${i}</span>`;
+                } else {
+                    daysContainer.innerHTML += `<span class="flex items-center justify-center w-7 h-7 mx-auto hover:bg-gray-100 rounded-full cursor-pointer transition">${i}</span>`;
+                }
+            }
         }
 
         function renderPodium(id, data, color, txt) {
