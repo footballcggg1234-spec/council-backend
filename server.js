@@ -7,7 +7,6 @@ const session = require('express-session');
 
 const app = express();
 
-// --- 1. Middleware ---
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '/')));
@@ -19,12 +18,10 @@ app.use(session({
     cookie: { maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-// --- 2. Database Connection ---
 mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://admin:rungradit@cluster0.8counxn.mongodb.net/?appName=Cluster0')
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch(err => console.error('❌ MongoDB Error:', err));
 
-// --- 3. Schema & Models ---
 const anySchema = new mongoose.Schema({}, { strict: false });
 
 const HistorySchema = new mongoose.Schema({
@@ -49,11 +46,7 @@ try {
     History = mongoose.models.History || mongoose.model('History', HistorySchema);
 } catch (e) { console.log(e); }
 
-// ==========================================
-// 🚀 API ROUTES
-// ==========================================
-
-// --- A. Login ---
+// API Routes
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     if (username === 'admin' && password === '123456') {
@@ -67,7 +60,6 @@ app.post('/api/login', (req, res) => {
 app.post('/api/logout', (req, res) => { req.session.destroy(); res.json({ success: true }); });
 app.get('/api/check-auth', (req, res) => { res.json({ authenticated: !!req.session.user }); });
 
-// --- B. Scores System ---
 app.get('/api/scores', async (req, res) => {
     try {
         let scores = await Score.find();
@@ -155,6 +147,9 @@ app.post('/api/scores/reset-monthly', async (req, res) => {
             unsetFields[`points_exercise_${d}`] = "";
             unsetFields[`points_dorm_${d}`] = "";
             unsetFields[`points_class_${d}`] = "";
+            unsetFields[`reason_points_exercise_${d}`] = "";
+            unsetFields[`reason_points_dorm_${d}`] = "";
+            unsetFields[`reason_points_class_${d}`] = "";
         });
 
         await Score.updateMany({}, { $unset: unsetFields });
@@ -163,7 +158,6 @@ app.post('/api/scores/reset-monthly', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// History APIs
 app.get('/api/history-list', async (req, res) => {
     const list = await History.find({}, 'label type timestamp').sort({ timestamp: -1 });
     res.json(list);
@@ -173,12 +167,37 @@ app.get('/api/history/:id', async (req, res) => {
     res.json(h ? h.data : []);
 });
 
-// --- News & Suggestions ---
 app.get('/api/news', async (req, res) => { const news = await News.find().sort({ date: -1 }); res.json(news); });
 app.post('/api/news', async (req, res) => { await new News(req.body).save(); res.json({ success: true }); });
 app.delete('/api/news/:id', async (req, res) => { await News.findByIdAndDelete(req.params.id); res.json({ success: true }); });
 app.get('/api/suggestions', async (req, res) => { const data = await Suggestion.find().sort({ createdAt: -1 }); res.json(data); });
 app.put('/api/suggestions/:id', async (req, res) => { await Suggestion.findByIdAndUpdate(req.params.id, req.body); res.json({ success: true }); });
+
+app.post('/api/vote', async (req, res) => {
+    try {
+        const { party } = req.body;
+        if (![1, 2, 3].includes(party)) return res.status(400).json({ error: 'Invalid Party' });
+        await new Vote({ party, ip: req.ip }).save();
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/election-results', async (req, res) => {
+    try {
+        const total = await Vote.countDocuments();
+        const p1 = await Vote.countDocuments({ party: 1 });
+        const p2 = await Vote.countDocuments({ party: 2 });
+        const p3 = await Vote.countDocuments({ party: 3 });
+        res.json({ total, results: [p1, p2, p3] });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/election-reset', async (req, res) => {
+    try {
+        await Vote.deleteMany({});
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
