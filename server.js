@@ -75,13 +75,13 @@ app.get('/api/scores', async (req, res) => {
         if (scores.length === 0) {
             console.log("🌱 Seeding new dorm names (ช.1-7, ญ.1-10)...");
             const initialData = [];
-            
-            // ✅ แก้ไขตรงนี้: ช.1 ถึง ช.7
-            for(let i=1; i<=7; i++) initialData.push({ name: `ช.${i}`, type: 'dorm', gender: 'male' });
-            
-            // ✅ แก้ไขตรงนี้: ญ.1 ถึง ญ.10
-            for(let i=1; i<=10; i++) initialData.push({ name: `ญ.${i}`, type: 'dorm', gender: 'female' });
-            
+
+            // ✅ แก้ไขตรงนี้: หอนอนชาย 1 ถึง หอนอนชาย 7
+            for(let i=1; i<=7; i++) initialData.push({ name: `หอนอนชาย ${i}`, type: 'dorm', gender: 'male' });
+
+            // ✅ แก้ไขตรงนี้: หอนอนหญิง 1 ถึง หอนอนหญิง 10
+            for(let i=1; i<=10; i++) initialData.push({ name: `หอนอนหญิง ${i}`, type: 'dorm', gender: 'female' });
+
             // ห้องเรียน
             ['ม.1','ม.2','ม.3','ม.4','ม.5','ม.6'].forEach(l => { for(let r=1; r<=3; r++) initialData.push({ name: `${l}/${r}`, type: 'classroom' }); });
             
