@@ -44,16 +44,23 @@
                     <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-orange-500"><h3 class="text-gray-500 text-xs font-bold">ร้องเรียน</h3><p class="text-3xl font-black mt-2" id="stat-sug">0</p></div>
                 </div>
                 
-                <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6"> <div class="bg-white p-6 rounded-xl shadow-sm lg:col-span-2">
-                        <h3 class="font-bold mb-4">5 อันดับหอพักสูงสุด (สะสม)</h3>
+                <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6"> 
+                    <div class="bg-white p-6 rounded-xl shadow-sm lg:col-span-2">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-gray-700" id="chart-title">5 อันดับคะแนนสูงสุด</h3>
+                            <div class="flex gap-2 bg-gray-100 p-1 rounded-lg">
+                                <button onclick="setChartType('exercise')" id="chart-btn-exercise" class="px-3 py-1 rounded text-xs font-bold transition bg-blue-500 text-white shadow">ออกกาย</button>
+                                <button onclick="setChartType('dorm')" id="chart-btn-dorm" class="px-3 py-1 rounded text-xs font-bold transition text-gray-500 hover:bg-gray-200">หอนอน</button>
+                                <button onclick="setChartType('classroom')" id="chart-btn-classroom" class="px-3 py-1 rounded text-xs font-bold transition text-gray-500 hover:bg-gray-200">ห้องเรียน</button>
+                            </div>
+                        </div>
                         <div class="relative h-64 w-full">
                             <canvas id="barChart"></canvas>
                         </div>
                     </div>
                     <div class="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center">
-                        <h3 class="font-bold mb-4 w-full text-left">สัดส่วนคะแนน</h3>
-                        <div class="relative h-56 w-56"> <canvas id="donutChart"></canvas>
-                        </div>
+                        <h3 class="font-bold mb-4 w-full text-left">สัดส่วนคะแนนรวม</h3>
+                        <div class="relative h-56 w-56"> <canvas id="donutChart"></canvas></div>
                     </div>
                 </div>
             </div>
@@ -107,6 +114,7 @@
     <script>
         const API = '/api';
         let allScores = [], currentAdminMode = '';
+        let currentChartMode = 'exercise'; // Default Chart
         let dashboardBarChart = null, dashboardDonutChart = null;
 
         function toggleSidebar() { const s = document.getElementById('sidebar'); s.classList.toggle('hidden'); }
@@ -156,25 +164,99 @@
             document.getElementById('stat-sug').innerText = sugs.length;
         }
 
-        function renderCharts(data) {
-            const dorms = data.filter(d=>d.type==='dorm');
-            dorms.forEach(d => { d.totalScore = getWeeklyScore(d, 'points_exercise') + getWeeklyScore(d, 'points_dorm'); });
-            dorms.sort((a,b) => b.totalScore - a.totalScore);
-            const top5 = dorms.slice(0, 5);
+        // 🔥 ฟังก์ชันสลับกราฟ
+        function setChartType(type) {
+            currentChartMode = type;
+            
+            // อัปเดตสีปุ่ม
+            ['exercise', 'dorm', 'classroom'].forEach(t => {
+                const btn = document.getElementById(`chart-btn-${t}`);
+                if (t === type) {
+                    btn.className = `px-3 py-1 rounded text-xs font-bold transition text-white shadow ${t==='exercise'?'bg-blue-500':(t==='dorm'?'bg-purple-500':'bg-green-500')}`;
+                } else {
+                    btn.className = 'px-3 py-1 rounded text-xs font-bold transition text-gray-500 hover:bg-gray-200';
+                }
+            });
 
+            renderCharts(allScores);
+        }
+
+        function renderCharts(data) {
+            // 1. Prepare Data based on currentChartMode
+            let items = [];
+            let chartLabel = '';
+            let barColor = '';
+
+            if (currentChartMode === 'exercise') {
+                items = data.filter(d => d.type === 'dorm');
+                items.forEach(d => d.chartScore = (d.accumulated_score||0) + getWeeklyScore(d, 'points_exercise'));
+                chartLabel = 'คะแนนออกกาย (รวมสะสม)';
+                barColor = '#3b82f6'; // Blue
+            } else if (currentChartMode === 'dorm') {
+                items = data.filter(d => d.type === 'dorm');
+                items.forEach(d => d.chartScore = (d.accumulated_score||0) + getWeeklyScore(d, 'points_dorm'));
+                chartLabel = 'คะแนนหอนอน (รวมสะสม)';
+                barColor = '#a855f7'; // Purple
+            } else { // classroom
+                items = data.filter(d => d.type === 'classroom');
+                items.forEach(d => d.chartScore = (d.accumulated_score||0) + getWeeklyScore(d, 'points_class'));
+                chartLabel = 'คะแนนห้องเรียน (รวมสะสม)';
+                barColor = '#22c55e'; // Green
+            }
+
+            // Sort & Top 5
+            items.sort((a,b) => b.chartScore - a.chartScore);
+            const top5 = items.slice(0, 5);
+
+            // 2. Render Bar Chart
             const ctxBar = document.getElementById('barChart').getContext('2d');
             if (dashboardBarChart) dashboardBarChart.destroy();
-            dashboardBarChart = new Chart(ctxBar, { type:'bar', data:{ labels: top5.map(d=>d.name), datasets:[{ label:'คะแนนสะสม', data: top5.map(d=>d.totalScore), backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899'], borderRadius:6 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}} } });
+            
+            dashboardBarChart = new Chart(ctxBar, { 
+                type: 'bar', 
+                data: { 
+                    labels: top5.map(d => d.name), 
+                    datasets: [{ 
+                        label: chartLabel, 
+                        data: top5.map(d => d.chartScore), 
+                        backgroundColor: barColor, 
+                        borderRadius: 6 
+                    }] 
+                }, 
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } }, 
+                    scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } 
+                } 
+            });
 
+            // 3. Render Donut (Overview) - Fixed colors
             const tEx = data.filter(d=>d.type==='dorm').reduce((a,b)=>a + getWeeklyScore(b,'points_exercise'), 0);
             const tDo = data.filter(d=>d.type==='dorm').reduce((a,b)=>a + getWeeklyScore(b,'points_dorm'), 0);
             const tCl = data.filter(d=>d.type==='classroom').reduce((a,b)=>a + getWeeklyScore(b,'points_class'), 0);
 
             const ctxDonut = document.getElementById('donutChart').getContext('2d');
             if (dashboardDonutChart) dashboardDonutChart.destroy();
-            dashboardDonutChart = new Chart(ctxDonut, { type:'doughnut', data:{ labels:['ออกกาย','หอนอน','ห้องเรียน'], datasets:[{ data: [tEx, tDo, tCl], backgroundColor:['#3b82f6','#a855f7','#f59e0b'], borderWidth:0, hoverOffset:5 }] }, options:{ cutout:'70%', plugins:{legend:{position:'bottom', labels:{usePointStyle:true}}} } });
+            dashboardDonutChart = new Chart(ctxDonut, { 
+                type: 'doughnut', 
+                data: { 
+                    labels: ['ออกกาย', 'หอนอน', 'ห้องเรียน'], 
+                    datasets: [{ 
+                        data: [tEx, tDo, tCl], 
+                        backgroundColor: ['#3b82f6', '#a855f7', '#f59e0b'], 
+                        borderWidth: 0, 
+                        hoverOffset: 5 
+                    }] 
+                }, 
+                options: { 
+                    cutout: '70%', 
+                    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true } } } 
+                } 
+            });
         }
 
+        // Logic อื่นๆ คงเดิม
         function setAutoDate() {
             const today = new Date();
             const dayNum = today.getDay();
@@ -273,7 +355,6 @@
             } catch { alert('Error!'); } finally { btn.innerHTML = oldHtml; }
         }
 
-        // 🔥 ฟังก์ชันสำหรับปุ่ม 2 ปุ่มนี้
         async function startNewWeek() {
             if(confirm('✅ ยืนยัน "จบสัปดาห์นี้" หรือไม่?\n- ระบบจะรวมคะแนนเข้า "ยอดสะสมรายเดือน"\n- ตารางรายวันจะถูกรีเซ็ตเป็น 0')) {
                 await fetch(`${API}/scores/reset-weekly`, {method:'POST'});
