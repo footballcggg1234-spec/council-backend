@@ -27,6 +27,13 @@
             </div>
             
             <div class="flex gap-2 items-center">
+                 <div class="flex items-center gap-2 mr-2 bg-green-50 p-1 rounded-lg border border-green-100">
+                    <span class="text-xs font-bold text-green-700 pl-2">ช่วงเวลา:</span>
+                    <select id="history-selector" onchange="fetchData()" class="bg-transparent text-sm font-bold text-green-800 outline-none cursor-pointer pr-2">
+                        <option value="live">⚡ สัปดาห์ปัจจุบัน</option>
+                    </select>
+                </div>
+
                 <div class="text-right mr-4 hidden md:block text-xs font-bold text-gray-400 uppercase">
                     <span>เกณฑ์: </span>
                     <span class="text-green-600 ml-2">10 ดีเยี่ยม</span>
@@ -34,7 +41,6 @@
                     <span class="text-red-600 ml-2">&lt;8 ปรับปรุง</span>
                 </div>
                 <a href="weekly-report.html" class="h-10 px-4 bg-white text-green-600 border border-green-200 rounded-lg shadow hover:bg-green-50 font-bold transition flex items-center gap-2"><i class="fas fa-bed"></i> ดูคะแนนหอ</a>
-                <button onclick="fetchAndRender()" class="h-10 px-4 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 font-bold transition flex items-center gap-2"><i class="fas fa-sync-alt"></i> อัปเดต</button>
             </div>
         </div>
 
@@ -59,19 +65,50 @@
     </div>
 
     <script>
-        const API_URL = '/api/scores';
+        const API_SCORES = '/api/scores';
+        const API_HISTORY_LIST = '/api/history-list';
+        const API_HISTORY_GET = '/api/history';
         const today = new Date().getDay();
 
-        async function fetchAndRender() {
+        async function init() {
+            await loadHistoryOptions();
+            fetchData();
+        }
+
+        async function loadHistoryOptions() {
             try {
-                const res = await fetch(API_URL);
+                const res = await fetch(API_HISTORY_LIST);
+                const list = await res.json();
+                const sel = document.getElementById('history-selector');
+                list.forEach(h => {
+                    const opt = document.createElement('option');
+                    opt.value = h._id;
+                    opt.text = `🕒 ${h.label}`;
+                    sel.appendChild(opt);
+                });
+            } catch(e) { console.error('History Error', e); }
+        }
+
+        async function fetchData() {
+            const mode = document.getElementById('history-selector').value;
+            let url = API_SCORES;
+            if(mode !== 'live') url = `${API_HISTORY_GET}/${mode}`;
+
+            try {
+                const res = await fetch(url);
                 const allData = await res.json();
                 const classroomData = allData.filter(d => d.type === 'classroom');
                 classroomData.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
 
                 renderTable(classroomData);
 
-                if(today >= 1 && today <= 5) {
+                // Clear highlights
+                document.querySelectorAll('.current-day-col').forEach(el => {
+                    el.classList.remove('current-day-col');
+                    if(el.innerHTML.includes('fa-caret-down')) el.innerHTML = el.innerHTML.split(' <')[0];
+                });
+
+                if(mode === 'live' && today >= 1 && today <= 5) {
                     document.querySelectorAll(`.day-col-${today}`).forEach(el => {
                         el.classList.add('current-day-col');
                         el.innerHTML += ' <i class="fas fa-caret-down ml-1"></i>';
@@ -92,13 +129,12 @@
                     const reason = item[`reason_points_class_${i}`] || '';
                     
                     let cellContent = '<span class="text-gray-300 font-light">-</span>';
-                    const isToday = i === today ? 'bg-green-50/50' : '';
+                    const isToday = (document.getElementById('history-selector').value === 'live' && i === today) ? 'bg-green-50/50' : '';
 
                     if(score !== undefined && score !== null) {
                         totalScore += parseInt(score);
                         let cls = score===10 ? 'badge-green' : (score>=8 ? 'badge-yellow' : 'badge-red');
                         
-                        // 🔥 แก้ไข: ตัวหนังสือใหญ่ขึ้น (text-xs) หนาขึ้น (font-bold) สีเข้มขึ้น (text-gray-700)
                         let reasonHtml = '';
                         if(reason) {
                             reasonHtml = `<span class="ml-2 text-xs text-gray-700 font-bold text-left break-words max-w-[100px] leading-tight">${reason}</span>`;
@@ -121,7 +157,7 @@
                 </tr>`;
             }).join('');
         }
-        document.addEventListener('DOMContentLoaded', fetchAndRender);
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>

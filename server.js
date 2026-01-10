@@ -27,18 +27,26 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://admin:rungradit@cluster
 // --- 3. Schema & Models ---
 const anySchema = new mongoose.Schema({}, { strict: false });
 
+// 🆕 Schema สำหรับเก็บประวัติย้อนหลัง
+const HistorySchema = new mongoose.Schema({
+    label: String,         // ชื่อช่วงเวลา เช่น "มกราคม สัปดาห์ที่ 2"
+    timestamp: { type: Date, default: Date.now },
+    data: Array            // เก็บข้อมูลคะแนนทั้งหมด ณ ตอนนั้น
+});
+
 const voteSchema = new mongoose.Schema({
     party: Number,
     timestamp: { type: Date, default: Date.now },
     ip: String
 });
 
-let News, Score, Suggestion, Vote;
+let News, Score, Suggestion, Vote, History;
 try {
     News = mongoose.models.News || mongoose.model('News', anySchema);
     Score = mongoose.models.Score || mongoose.model('Score', anySchema);
     Suggestion = mongoose.models.Suggestion || mongoose.model('Suggestion', anySchema);
     Vote = mongoose.models.Vote || mongoose.model('Vote', voteSchema);
+    History = mongoose.models.History || mongoose.model('History', HistorySchema);
 } catch (e) { console.log(e); }
 
 // ==========================================
@@ -63,39 +71,13 @@ app.get('/api/check-auth', (req, res) => { res.json({ authenticated: !!req.sessi
 app.get('/api/scores', async (req, res) => {
     try {
         let scores = await Score.find();
-
-        // 🔥 ระบบตรวจจับและเปลี่ยนชื่อหออัตโนมัติ
-        // ถ้าเจอชื่อเก่า (หอพัก..., ช...., ญ....) หรือ Database ว่างเปล่า -> ให้ล้างทิ้งแล้วสร้างใหม่
-        const hasOldNames = scores.some(s => s.name.includes('หอพัก') || s.name.startsWith('ช.') || s.name.startsWith('ญ.'));
-        
-        if (scores.length === 0 || hasOldNames) {
-            console.log("♻️ ตรวจพบชื่อเก่าหรือไม่มีข้อมูล... กำลังอัปเดตเป็น 'หอนอนชาย/หญิง'...");
-            
-            if (scores.length > 0) {
-                await Score.deleteMany({}); // ลบข้อมูลเก่าทิ้ง
-            }
-
+        if (scores.length === 0) {
             const initialData = [];
-            
-            // ✅ แก้ไขใหม่: หอนอนชาย 1 ถึง 7
-            for(let i=1; i<=7; i++) {
-                initialData.push({ name: `หอนอนชาย ${i}`, type: 'dorm', gender: 'male' });
-            }
-            
-            // ✅ แก้ไขใหม่: หอนอนหญิง 1 ถึง 10
-            for(let i=1; i<=10; i++) {
-                initialData.push({ name: `หอนอนหญิง ${i}`, type: 'dorm', gender: 'female' });
-            }
-            
-            // ห้องเรียน (คงเดิม)
-            ['ม.1','ม.2','ม.3','ม.4','ม.5','ม.6'].forEach(l => { 
-                for(let r=1; r<=3; r++) initialData.push({ name: `${l}/${r}`, type: 'classroom' }); 
-            });
-            
+            for(let i=1; i<=8; i++) initialData.push({ name: `หอพักชายที่ ${i}`, type: 'dorm', gender: 'male' });
+            for(let i=9; i<=17; i++) initialData.push({ name: `หอพักหญิงที่ ${i}`, type: 'dorm', gender: 'female' });
+            ['ม.1','ม.2','ม.3','ม.4','ม.5','ม.6'].forEach(l => { for(let r=1; r<=3; r++) initialData.push({ name: `${l}/${r}`, type: 'classroom' }); });
             scores = await Score.insertMany(initialData);
-            console.log("✅ สร้างข้อมูลชุดใหม่เสร็จสิ้น!");
         }
-        
         res.json(scores);
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -112,9 +94,24 @@ app.put('/api/scores', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// API: ล้างคะแนนรายสัปดาห์
+// 🔥 API: เริ่มสัปดาห์ใหม่ (Backup ข้อมูลเก่า -> แล้วค่อยลบ)
 app.post('/api/scores/reset-weekly', async (req, res) => {
     try {
+        // 1. ดึงข้อมูลปัจจุบันมา backup ก่อน
+        const currentScores = await Score.find();
+        
+        // สร้างชื่อประวัติจากวันที่ (เช่น "10 ม.ค. 67")
+        const date = new Date();
+        const thMonth = date.toLocaleString('th-TH', { month: 'short' });
+        const label = `งวดวันที่ ${date.getDate()} ${thMonth} ${date.getFullYear() + 543}`;
+
+        // บันทึกลง History
+        if (currentScores.length > 0) {
+            await new History({ label: label, data: currentScores }).save();
+            console.log(`💾 Archived history: ${label}`);
+        }
+
+        // 2. ลบข้อมูลคะแนนในตารางหลัก
         const unsetFields = {};
         const days = [1, 2, 3, 4, 5, 6, 7];
         const types = ['points_exercise', 'points_dorm', 'points_class'];
@@ -127,11 +124,27 @@ app.post('/api/scores/reset-weekly', async (req, res) => {
         });
 
         await Score.updateMany({}, { $unset: unsetFields });
-        console.log('🗑️ Weekly scores reset!');
-        res.json({ success: true });
+        
+        res.json({ success: true, message: "Archived and Reset successfully" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+});
+
+// 🆕 API: ดึงรายการประวัติย้อนหลัง (List)
+app.get('/api/history-list', async (req, res) => {
+    try {
+        const list = await History.find({}, 'label timestamp').sort({ timestamp: -1 });
+        res.json(list);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// 🆕 API: ดึงข้อมูลประวัติระบุ ID
+app.get('/api/history/:id', async (req, res) => {
+    try {
+        const history = await History.findById(req.params.id);
+        res.json(history ? history.data : []);
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // --- C. News & Suggestions ---
@@ -142,7 +155,7 @@ app.delete('/api/news/:id', async (req, res) => { await News.findByIdAndDelete(r
 app.get('/api/suggestions', async (req, res) => { const data = await Suggestion.find().sort({ createdAt: -1 }); res.json(data); });
 app.put('/api/suggestions/:id', async (req, res) => { await Suggestion.findByIdAndUpdate(req.params.id, req.body); res.json({ success: true }); });
 
-// --- D. Election (ถ้าไม่ใช้ ลบส่วนนี้ออกได้ครับ) ---
+// --- D. Election ---
 app.post('/api/vote', async (req, res) => {
     try {
         const { party } = req.body;
