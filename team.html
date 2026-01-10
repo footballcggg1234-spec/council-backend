@@ -3,87 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team RPK26</title>
+    <title>Team RPK26 | คณะกรรมการ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>body { font-family: 'Sarabun', sans-serif; background: #F8FAFC; }</style>
-</head>
-<body>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#9F1239', gold: '#F59E0B', dark: '#0F172A' },
+                    fontFamily: { sans: ['Sarabun', 'sans-serif'] },
+                    animation: { 'aurora': 'aurora 20s infinite alternate' },
+                    keyframes: { aurora: { '0%': { backgroundPosition: '0% 50%' }, '100%': { backgroundPosition: '100% 50%' } } }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F8FAFC; overflow-x: hidden; }
+        .mesh-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            background: radial-gradient(at 0% 0%, rgba(254,226,226,0.8) 0, transparent 50%), 
+                        radial-gradient(at 100% 0%, rgba(253,230,138,0.5) 0, transparent 50%), 
+                        radial-gradient(at 100% 100%, rgba(224,231,255,0.5) 0, transparent 50%);
+            background-size: 150% 150%; animation: aurora 15s ease infinite;
+        }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); }
+        
+        /* Layout Structure */
+        @media (min-width: 1024px) { 
+            .app-layout { display: grid; grid-template-columns: 260px 1fr; gap: 24px; padding: 24px; height: 100vh; overflow: hidden; } 
+            .mobile-nav { display: none; } 
+            .main-content { overflow-y: auto; height: 100%; border-radius: 32px; scrollbar-width: none; } 
+        }
+        @media (max-width: 1023px) { 
+            .app-layout { display: block; padding: 16px; padding-bottom: 100px; } 
+            .mobile-nav { display: flex; } 
+            .desktop-sidebar { display: none; } 
+        }
 
-    <nav class="hidden lg:flex items-center justify-between px-10 py-5 bg-white/80 backdrop-blur sticky top-0 z-50 border-b border-gray-100">
-        <a href="index.html" class="text-2xl font-black text-slate-800">RPK<span class="text-red-600">26</span></a>
-        <div class="flex gap-8 font-bold text-gray-500">
-            <a href="index.html" class="hover:text-red-600 transition">หน้าแรก</a>
-            <a href="team.html" class="text-red-600">คณะกรรมการ</a>
-            <a href="register.html" class="hover:text-red-600 transition">สมัครสมาชิก</a>
-        </div>
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; color: #64748b; font-weight: 600; transition: 0.2s; }
+        .nav-item:hover, .nav-item.active { background: #fff1f2; color: #9F1239; }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="mesh-bg"></div>
+
+    <div class="app-layout max-w-[1920px] mx-auto">
+        
+        <aside class="desktop-sidebar glass rounded-[32px] p-6 flex-col justify-between h-full sticky top-6">
+            <div>
+                <div class="flex items-center gap-3 mb-10 px-2">
+                    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white text-xl shadow-lg shadow-red-500/30"><i class="fas fa-university"></i></div>
+                    <div><h1 class="font-black text-xl tracking-tight text-slate-800">RPK<span class="text-primary">26</span></h1><p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Student Council</p></div>
+                </div>
+                <nav class="space-y-1">
+                    <a href="index.html" class="nav-item"><i class="fas fa-home w-6"></i> หน้าแรก</a>
+                    <a href="weekly-report.html" class="nav-item"><i class="fas fa-chart-pie w-6"></i> รายงานคะแนน</a>
+                    <a href="election.html" class="nav-item"><i class="fas fa-vote-yea w-6"></i> เลือกตั้ง</a>
+                    <a href="team.html" class="nav-item active"><i class="fas fa-users w-6"></i> คณะกรรมการ</a>
+                    <a href="suggestion.html" class="nav-item"><i class="fas fa-envelope-open-text w-6"></i> ร้องเรียน</a>
+                </nav>
+            </div>
+            <a href="login.html" class="flex items-center gap-3 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition"><div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-shield-alt"></i></div><div><div class="text-xs font-bold text-gray-400">System</div><div class="text-sm font-bold text-gray-800">Admin Login</div></div></a>
+        </aside>
+
+        <main class="main-content">
+            
+            <div class="lg:hidden flex justify-between items-center mb-6">
+                <div><h1 class="text-2xl font-black text-slate-800">คณะกรรมการ</h1><p class="text-xs text-gray-500">สภานักเรียน รุ่นที่ 26</p></div>
+                <a href="login.html" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow text-primary"><i class="fas fa-user"></i></a>
+            </div>
+
+            <div class="w-full bg-slate-900 rounded-[32px] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl mb-8">
+                <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-primary rounded-full blur-[120px] opacity-30 pointer-events-none"></div>
+                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div class="text-center md:text-left">
+                        <div class="inline-block px-3 py-1 border border-white/30 rounded-full text-[10px] font-bold mb-4 backdrop-blur tracking-widest">GEN 26 LEADERS</div>
+                        <h1 class="text-4xl md:text-6xl font-black mb-4 tracking-tight">TEAM RPK26</h1>
+                        <p class="text-lg text-gray-400 max-w-lg">คณะกรรมการนักเรียน ประจำปีการศึกษา 2568<br>ผู้นำกิจกรรม พัฒนาวิชาการ สานสัมพันธ์น้องพี่</p>
+                    </div>
+                    <div class="hidden md:block text-9xl text-white/5 rotate-12"><i class="fas fa-users"></i></div>
+                </div>
+            </div>
+
+            <div class="glass p-8 rounded-[32px] shadow-sm border border-white/50 mb-10 flex flex-col lg:flex-row items-center gap-10">
+                <div class="w-48 h-48 lg:w-64 lg:h-64 relative flex-shrink-0">
+                    <div class="absolute inset-0 bg-yellow-400 rounded-full blur-2xl opacity-20"></div>
+                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-full border-[6px] border-white shadow-xl relative z-10">
+                    <div class="absolute -right-2 top-4 bg-slate-900 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg z-20 border-2 border-white">PRESIDENT</div>
+                </div>
+                <div class="text-center lg:text-left max-w-xl">
+                    <h2 class="text-3xl font-black text-slate-900 mb-1">นายสมชาย รักเรียน</h2>
+                    <p class="text-primary font-bold mb-4">ประธานนักเรียน • ชั้น ม.6/1</p>
+                    <p class="text-gray-500 text-sm leading-relaxed mb-6 bg-white/50 p-4 rounded-xl border border-white">"หน้าที่ของผู้นำ คือการสร้างผู้นำคนต่อไป ผมพร้อมที่จะรับฟังและผลักดันทุกไอเดียของเพื่อนๆ ให้เป็นจริง เพื่อโรงเรียนที่ดียิ่งขึ้น"</p>
+                    <div class="flex gap-3 justify-center lg:justify-start">
+                        <button class="w-10 h-10 rounded-full bg-white hover:bg-black hover:text-white transition flex items-center justify-center shadow-sm"><i class="fab fa-instagram"></i></button>
+                        <button class="w-10 h-10 rounded-full bg-white hover:bg-blue-600 hover:text-white transition flex items-center justify-center shadow-sm"><i class="fab fa-facebook-f"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
+                
+                <div class="bg-white rounded-[24px] p-5 shadow-sm hover:-translate-y-1 transition duration-300 group border border-gray-100">
+                    <div class="w-full aspect-square rounded-[20px] overflow-hidden mb-4 bg-gray-100 relative">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                        <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur px-2 py-1 rounded-lg text-[10px] font-bold shadow-sm">VICE PRESIDENT</div>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-lg">น.ส.สมหญิง จริงใจ</h3>
+                    <p class="text-gray-400 text-xs">รองประธานฝ่ายกิจกรรม</p>
+                </div>
+
+                <div class="bg-white rounded-[24px] p-5 shadow-sm hover:-translate-y-1 transition duration-300 group border border-gray-100">
+                    <div class="w-full aspect-square rounded-[20px] overflow-hidden mb-4 bg-gray-100 relative">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                        <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur px-2 py-1 rounded-lg text-[10px] font-bold shadow-sm">TREASURER</div>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-lg">นายมานะ อดทน</h3>
+                    <p class="text-gray-400 text-xs">เหรัญญิก</p>
+                </div>
+
+                <a href="register.html" class="bg-slate-50 rounded-[24px] p-5 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-center hover:bg-white hover:border-primary hover:text-primary transition group cursor-pointer aspect-square sm:aspect-auto">
+                    <div class="w-14 h-14 rounded-full bg-white flex items-center justify-center text-xl shadow-sm mb-3 group-hover:scale-110 transition text-gray-400 group-hover:text-primary"><i class="fas fa-plus"></i></div>
+                    <h3 class="font-bold text-sm">ร่วมทีมกับเรา</h3>
+                    <p class="text-[10px] opacity-60">สมัครสมาชิกสภานักเรียน</p>
+                </a>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <nav class="mobile-nav fixed bottom-6 left-4 right-4 bg-gray-900/90 backdrop-blur-xl text-white p-3 rounded-[24px] shadow-2xl z-50 justify-between items-center px-6 border border-white/10">
+        <a href="index.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-home text-xl"></i></a>
+        <a href="election.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-vote-yea text-xl"></i></a>
+        <a href="suggestion.html" class="flex flex-col items-center justify-center -mt-10"><div class="w-14 h-14 rounded-full bg-gradient-to-r from-primary to-red-600 text-white flex items-center justify-center text-2xl shadow-lg border-4 border-gray-100"><i class="fas fa-plus"></i></div></a>
+        <a href="weekly-report.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-chart-bar text-xl"></i></a>
+        <a href="team.html" class="flex flex-col items-center text-primary"><i class="fas fa-users text-xl"></i></a>
     </nav>
 
-    <div class="lg:hidden h-20 flex items-center justify-between px-6 bg-white sticky top-0 z-50 shadow-sm">
-        <a href="index.html" class="text-gray-500"><i class="fas fa-arrow-left text-xl"></i></a>
-        <span class="font-bold text-lg">คณะกรรมการ</span>
-        <div class="w-5"></div>
-    </div>
-
-    <header class="bg-slate-900 text-white py-20 px-6 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-red-600 rounded-full blur-[150px] opacity-20 pointer-events-none"></div>
-        <div class="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
-            <div class="text-center md:text-left">
-                <div class="inline-block px-3 py-1 border border-white/30 rounded-full text-xs font-bold mb-4 backdrop-blur">GEN 26</div>
-                <h1 class="text-5xl md:text-7xl font-black mb-4 tracking-tight">LEADERS</h1>
-                <p class="text-xl text-gray-400 max-w-lg">คณะกรรมการนักเรียน ประจำปีการศึกษา 2568 ผู้นำกิจกรรม พัฒนาวิชาการ</p>
-            </div>
-            <div class="hidden md:block text-9xl text-white/5 rotate-12"><i class="fas fa-users"></i></div>
-        </div>
-    </header>
-
-    <div class="max-w-[1600px] mx-auto px-6 py-16 -mt-10 relative z-20">
-        
-        <div class="bg-white rounded-[40px] p-10 shadow-2xl mb-12 flex flex-col lg:flex-row items-center gap-12 hover:shadow-red-900/10 transition duration-500 border border-gray-100">
-            <div class="w-64 h-64 lg:w-80 lg:h-80 relative flex-shrink-0">
-                <div class="absolute inset-0 bg-yellow-400 rounded-full blur-3xl opacity-20"></div>
-                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-full border-[8px] border-white shadow-lg relative z-10">
-                <div class="absolute -right-0 top-10 bg-black text-white px-5 py-2 rounded-full font-bold shadow-xl z-20 rotate-6 border-4 border-white">PRESIDENT</div>
-            </div>
-            <div class="text-center lg:text-left max-w-2xl">
-                <h2 class="text-4xl lg:text-5xl font-black text-slate-900 mb-2">นายสมชาย รักเรียน</h2>
-                <p class="text-xl text-red-600 font-bold mb-6">ประธานนักเรียน • ชั้น ม.6/1</p>
-                <p class="text-gray-500 text-lg leading-relaxed mb-8">"หน้าที่ของผู้นำ คือการสร้างผู้นำคนต่อไป ผมพร้อมที่จะรับฟังและผลักดันทุกไอเดียของเพื่อนๆ ให้เป็นจริง"</p>
-                <div class="flex gap-4 justify-center lg:justify-start">
-                    <button class="w-12 h-12 rounded-full bg-gray-100 hover:bg-black hover:text-white transition flex items-center justify-center text-xl"><i class="fab fa-instagram"></i></button>
-                    <button class="w-12 h-12 rounded-full bg-gray-100 hover:bg-blue-600 hover:text-white transition flex items-center justify-center text-xl"><i class="fab fa-facebook-f"></i></button>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            
-            <div class="bg-white rounded-[30px] p-6 shadow-lg hover:-translate-y-2 transition duration-300 group">
-                <div class="w-full aspect-square rounded-[24px] overflow-hidden mb-6 bg-gray-200 relative">
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-                    <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-xs font-bold shadow-sm">VICE PRESIDENT</div>
-                </div>
-                <h3 class="text-xl font-bold text-slate-800">น.ส.สมหญิง จริงใจ</h3>
-                <p class="text-gray-500 text-sm">รองประธานฝ่ายกิจกรรม</p>
-            </div>
-
-            <div class="bg-white rounded-[30px] p-6 shadow-lg hover:-translate-y-2 transition duration-300 group">
-                <div class="w-full aspect-square rounded-[24px] overflow-hidden mb-6 bg-gray-200 relative">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-                    <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-xs font-bold shadow-sm">TREASURER</div>
-                </div>
-                <h3 class="text-xl font-bold text-slate-800">นายมานะ อดทน</h3>
-                <p class="text-gray-500 text-sm">เหรัญญิก</p>
-            </div>
-
-            <a href="register.html" class="bg-gray-50 rounded-[30px] p-6 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-center hover:bg-white hover:border-red-200 hover:text-red-600 transition group cursor-pointer aspect-square lg:aspect-auto">
-                <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center text-2xl shadow-sm mb-4 group-hover:scale-110 transition"><i class="fas fa-plus"></i></div>
-                <h3 class="text-lg font-bold">ร่วมทีมกับเรา</h3>
-                <p class="text-sm opacity-60">สมัครสมาชิกสภานักเรียน</p>
-            </a>
-
-        </div>
-    </div>
 </body>
 </html>
