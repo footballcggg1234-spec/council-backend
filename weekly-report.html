@@ -120,7 +120,19 @@
                 
                 // กรองและเรียงลำดับ
                 const dormData = allData.filter(d => d.type === 'dorm');
-                dormData.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
+                
+                // เรียงลำดับ (Custom sort for หอนอนชาย/หญิง)
+                dormData.sort((a, b) => {
+                     // แยกประเภท ช/ญ
+                     const typeA = a.name.includes('ชาย') ? 1 : 2;
+                     const typeB = b.name.includes('ชาย') ? 1 : 2;
+                     if(typeA !== typeB) return typeA - typeB;
+                     
+                     // แยกเลข
+                     const numA = parseInt(a.name.match(/\d+/)) || 0;
+                     const numB = parseInt(b.name.match(/\d+/)) || 0;
+                     return numA - numB;
+                });
 
                 renderTable('tbody-exercise', dormData, 'points_exercise', 'blue');
                 renderTable('tbody-dorm', dormData, 'points_dorm', 'purple');
@@ -152,12 +164,28 @@
                     
                     if (dayScore) {
                         totalScore += parseInt(dayScore); // รวมคะแนน
+                        
+                        // ✅ สร้าง Tooltip เหตุผล (แบบเดียวกับ Classroom)
                         let reasonHtml = '';
                         if (dayReason) {
-                            reasonHtml = `<div class="mt-1 group relative cursor-help"><div class="hidden group-hover:block absolute z-10 bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[150px] bg-black/80 text-white text-xs p-2 rounded shadow-lg backdrop-blur">${dayReason}</div><i class="fas fa-comment-dots text-yellow-500 text-xs"></i></div>`;
-                        } else reasonHtml = `<div class="mt-1 h-4"></div>`;
+                            reasonHtml = `
+                                <div class="mt-1 group relative cursor-help inline-block">
+                                    <i class="fas fa-comment-dots text-yellow-500 text-xs hover:scale-110 transition"></i>
+                                    <div class="hidden group-hover:block absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[150px] bg-gray-800 text-white text-xs p-2 rounded shadow-lg backdrop-blur text-center leading-relaxed">
+                                        ${dayReason}
+                                        <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                                    </div>
+                                </div>`;
+                        } else {
+                            reasonHtml = `<div class="mt-1 h-4"></div>`;
+                        }
 
-                        daysHtml += `<td class="table-cell px-2 align-top min-w-[60px] ${isTodayClass}"><div class="flex flex-col items-center"><span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold shadow-sm ${getBadgeColor(dayScore)}">${dayScore}</span>${reasonHtml}</div></td>`;
+                        daysHtml += `<td class="table-cell px-2 align-top min-w-[60px] ${isTodayClass}">
+                            <div class="flex flex-col items-center">
+                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold shadow-sm ${getBadgeColor(dayScore)}">${dayScore}</span>
+                                ${reasonHtml}
+                            </div>
+                        </td>`;
                     } else {
                         daysHtml += `<td class="table-cell text-gray-300 align-middle ${isTodayClass}">-</td>`;
                     }

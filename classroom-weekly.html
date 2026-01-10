@@ -89,18 +89,48 @@
 
                 for (let i = 1; i <= 5; i++) {
                     const score = item[`points_class_${i}`];
-                    let cell = '<span class="text-gray-300 font-light">-</span>';
+                    // ✅ ดึงเหตุผลออกมา
+                    const reason = item[`reason_points_class_${i}`] || '';
+                    
+                    let cellContent = '<span class="text-gray-300 font-light">-</span>';
                     const isToday = i === today ? 'bg-green-50/50' : '';
 
                     if(score !== undefined && score !== null) {
                         totalScore += parseInt(score);
                         let cls = score===10 ? 'badge-green' : (score>=8 ? 'badge-yellow' : 'badge-red');
-                        cell = `<span class="${cls} inline-block w-8 h-8 leading-8 rounded-full text-sm font-bold shadow-sm">${score}</span>`;
+                        
+                        // ✅ สร้าง Tooltip ถ้ามีเหตุผล
+                        let reasonHtml = '';
+                        if(reason) {
+                            reasonHtml = `
+                                <div class="mt-1 group relative cursor-help inline-block">
+                                    <i class="fas fa-comment-dots text-yellow-500 text-sm hover:scale-110 transition"></i>
+                                    <div class="hidden group-hover:block absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[200px] bg-gray-800 text-white text-xs p-2 rounded shadow-lg backdrop-blur text-center leading-relaxed">
+                                        ${reason}
+                                        <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            // ใส่ช่องว่างเพื่อให้ตารางสูงเท่ากันแม้ไม่มีคอมเมนต์
+                            reasonHtml = `<div class="mt-1 h-5"></div>`;
+                        }
+
+                        cellContent = `
+                            <div class="flex flex-col items-center justify-center">
+                                <span class="${cls} inline-block w-8 h-8 leading-8 rounded-full text-sm font-bold shadow-sm">${score}</span>
+                                ${reasonHtml}
+                            </div>
+                        `;
                     }
-                    daysHtml += `<td class="table-cell ${isToday}">${cell}</td>`;
+                    daysHtml += `<td class="table-cell ${isToday} align-top">${cellContent}</td>`;
                 }
 
-                return `<tr class="${rowClass} hover:bg-green-50 transition duration-150"><td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-700 text-left border-b border-gray-100">${item.name}</td>${daysHtml}<td class="table-cell total-cell text-lg border-l border-green-100 text-green-700">${totalScore}</td></tr>`;
+                return `<tr class="${rowClass} hover:bg-green-50 transition duration-150">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-700 text-left border-b border-gray-100 align-middle">${item.name}</td>
+                    ${daysHtml}
+                    <td class="table-cell total-cell text-lg border-l border-green-100 text-green-700 align-middle">${totalScore}</td>
+                </tr>`;
             }).join('');
         }
         document.addEventListener('DOMContentLoaded', fetchAndRender);
