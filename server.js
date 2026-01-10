@@ -25,7 +25,6 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://admin:rungradit@cluster
 .catch(err => console.error('❌ MongoDB Error:', err));
 
 // --- 3. Schema & Models ---
-// ใช้ Schema แบบยืดหยุ่น (Strict: false) เพื่อให้เก็บฟิลด์รายวันได้ (เช่น points_dorm_1, points_dorm_2)
 const anySchema = new mongoose.Schema({}, { strict: false });
 
 const voteSchema = new mongoose.Schema({
@@ -64,11 +63,28 @@ app.get('/api/check-auth', (req, res) => { res.json({ authenticated: !!req.sessi
 app.get('/api/scores', async (req, res) => {
     try {
         let scores = await Score.find();
+
+        // ⚠️ ล้างชื่อเก่าออก (หอพักชายที่...) เพื่อให้สร้างชื่อใหม่ (ช.1/ญ.1)
+        // ถ้าชื่อเปลี่ยนแล้ว สามารถใส่ // กลับไปหน้าบรรทัดนี้ได้ครับ
+        if (scores.length > 0 && scores[0].name.includes('หอพัก')) {
+             console.log("🧹 Clearing old dorm names...");
+             await Score.deleteMany({}); 
+             scores = []; 
+        }
+
         if (scores.length === 0) {
+            console.log("🌱 Seeding new dorm names (ช.1-7, ญ.1-10)...");
             const initialData = [];
-            for(let i=1; i<=8; i++) initialData.push({ name: `หอพักชายที่ ${i}`, type: 'dorm', gender: 'male' });
-            for(let i=9; i<=17; i++) initialData.push({ name: `หอพักหญิงที่ ${i}`, type: 'dorm', gender: 'female' });
+            
+            // ✅ แก้ไขตรงนี้: ช.1 ถึง ช.7
+            for(let i=1; i<=7; i++) initialData.push({ name: `ช.${i}`, type: 'dorm', gender: 'male' });
+            
+            // ✅ แก้ไขตรงนี้: ญ.1 ถึง ญ.10
+            for(let i=1; i<=10; i++) initialData.push({ name: `ญ.${i}`, type: 'dorm', gender: 'female' });
+            
+            // ห้องเรียน
             ['ม.1','ม.2','ม.3','ม.4','ม.5','ม.6'].forEach(l => { for(let r=1; r<=3; r++) initialData.push({ name: `${l}/${r}`, type: 'classroom' }); });
+            
             scores = await Score.insertMany(initialData);
         }
         res.json(scores);
@@ -87,24 +103,21 @@ app.put('/api/scores', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 🌟 API ใหม่: ล้างคะแนนรายสัปดาห์ (Reset Weekly)
+// API: ล้างคะแนนรายสัปดาห์
 app.post('/api/scores/reset-weekly', async (req, res) => {
     try {
-        // สร้างรายการฟิลด์ที่จะลบ (จันทร์-อาทิตย์, ทุกประเภท)
         const unsetFields = {};
-        const days = [1, 2, 3, 4, 5, 6, 7]; // 1=จันทร์ ...
+        const days = [1, 2, 3, 4, 5, 6, 7];
         const types = ['points_exercise', 'points_dorm', 'points_class'];
         
         days.forEach(d => {
             types.forEach(t => {
-                unsetFields[`${t}_${d}`] = "";          // ลบคะแนน
-                unsetFields[`reason_${t}_${d}`] = "";   // ลบเหตุผล
+                unsetFields[`${t}_${d}`] = "";
+                unsetFields[`reason_${t}_${d}`] = "";
             });
         });
 
-        // ลบฟิลด์เหล่านั้นออกจากทุก Document
         await Score.updateMany({}, { $unset: unsetFields });
-        
         console.log('🗑️ Weekly scores reset!');
         res.json({ success: true });
     } catch (err) {
@@ -120,7 +133,7 @@ app.delete('/api/news/:id', async (req, res) => { await News.findByIdAndDelete(r
 app.get('/api/suggestions', async (req, res) => { const data = await Suggestion.find().sort({ createdAt: -1 }); res.json(data); });
 app.put('/api/suggestions/:id', async (req, res) => { await Suggestion.findByIdAndUpdate(req.params.id, req.body); res.json({ success: true }); });
 
-// --- D. Election ---
+// --- D. Election (ถ้าไม่ใช้ ลบส่วนนี้ออกได้ครับ) ---
 app.post('/api/vote', async (req, res) => {
     try {
         const { party } = req.body;
