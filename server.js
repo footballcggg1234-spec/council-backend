@@ -64,29 +64,38 @@ app.get('/api/scores', async (req, res) => {
     try {
         let scores = await Score.find();
 
-        // ⚠️ ล้างชื่อเก่าออก (หอพักชายที่...) เพื่อให้สร้างชื่อใหม่ (ช.1/ญ.1)
-        // ถ้าชื่อเปลี่ยนแล้ว สามารถใส่ // กลับไปหน้าบรรทัดนี้ได้ครับ
-        if (scores.length > 0 && scores[0].name.includes('หอพัก')) {
-             console.log("🧹 Clearing old dorm names...");
-             await Score.deleteMany({}); 
-             scores = []; 
-        }
+        // 🔥 ระบบตรวจจับและเปลี่ยนชื่อหออัตโนมัติ
+        // ถ้าเจอชื่อเก่า (หอพัก..., ช...., ญ....) หรือ Database ว่างเปล่า -> ให้ล้างทิ้งแล้วสร้างใหม่
+        const hasOldNames = scores.some(s => s.name.includes('หอพัก') || s.name.startsWith('ช.') || s.name.startsWith('ญ.'));
+        
+        if (scores.length === 0 || hasOldNames) {
+            console.log("♻️ ตรวจพบชื่อเก่าหรือไม่มีข้อมูล... กำลังอัปเดตเป็น 'หอนอนชาย/หญิง'...");
+            
+            if (scores.length > 0) {
+                await Score.deleteMany({}); // ลบข้อมูลเก่าทิ้ง
+            }
 
-        if (scores.length === 0) {
-            console.log("🌱 Seeding new dorm names (ช.1-7, ญ.1-10)...");
             const initialData = [];
-
-            // ✅ แก้ไขตรงนี้: หอนอนชาย 1 ถึง หอนอนชาย 7
-            for(let i=1; i<=7; i++) initialData.push({ name: `หอนอนชาย ${i}`, type: 'dorm', gender: 'male' });
-
-            // ✅ แก้ไขตรงนี้: หอนอนหญิง 1 ถึง หอนอนหญิง 10
-            for(let i=1; i<=10; i++) initialData.push({ name: `หอนอนหญิง ${i}`, type: 'dorm', gender: 'female' });
-
-            // ห้องเรียน
-            ['ม.1','ม.2','ม.3','ม.4','ม.5','ม.6'].forEach(l => { for(let r=1; r<=3; r++) initialData.push({ name: `${l}/${r}`, type: 'classroom' }); });
+            
+            // ✅ แก้ไขใหม่: หอนอนชาย 1 ถึง 7
+            for(let i=1; i<=7; i++) {
+                initialData.push({ name: `หอนอนชาย ${i}`, type: 'dorm', gender: 'male' });
+            }
+            
+            // ✅ แก้ไขใหม่: หอนอนหญิง 1 ถึง 10
+            for(let i=1; i<=10; i++) {
+                initialData.push({ name: `หอนอนหญิง ${i}`, type: 'dorm', gender: 'female' });
+            }
+            
+            // ห้องเรียน (คงเดิม)
+            ['ม.1','ม.2','ม.3','ม.4','ม.5','ม.6'].forEach(l => { 
+                for(let r=1; r<=3; r++) initialData.push({ name: `${l}/${r}`, type: 'classroom' }); 
+            });
             
             scores = await Score.insertMany(initialData);
+            console.log("✅ สร้างข้อมูลชุดใหม่เสร็จสิ้น!");
         }
+        
         res.json(scores);
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
