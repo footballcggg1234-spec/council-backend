@@ -17,10 +17,11 @@
         .current-day-col { background-color: #f0fdf4; color: #15803d; border-bottom-color: #16a34a; }
         .total-cell { font-weight: 800; font-size: 1.1rem; }
 
-        /* Scrollbar */
+        /* ซ่อน Scrollbar แต่ยังเลื่อนได้ */
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
+        /* ตั้งค่าการพิมพ์ PDF */
         @media print {
             @page { size: A4 portrait; margin: 10mm; }
             body { background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -29,7 +30,7 @@
             .overflow-x-auto { overflow-x: visible !important; }
             .bg-white { background-color: white !important; }
             table { width: 100% !important; border-collapse: collapse; }
-            th, td { border: 1px solid #ddd !important; padding: 4px !important; }
+            th, td { border: 1px solid #ddd !important; padding: 4px !important; font-size: 12px; }
         }
     </style>
 </head>
@@ -48,14 +49,14 @@
                     <i class="fas fa-file-pdf"></i> PDF
                 </button>
                 <button onclick="showSummary()" class="h-10 px-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg shadow-lg hover:shadow-green-500/30 hover:-translate-y-0.5 font-bold transition flex items-center gap-2">
-                    <i class="fas fa-medal text-yellow-300"></i> สรุปผล
+                    <i class="fas fa-medal text-yellow-300"></i> สรุปผล (ตามชั้น)
                 </button>
                 <a href="weekly-report.html" class="h-10 px-4 bg-white text-green-600 border border-green-200 rounded-lg shadow hover:bg-green-50 font-bold transition flex items-center gap-2"><i class="fas fa-bed"></i> ดูหอพัก</a>
             </div>
         </div>
 
         <div class="flex gap-2 overflow-x-auto hide-scroll pb-2 no-print" id="grade-filters">
-            <button onclick="setFilter('All')" id="filter-All" class="px-5 py-2 rounded-full font-bold text-sm transition bg-green-600 text-white shadow-md border border-green-600 whitespace-nowrap">ทั้งหมด</button>
+            <button onclick="setFilter('All')" id="filter-All" class="px-5 py-2 rounded-full font-bold text-sm transition bg-green-600 text-white shadow-md border border-green-600 whitespace-nowrap scale-105">ทั้งหมด</button>
             <button onclick="setFilter('ม.1')" id="filter-ม.1" class="px-5 py-2 rounded-full font-bold text-sm transition bg-white text-gray-600 border border-gray-200 hover:bg-green-50 whitespace-nowrap">ม.1</button>
             <button onclick="setFilter('ม.2')" id="filter-ม.2" class="px-5 py-2 rounded-full font-bold text-sm transition bg-white text-gray-600 border border-gray-200 hover:bg-green-50 whitespace-nowrap">ม.2</button>
             <button onclick="setFilter('ม.3')" id="filter-ม.3" class="px-5 py-2 rounded-full font-bold text-sm transition bg-white text-gray-600 border border-gray-200 hover:bg-green-50 whitespace-nowrap">ม.3</button>
@@ -102,7 +103,7 @@
         const API_URL = '/api/scores';
         const today = new Date().getDay();
         let classData = [];
-        let currentFilter = 'All'; // 🔥 ตัวแปรเก็บสถานะการกรอง
+        let currentFilter = 'All'; // ตัวแปรเก็บค่าตัวกรองปัจจุบัน
 
         async function fetchAndRender() {
             try {
@@ -110,11 +111,12 @@
                 const allData = await res.json();
                 classData = allData.filter(d => d.type === 'classroom');
                 
-                // Sort by name for main table
+                // Sort ข้อมูลตามชื่อห้อง
                 classData.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
 
-                renderTable(); // เรียก render โดยไม่ต้องส่ง data
+                renderTable(); // เรียกฟังก์ชัน render (จะใช้ currentFilter อัตโนมัติ)
 
+                // Highlight วันปัจจุบัน
                 if(today >= 1 && today <= 5) {
                     document.querySelectorAll(`.day-col-${today}`).forEach(el => {
                         el.classList.add('current-day-col');
@@ -124,11 +126,11 @@
             } catch (err) { console.error(err); }
         }
 
-        // 🔥 ฟังก์ชันเลือกตัวกรอง
+        // 🔥 ฟังก์ชันกดเลือก Filter (กดแล้วตารางเปลี่ยน + สรุปเปลี่ยน)
         function setFilter(grade) {
             currentFilter = grade;
             
-            // อัปเดตสีปุ่ม
+            // เปลี่ยนสีปุ่มให้รู้ว่าเลือกอันไหนอยู่
             document.querySelectorAll('#grade-filters button').forEach(btn => {
                 if(btn.id === `filter-${grade}`) {
                     btn.className = "px-5 py-2 rounded-full font-bold text-sm transition bg-green-600 text-white shadow-md border border-green-600 whitespace-nowrap scale-105";
@@ -141,7 +143,7 @@
         }
 
         function renderTable() {
-            // 🔥 กรองข้อมูลก่อนแสดงผล
+            // กรองข้อมูลก่อนแสดงผลตาราง
             const filteredData = currentFilter === 'All' 
                 ? classData 
                 : classData.filter(item => item.name.startsWith(currentFilter));
@@ -173,7 +175,7 @@
                     }
                 }
 
-                // Calculate Grand Total (Accumulated + Weekly)
+                // คำนวณยอดสะสม (Accumulated + Weekly)
                 const grandTotal = (item.accumulated_score || 0) + weeklyTotal;
 
                 return `<tr class="${rowClass} hover:bg-green-50 transition duration-150"><td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-700 text-left border-b border-gray-100 align-middle">${item.name}</td>${daysHtml}<td class="table-cell total-cell text-green-700 border-l border-green-100 align-middle">${weeklyTotal}</td><td class="table-cell total-cell text-white bg-green-600 align-middle shadow-sm">${grandTotal}</td></tr>`;
@@ -184,19 +186,19 @@
             const list = document.getElementById('top-class-list');
             list.innerHTML = '';
 
-            // 🔥 ใช้ข้อมูลที่กรองแล้วมาจัดอันดับ
+            // 🔥 กรองข้อมูลตามที่เลือกไว้ก่อนคำนวณอันดับ
             const filteredData = currentFilter === 'All' 
                 ? classData 
                 : classData.filter(item => item.name.startsWith(currentFilter));
 
-            // เปลี่ยนหัวข้อ Modal ตามฟิลเตอร์
+            // เปลี่ยนชื่อหัวข้อ Modal
             document.getElementById('summary-title').innerText = currentFilter === 'All' ? 'Top Classrooms (รวม)' : `Top Classrooms (${currentFilter})`;
 
             const ranking = filteredData.map(c => {
                 let w = 0;
                 for(let i=1; i<=5; i++) w += (parseInt(c[`points_class_${i}`]) || 0);
                 return { name: c.name, total: (c.accumulated_score || 0) + w };
-            }).sort((a,b) => b.total - a.total).slice(0, 5); // Take top 5
+            }).sort((a,b) => b.total - a.total).slice(0, 5); // เอาแค่ 5 อันดับแรก
 
             if (ranking.length === 0) {
                 list.innerHTML = '<div class="text-center text-gray-400 py-4">ไม่มีข้อมูล</div>';
