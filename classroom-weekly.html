@@ -17,11 +17,10 @@
         .current-day-col { background-color: #f0fdf4; color: #15803d; border-bottom-color: #16a34a; }
         .total-cell { font-weight: 800; font-size: 1.1rem; }
 
-        /* ซ่อน Scrollbar แต่ยังเลื่อนได้ */
+        /* ซ่อน Scrollbar */
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* ตั้งค่าการพิมพ์ PDF */
         @media print {
             @page { size: A4 portrait; margin: 10mm; }
             body { background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -49,7 +48,7 @@
                     <i class="fas fa-file-pdf"></i> PDF
                 </button>
                 <button onclick="showSummary()" class="h-10 px-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg shadow-lg hover:shadow-green-500/30 hover:-translate-y-0.5 font-bold transition flex items-center gap-2">
-                    <i class="fas fa-medal text-yellow-300"></i> สรุปผล (ตามชั้น)
+                    <i class="fas fa-medal text-yellow-300"></i> สรุปผล
                 </button>
                 <a href="weekly-report.html" class="h-10 px-4 bg-white text-green-600 border border-green-200 rounded-lg shadow hover:bg-green-50 font-bold transition flex items-center gap-2"><i class="fas fa-bed"></i> ดูหอพัก</a>
             </div>
@@ -103,7 +102,7 @@
         const API_URL = '/api/scores';
         const today = new Date().getDay();
         let classData = [];
-        let currentFilter = 'All'; // ตัวแปรเก็บค่าตัวกรองปัจจุบัน
+        let currentFilter = 'All'; // ตัวแปรเก็บสถานะการกรองปัจจุบัน
 
         async function fetchAndRender() {
             try {
@@ -111,12 +110,11 @@
                 const allData = await res.json();
                 classData = allData.filter(d => d.type === 'classroom');
                 
-                // Sort ข้อมูลตามชื่อห้อง
+                // เรียงลำดับตามชื่อห้อง
                 classData.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
 
-                renderTable(); // เรียกฟังก์ชัน render (จะใช้ currentFilter อัตโนมัติ)
+                renderTable();
 
-                // Highlight วันปัจจุบัน
                 if(today >= 1 && today <= 5) {
                     document.querySelectorAll(`.day-col-${today}`).forEach(el => {
                         el.classList.add('current-day-col');
@@ -126,11 +124,11 @@
             } catch (err) { console.error(err); }
         }
 
-        // 🔥 ฟังก์ชันกดเลือก Filter (กดแล้วตารางเปลี่ยน + สรุปเปลี่ยน)
+        // 🔥 ฟังก์ชันกรอง
         function setFilter(grade) {
             currentFilter = grade;
             
-            // เปลี่ยนสีปุ่มให้รู้ว่าเลือกอันไหนอยู่
+            // อัปเดตสีปุ่ม
             document.querySelectorAll('#grade-filters button').forEach(btn => {
                 if(btn.id === `filter-${grade}`) {
                     btn.className = "px-5 py-2 rounded-full font-bold text-sm transition bg-green-600 text-white shadow-md border border-green-600 whitespace-nowrap scale-105";
@@ -143,7 +141,7 @@
         }
 
         function renderTable() {
-            // กรองข้อมูลก่อนแสดงผลตาราง
+            // กรองข้อมูลตามที่เลือก
             const filteredData = currentFilter === 'All' 
                 ? classData 
                 : classData.filter(item => item.name.startsWith(currentFilter));
@@ -182,11 +180,12 @@
             }).join('');
         }
 
+        // 🔥 ฟังก์ชันแสดงผลสรุป (กรองตามที่เลือก)
         function showSummary() {
             const list = document.getElementById('top-class-list');
             list.innerHTML = '';
 
-            // 🔥 กรองข้อมูลตามที่เลือกไว้ก่อนคำนวณอันดับ
+            // ใช้ข้อมูลที่ผ่านการกรองแล้วมาคำนวณ
             const filteredData = currentFilter === 'All' 
                 ? classData 
                 : classData.filter(item => item.name.startsWith(currentFilter));
@@ -198,7 +197,7 @@
                 let w = 0;
                 for(let i=1; i<=5; i++) w += (parseInt(c[`points_class_${i}`]) || 0);
                 return { name: c.name, total: (c.accumulated_score || 0) + w };
-            }).sort((a,b) => b.total - a.total).slice(0, 5); // เอาแค่ 5 อันดับแรก
+            }).sort((a,b) => b.total - a.total).slice(0, 5); // เอา 5 อันดับแรก
 
             if (ranking.length === 0) {
                 list.innerHTML = '<div class="text-center text-gray-400 py-4">ไม่มีข้อมูล</div>';
