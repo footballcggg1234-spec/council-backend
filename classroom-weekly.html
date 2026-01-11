@@ -17,7 +17,10 @@
         .current-day-col { background-color: #f0fdf4; color: #15803d; border-bottom-color: #16a34a; }
         .total-cell { font-weight: 800; font-size: 1.1rem; }
 
-        /* 🔥 CSS สำหรับการพิมพ์ PDF */
+        /* Scrollbar */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
         @media print {
             @page { size: A4 portrait; margin: 10mm; }
             body { background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -51,6 +54,16 @@
             </div>
         </div>
 
+        <div class="flex gap-2 overflow-x-auto hide-scroll pb-2 no-print" id="grade-filters">
+            <button onclick="setFilter('All')" id="filter-All" class="px-5 py-2 rounded-full font-bold text-sm transition bg-green-600 text-white shadow-md border border-green-600 whitespace-nowrap">ทั้งหมด</button>
+            <button onclick="setFilter('ม.1')" id="filter-ม.1" class="px-5 py-2 rounded-full font-bold text-sm transition bg-white text-gray-600 border border-gray-200 hover:bg-green-50 whitespace-nowrap">ม.1</button>
+            <button onclick="setFilter('ม.2')" id="filter-ม.2" class="px-5 py-2 rounded-full font-bold text-sm transition bg-white text-gray-600 border border-gray-200 hover:bg-green-50 whitespace-nowrap">ม.2</button>
+            <button onclick="setFilter('ม.3')" id="filter-ม.3" class="px-5 py-2 rounded-full font-bold text-sm transition bg-white text-gray-600 border border-gray-200 hover:bg-green-50 whitespace-nowrap">ม.3</button>
+            <button onclick="setFilter('ม.4')" id="filter-ม.4" class="px-5 py-2 rounded-full font-bold text-sm transition bg-white text-gray-600 border border-gray-200 hover:bg-green-50 whitespace-nowrap">ม.4</button>
+            <button onclick="setFilter('ม.5')" id="filter-ม.5" class="px-5 py-2 rounded-full font-bold text-sm transition bg-white text-gray-600 border border-gray-200 hover:bg-green-50 whitespace-nowrap">ม.5</button>
+            <button onclick="setFilter('ม.6')" id="filter-ม.6" class="px-5 py-2 rounded-full font-bold text-sm transition bg-white text-gray-600 border border-gray-200 hover:bg-green-50 whitespace-nowrap">ม.6</button>
+        </div>
+
         <div class="bg-white rounded-2xl shadow-lg border border-green-100 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full">
@@ -74,7 +87,7 @@
         <div id="class-summary-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4 no-print">
             <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 transition-all" id="modal-box">
                 <div class="bg-green-600 p-5 text-white flex justify-between items-center">
-                    <h2 class="text-xl font-bold"><i class="fas fa-crown mr-2 text-yellow-300"></i>Top Classrooms</h2>
+                    <h2 class="text-xl font-bold"><i class="fas fa-crown mr-2 text-yellow-300"></i><span id="summary-title">Top Classrooms</span></h2>
                     <button onclick="closeSummary()" class="hover:text-green-200"><i class="fas fa-times text-xl"></i></button>
                 </div>
                 <div class="p-6 bg-gradient-to-b from-green-50 to-white">
@@ -89,6 +102,7 @@
         const API_URL = '/api/scores';
         const today = new Date().getDay();
         let classData = [];
+        let currentFilter = 'All'; // 🔥 ตัวแปรเก็บสถานะการกรอง
 
         async function fetchAndRender() {
             try {
@@ -99,7 +113,7 @@
                 // Sort by name for main table
                 classData.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
 
-                renderTable(classData);
+                renderTable(); // เรียก render โดยไม่ต้องส่ง data
 
                 if(today >= 1 && today <= 5) {
                     document.querySelectorAll(`.day-col-${today}`).forEach(el => {
@@ -110,9 +124,36 @@
             } catch (err) { console.error(err); }
         }
 
-        function renderTable(data) {
+        // 🔥 ฟังก์ชันเลือกตัวกรอง
+        function setFilter(grade) {
+            currentFilter = grade;
+            
+            // อัปเดตสีปุ่ม
+            document.querySelectorAll('#grade-filters button').forEach(btn => {
+                if(btn.id === `filter-${grade}`) {
+                    btn.className = "px-5 py-2 rounded-full font-bold text-sm transition bg-green-600 text-white shadow-md border border-green-600 whitespace-nowrap scale-105";
+                } else {
+                    btn.className = "px-5 py-2 rounded-full font-bold text-sm transition bg-white text-gray-600 border border-gray-200 hover:bg-green-50 whitespace-nowrap";
+                }
+            });
+
+            renderTable();
+        }
+
+        function renderTable() {
+            // 🔥 กรองข้อมูลก่อนแสดงผล
+            const filteredData = currentFilter === 'All' 
+                ? classData 
+                : classData.filter(item => item.name.startsWith(currentFilter));
+
             const tbody = document.getElementById('classroom-tbody');
-            tbody.innerHTML = data.map((item, index) => {
+            
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400">ไม่พบข้อมูลของชั้น ${currentFilter}</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filteredData.map((item, index) => {
                 const rowClass = index % 2 === 0 ? 'bg-white' : 'bg-green-50/30';
                 let daysHtml = '';
                 let weeklyTotal = 0;
@@ -143,26 +184,38 @@
             const list = document.getElementById('top-class-list');
             list.innerHTML = '';
 
-            const ranking = classData.map(c => {
+            // 🔥 ใช้ข้อมูลที่กรองแล้วมาจัดอันดับ
+            const filteredData = currentFilter === 'All' 
+                ? classData 
+                : classData.filter(item => item.name.startsWith(currentFilter));
+
+            // เปลี่ยนหัวข้อ Modal ตามฟิลเตอร์
+            document.getElementById('summary-title').innerText = currentFilter === 'All' ? 'Top Classrooms (รวม)' : `Top Classrooms (${currentFilter})`;
+
+            const ranking = filteredData.map(c => {
                 let w = 0;
                 for(let i=1; i<=5; i++) w += (parseInt(c[`points_class_${i}`]) || 0);
                 return { name: c.name, total: (c.accumulated_score || 0) + w };
             }).sort((a,b) => b.total - a.total).slice(0, 5); // Take top 5
 
-            ranking.forEach((r, i) => {
-                let badge = i===0 ? '🥇' : (i===1 ? '🥈' : (i===2 ? '🥉' : `#${i+1}`));
-                let style = i===0 ? 'bg-green-600 text-white ring-4 ring-green-100 scale-105' : 'bg-white text-gray-700 border border-green-100';
-                
-                list.innerHTML += `
-                    <div class="flex items-center justify-between p-4 rounded-xl shadow-sm ${style} transition">
-                        <div class="flex items-center gap-3">
-                            <span class="text-xl w-8 text-center">${badge}</span>
-                            <span class="font-bold text-lg">${r.name}</span>
+            if (ranking.length === 0) {
+                list.innerHTML = '<div class="text-center text-gray-400 py-4">ไม่มีข้อมูล</div>';
+            } else {
+                ranking.forEach((r, i) => {
+                    let badge = i===0 ? '🥇' : (i===1 ? '🥈' : (i===2 ? '🥉' : `#${i+1}`));
+                    let style = i===0 ? 'bg-green-600 text-white ring-4 ring-green-100 scale-105' : 'bg-white text-gray-700 border border-green-100';
+                    
+                    list.innerHTML += `
+                        <div class="flex items-center justify-between p-4 rounded-xl shadow-sm ${style} transition">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xl w-8 text-center">${badge}</span>
+                                <span class="font-bold text-lg">${r.name}</span>
+                            </div>
+                            <span class="font-black text-xl">${r.total}</span>
                         </div>
-                        <span class="font-black text-xl">${r.total}</span>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            }
 
             const m = document.getElementById('class-summary-modal');
             m.classList.remove('hidden');
