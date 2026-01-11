@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายงานคะแนนหอพักประจำสัปดาห์ | Student Council</title>
-    
+    <title>รายงานคะแนนหอพักประจำสัปดาห์</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; }
         .table-header { @apply px-2 py-3 text-center text-xs font-bold uppercase tracking-wider border-b-2; }
@@ -18,11 +16,26 @@
         .badge-red { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
         .total-cell { font-weight: 800; font-size: 1.1rem; vertical-align: middle; }
         
-        /* Scrollbar สวยๆ */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* 🔥 CSS สำหรับการพิมพ์ PDF */
+        @media print {
+            @page { size: A4 landscape; margin: 10mm; } /* แนวนอน */
+            body { background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print, button, a { display: none !important; } /* ซ่อนปุ่ม */
+            .shadow-sm, .shadow-md, .shadow-lg, .shadow-2xl { box-shadow: none !important; } /* ลบเงา */
+            .overflow-hidden { overflow: visible !important; } /* ให้ตารางยืดได้ */
+            .overflow-x-auto { overflow-x: visible !important; }
+            .bg-white { background-color: white !important; }
+            h1 { font-size: 24px !important; color: black !important; }
+            p { color: #333 !important; }
+            table { width: 100% !important; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd !important; padding: 4px !important; font-size: 12px !important; }
+            .grid { display: block !important; } /* เปลี่ยน Grid เป็น Block เพื่อให้เรียงลงมา */
+            .grid > div { margin-bottom: 20px; page-break-inside: avoid; } /* ห้ามตัดกลางตาราง */
+        }
     </style>
 </head>
 <body class="p-4 md:p-8 min-h-screen relative">
@@ -33,11 +46,11 @@
             <div>
                 <h1 class="text-3xl font-extrabold text-gray-800">รายงานคะแนนหอพัก</h1>
                 <p class="text-gray-500 font-medium mt-1">
-                    <i class="far fa-calendar-alt mr-2"></i>อัปเดตแบบ Real-time (จันทร์ - ศุกร์)
+                    <i class="far fa-calendar-alt mr-2"></i>อัปเดตแบบ Real-time
                 </p>
             </div>
             
-            <div class="flex flex-col items-end gap-2">
+            <div class="flex flex-col items-end gap-2 no-print">
                 <div class="flex gap-2 text-xs font-bold bg-white px-3 py-2 rounded-lg shadow-sm border">
                     <span class="text-gray-500 mr-1">เกณฑ์:</span>
                     <span class="text-green-700"><span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-1"></span>3 ผ่าน</span>
@@ -45,8 +58,11 @@
                     <span class="text-red-700"><span class="w-2 h-2 rounded-full bg-red-500 inline-block mr-1"></span>1 ไม่ผ่าน</span>
                 </div>
                 <div class="flex gap-2">
-                     <button onclick="showMonthlySummary()" class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-purple-500/30 hover:-translate-y-0.5 font-bold transition flex items-center gap-2">
-                        <i class="fas fa-trophy text-yellow-300"></i> สรุปผลประจำเดือน
+                     <button onclick="window.print()" class="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 font-bold transition flex items-center gap-2">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                     <button onclick="showMonthlySummary()" class="px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 font-bold transition flex items-center gap-2">
+                        <i class="fas fa-trophy text-yellow-300"></i> สรุปผล
                     </button>
                      <a href="classroom-weekly.html" class="px-4 py-2 bg-white text-green-600 border border-green-200 rounded-lg shadow hover:bg-green-50 font-bold transition flex items-center gap-2">
                         <i class="fas fa-chalkboard"></i> ห้องเรียน
@@ -56,7 +72,6 @@
         </div>
 
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-
             <div class="bg-white rounded-2xl shadow-sm border border-blue-100 overflow-hidden">
                 <div class="p-5 bg-blue-50 border-b border-blue-100 flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -110,55 +125,40 @@
             </div>
         </div>
 
-        <div id="summary-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl overflow-hidden transform scale-95 transition-all flex flex-col max-h-[90vh]" id="modal-content">
-                
-                <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-6 text-white flex justify-between items-center shrink-0">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-yellow-400 text-xl"><i class="fas fa-crown"></i></div>
+        <div id="summary-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 no-print">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-6xl overflow-hidden transform scale-95 transition-all flex flex-col max-h-[90vh]" id="modal-content">
+                <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-5 text-white flex justify-between items-center shrink-0">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-yellow-400 text-2xl shadow-inner"><i class="fas fa-crown"></i></div>
                         <div>
-                            <h2 class="text-xl font-bold">สรุปผลคะแนนประจำเดือน</h2>
-                            <p class="text-xs text-slate-400">Monthly Leaderboard</p>
+                            <h2 class="text-2xl font-bold tracking-tight">สรุปผลคะแนนรวมประจำเดือน</h2>
+                            <p class="text-xs text-slate-400 font-medium tracking-wide uppercase">Monthly Leaderboard</p>
                         </div>
                     </div>
-                    <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-red-500 hover:text-white transition"><i class="fas fa-times"></i></button>
+                    <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-red-500 hover:text-white transition"><i class="fas fa-times text-lg"></i></button>
                 </div>
-
-                <div class="p-6 md:p-8 overflow-y-auto custom-scrollbar bg-gray-50">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        
-                        <div class="bg-white rounded-2xl shadow-sm border border-blue-100 overflow-hidden flex flex-col">
-                            <div class="bg-blue-50 p-4 border-b border-blue-100 text-center">
-                                <h3 class="text-blue-800 font-extrabold text-lg"><i class="fas fa-male mr-2"></i>หอพักชาย</h3>
-                            </div>
-                            <div class="p-6 flex flex-col items-center bg-gradient-to-b from-blue-50/50 to-white">
-                                <div class="relative mb-6">
-                                    <i class="fas fa-crown text-4xl text-yellow-400 absolute -top-6 left-1/2 -translate-x-1/2 drop-shadow-md animate-bounce"></i>
-                                    <div class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 p-1 shadow-lg shadow-blue-500/30">
-                                        <div class="w-full h-full bg-white rounded-full flex items-center justify-center text-3xl font-black text-blue-600" id="winner-male">-</div>
-                                    </div>
-                                    <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">WINNER</div>
+                <div class="p-6 md:p-8 overflow-y-auto custom-scrollbar bg-gray-50 flex-1">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+                        <div class="bg-white rounded-3xl shadow-sm border border-blue-100 overflow-hidden flex flex-col h-full">
+                            <div class="bg-blue-600 p-4 text-white text-center relative overflow-hidden"><h3 class="text-xl font-black relative z-10 uppercase tracking-widest"><i class="fas fa-mars mr-2"></i>หอพักชาย</h3></div>
+                            <div class="p-6 flex flex-col items-center flex-1 bg-gradient-to-b from-blue-50 to-white">
+                                <div class="relative mb-8 mt-2 transform hover:scale-105 transition duration-500">
+                                    <i class="fas fa-crown text-5xl text-yellow-400 absolute -top-8 left-1/2 -translate-x-1/2 drop-shadow-lg animate-bounce"></i>
+                                    <div class="w-32 h-32 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 p-1.5 shadow-xl shadow-blue-500/40"><div class="w-full h-full bg-white rounded-full flex items-center justify-center text-3xl font-black text-blue-600 border-4 border-white" id="winner-male">-</div></div>
                                 </div>
-                                <div id="list-male" class="w-full space-y-2"></div>
+                                <div id="list-male" class="w-full space-y-3"></div>
                             </div>
                         </div>
-
-                        <div class="bg-white rounded-2xl shadow-sm border border-pink-100 overflow-hidden flex flex-col">
-                            <div class="bg-pink-50 p-4 border-b border-pink-100 text-center">
-                                <h3 class="text-pink-800 font-extrabold text-lg"><i class="fas fa-female mr-2"></i>หอพักหญิง</h3>
-                            </div>
-                            <div class="p-6 flex flex-col items-center bg-gradient-to-b from-pink-50/50 to-white">
-                                <div class="relative mb-6">
-                                    <i class="fas fa-crown text-4xl text-yellow-400 absolute -top-6 left-1/2 -translate-x-1/2 drop-shadow-md animate-bounce" style="animation-delay: 0.2s;"></i>
-                                    <div class="w-24 h-24 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 p-1 shadow-lg shadow-pink-500/30">
-                                        <div class="w-full h-full bg-white rounded-full flex items-center justify-center text-3xl font-black text-pink-600" id="winner-female">-</div>
-                                    </div>
-                                    <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">WINNER</div>
+                        <div class="bg-white rounded-3xl shadow-sm border border-pink-100 overflow-hidden flex flex-col h-full">
+                            <div class="bg-pink-600 p-4 text-white text-center relative overflow-hidden"><h3 class="text-xl font-black relative z-10 uppercase tracking-widest"><i class="fas fa-venus mr-2"></i>หอพักหญิง</h3></div>
+                            <div class="p-6 flex flex-col items-center flex-1 bg-gradient-to-b from-pink-50 to-white">
+                                <div class="relative mb-8 mt-2 transform hover:scale-105 transition duration-500">
+                                    <i class="fas fa-crown text-5xl text-yellow-400 absolute -top-8 left-1/2 -translate-x-1/2 drop-shadow-lg animate-bounce" style="animation-delay: 0.2s;"></i>
+                                    <div class="w-32 h-32 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 p-1.5 shadow-xl shadow-pink-500/40"><div class="w-full h-full bg-white rounded-full flex items-center justify-center text-3xl font-black text-pink-600 border-4 border-white" id="winner-female">-</div></div>
                                 </div>
-                                <div id="list-female" class="w-full space-y-2"></div>
+                                <div id="list-female" class="w-full space-y-3"></div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -178,7 +178,6 @@
                 
                 const dormData = globalData.filter(d => d.type === 'dorm');
                 
-                // เรียงลำดับสำหรับตารางหลัก (แยกชายหญิง แล้วเรียงตามเลข)
                 dormData.sort((a, b) => {
                      const typeA = a.name.includes('ชาย') ? 1 : 2;
                      const typeB = b.name.includes('ชาย') ? 1 : 2;
@@ -194,7 +193,7 @@
                 if(today >= 1 && today <= 5) {
                     document.querySelectorAll(`.day-col-${today}`).forEach(el => {
                         el.classList.add('bg-yellow-100', 'text-yellow-700');
-                        el.innerHTML += ' <i class="fas fa-caret-down"></i>';
+                        el.innerHTML += ' <i class="fas fa-caret-down ml-1"></i>';
                     });
                 }
             } catch (error) { console.error('Error:', error); }
@@ -217,17 +216,17 @@
                     
                     if (dayScore) {
                         weeklyTotal += parseInt(dayScore);
-                        let reasonHtml = dayReason ? `<span class="ml-2 text-[10px] text-gray-500 font-normal text-left break-words max-w-[80px] leading-tight">${dayReason}</span>` : '';
+                        // 🔥 แก้ไขการแสดงหมายเหตุ (ซ่อนตอนปริ้น)
+                        let reasonHtml = dayReason ? `<span class="ml-2 text-[10px] text-gray-500 font-normal text-left break-words max-w-[80px] leading-tight no-print">${dayReason}</span>` : '';
                         daysHtml += `<td class="table-cell px-2 align-middle min-w-[60px] ${isTodayClass}"><div class="flex items-center justify-center min-h-[40px]"><span class="inline-flex flex-shrink-0 items-center justify-center w-6 h-6 rounded-full text-xs font-bold shadow-sm ${getBadgeColor(dayScore)}">${dayScore}</span>${reasonHtml}</div></td>`;
                     } else {
                         daysHtml += `<td class="table-cell text-gray-300 align-middle ${isTodayClass}">-</td>`;
                     }
                 }
 
-                // คำนวณยอดสะสม (Accumulated + Weekly)
                 const grandTotal = (item.accumulated_score || 0) + weeklyTotal;
 
-                return `<tr class="${rowBg} hover:bg-gray-100 transition"><td class="px-4 py-3 text-sm font-bold text-gray-700 text-left border-b border-gray-100 align-middle">${item.name}</td>${daysHtml}<td class="table-cell total-cell ${totalColor} border-l border-gray-100 align-middle">${weeklyTotal}</td><td class="table-cell total-cell text-white ${accumColor} align-middle">${grandTotal}</td></tr>`;
+                return `<tr class="${rowBg} hover:bg-gray-100 transition"><td class="px-4 py-3 text-sm font-bold text-gray-700 text-left border-b border-gray-100 align-middle">${item.name}</td>${daysHtml}<td class="table-cell total-cell ${totalColor} border-l border-gray-100 align-middle">${weeklyTotal}</td><td class="table-cell total-cell text-white ${accumColor} align-middle shadow-sm">${grandTotal}</td></tr>`;
             }).join('');
         }
 
@@ -238,33 +237,26 @@
             return 'badge-red';
         }
 
-        // --- 🏆 Summary Logic (แยกชาย/หญิง) ---
         function showMonthlySummary() {
-            // 1. คำนวณคะแนนรวมทั้งหมด
             const summaryData = globalData.filter(d => d.type === 'dorm').map(d => {
                 const wEx = [1,2,3,4,5].reduce((a, b) => a + (parseInt(d[`points_exercise_${b}`]) || 0), 0);
                 const wDo = [1,2,3,4,5].reduce((a, b) => a + (parseInt(d[`points_dorm_${b}`]) || 0), 0);
                 return {
                     name: d.name,
-                    gender: d.gender, // ใช้ gender จาก DB หรือเดาจากชื่อถ้าไม่มี
+                    gender: d.gender || (d.name.includes('ชาย') ? 'male' : 'female'),
                     total: (d.accumulated_score || 0) + wEx + wDo
                 };
             });
 
-            // 2. แยกชาย/หญิง และเรียงลำดับ
-            // ถ้าใน DB ไม่ได้เก็บ gender ให้ใช้ .name.includes('ชาย') แทน
-            const males = summaryData.filter(d => d.gender === 'male' || d.name.includes('ชาย')).sort((a,b) => b.total - a.total);
-            const females = summaryData.filter(d => d.gender === 'female' || d.name.includes('หญิง')).sort((a,b) => b.total - a.total);
+            const males = summaryData.filter(d => d.gender === 'male').sort((a,b) => b.total - a.total);
+            const females = summaryData.filter(d => d.gender === 'female').sort((a,b) => b.total - a.total);
 
-            // 3. Render ผู้ชนะ (Top 1)
             document.getElementById('winner-male').innerText = males.length > 0 ? males[0].name.replace('หอนอนชาย', 'ช.') : '-';
             document.getElementById('winner-female').innerText = females.length > 0 ? females[0].name.replace('หอนอนหญิง', 'ญ.') : '-';
 
-            // 4. Render รายการ (Function Helper)
             renderSummaryList('list-male', males, 'blue');
             renderSummaryList('list-female', females, 'pink');
 
-            // 5. Show Modal
             const modal = document.getElementById('summary-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -277,19 +269,20 @@
             
             data.forEach((s, i) => {
                 const isTop = i === 0;
-                let rankClass = isTop 
-                    ? (color === 'blue' ? 'bg-blue-600 text-white border-blue-600' : 'bg-pink-600 text-white border-pink-600') 
-                    : 'bg-white text-gray-600 border-gray-100 hover:bg-gray-50';
+                let cardClass = isTop 
+                    ? (color === 'blue' ? 'bg-blue-600 text-white ring-4 ring-blue-200' : 'bg-pink-600 text-white ring-4 ring-pink-200')
+                    : 'bg-white text-gray-700 border border-gray-100 hover:bg-gray-50';
                 
-                let icon = isTop ? '🥇' : (i===1 ? '🥈' : (i===2 ? '🥉' : `<span class="text-xs font-bold text-gray-400">#${i+1}</span>`));
-                
+                let rankBadge = isTop ? '🥇' : (i===1 ? '🥈' : (i===2 ? '🥉' : `<span class="bg-gray-200 text-gray-500 text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">${i+1}</span>`));
+                let scoreColor = isTop ? 'text-white' : (color === 'blue' ? 'text-blue-600' : 'text-pink-600');
+
                 list.innerHTML += `
-                    <div class="flex items-center justify-between p-3 rounded-xl border ${rankClass} shadow-sm transition">
+                    <div class="flex items-center justify-between p-3 rounded-xl shadow-sm transition transform hover:scale-[1.01] ${cardClass}">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 text-center text-lg">${icon}</div>
+                            <div class="w-8 flex justify-center text-lg">${rankBadge}</div>
                             <span class="font-bold text-sm md:text-base">${s.name}</span>
                         </div>
-                        <div class="font-black text-lg ${isTop ? 'text-white' : (color === 'blue' ? 'text-blue-600' : 'text-pink-600')}">${s.total}</div>
+                        <div class="font-black text-lg ${scoreColor} px-2">${s.total}</div>
                     </div>
                 `;
             });

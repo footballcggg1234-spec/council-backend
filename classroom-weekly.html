@@ -16,6 +16,18 @@
         .badge-red { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
         .current-day-col { background-color: #f0fdf4; color: #15803d; border-bottom-color: #16a34a; }
         .total-cell { font-weight: 800; font-size: 1.1rem; }
+
+        /* 🔥 CSS สำหรับการพิมพ์ PDF */
+        @media print {
+            @page { size: A4 portrait; margin: 10mm; }
+            body { background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print, button, a { display: none !important; }
+            .shadow-sm, .shadow-md, .shadow-lg { box-shadow: none !important; }
+            .overflow-x-auto { overflow-x: visible !important; }
+            .bg-white { background-color: white !important; }
+            table { width: 100% !important; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd !important; padding: 4px !important; }
+        }
     </style>
 </head>
 <body class="p-4 md:p-8 min-h-screen">
@@ -28,9 +40,12 @@
                 <div><h1 class="text-2xl font-extrabold text-gray-800">รายงานห้องเรียน</h1><p class="text-gray-500 font-medium">คะแนนความสะอาดรายวัน</p></div>
             </div>
             
-            <div class="flex gap-2 items-center">
+            <div class="flex gap-2 items-center no-print">
+                <button onclick="window.print()" class="h-10 px-4 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 font-bold transition flex items-center gap-2">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </button>
                 <button onclick="showSummary()" class="h-10 px-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg shadow-lg hover:shadow-green-500/30 hover:-translate-y-0.5 font-bold transition flex items-center gap-2">
-                    <i class="fas fa-medal text-yellow-300"></i> สรุปผลประจำเดือน
+                    <i class="fas fa-medal text-yellow-300"></i> สรุปผล
                 </button>
                 <a href="weekly-report.html" class="h-10 px-4 bg-white text-green-600 border border-green-200 rounded-lg shadow hover:bg-green-50 font-bold transition flex items-center gap-2"><i class="fas fa-bed"></i> ดูหอพัก</a>
             </div>
@@ -56,7 +71,7 @@
             </div>
         </div>
 
-        <div id="class-summary-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div id="class-summary-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4 no-print">
             <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 transition-all" id="modal-box">
                 <div class="bg-green-600 p-5 text-white flex justify-between items-center">
                     <h2 class="text-xl font-bold"><i class="fas fa-crown mr-2 text-yellow-300"></i>Top Classrooms</h2>
@@ -110,7 +125,7 @@
                     if(score !== undefined && score !== null) {
                         weeklyTotal += parseInt(score);
                         let cls = score===10 ? 'badge-green' : (score>=8 ? 'badge-yellow' : 'badge-red');
-                        let reasonHtml = reason ? `<span class="ml-2 text-xs text-gray-700 font-bold text-left break-words max-w-[80px] leading-tight">${reason}</span>` : '';
+                        let reasonHtml = reason ? `<span class="ml-2 text-xs text-gray-700 font-bold text-left break-words max-w-[80px] leading-tight no-print">${reason}</span>` : '';
                         daysHtml += `<td class="table-cell ${isToday} align-middle"><div class="flex items-center justify-center min-h-[40px]"><span class="${cls} inline-flex flex-shrink-0 items-center justify-center w-8 h-8 rounded-full text-sm font-bold shadow-sm">${score}</span>${reasonHtml}</div></td>`;
                     } else {
                         daysHtml += `<td class="table-cell ${isToday} align-middle"><span class="text-gray-300 font-light">-</span></td>`;
@@ -128,7 +143,6 @@
             const list = document.getElementById('top-class-list');
             list.innerHTML = '';
 
-            // Calculate totals for ranking
             const ranking = classData.map(c => {
                 let w = 0;
                 for(let i=1; i<=5; i++) w += (parseInt(c[`points_class_${i}`]) || 0);
