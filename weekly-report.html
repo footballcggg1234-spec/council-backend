@@ -167,10 +167,9 @@
     </div>
 
     <script>
-        const API_URL = '/api/scores';
-        const today = new Date().getDay();
-        let globalData = [];
-
+        const API_URL = '/studentcouncil/api/scores'; // 
+    const today = new Date().getDay();
+    let globalData = [];
         async function fetchAndRender() {
             try {
                 const res = await fetch(API_URL);

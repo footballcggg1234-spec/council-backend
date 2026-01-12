@@ -137,7 +137,7 @@
 
     <script>
         // --- 🔒 ระบบ Login เดิม (ห้ามแก้ Logic นี้) ---
-        const API_URL = '/api/login';
+        const API_URL = '/studentcouncil/api/login';
         
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -154,12 +154,11 @@
             errorDiv.classList.add('hidden');
 
             try {
-                const res = await fetch(API_URL, {
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: user, password: pass })
-                });
-
+                const res = await fetch('/studentcouncil/api/login', {
+    method: 'POST', 
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: user, password: pass })
+});
                 if (res.status === 404) throw new Error('API Login Not Found (กรุณาเช็ค Server)');
                 const data = await res.json();
 
