@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPK26 Portal</title>
+    <title>RPK26 Student Council | หน้าหลัก</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -13,12 +15,11 @@
                 extend: {
                     colors: { primary: '#9F1239', gold: '#F59E0B', dark: '#0F172A' },
                     fontFamily: { sans: ['Sarabun', 'sans-serif'] },
-                    animation: { 'aurora': 'aurora 20s infinite alternate' },
-                    keyframes: { aurora: { '0%': { backgroundPosition: '0% 50%' }, '100%': { backgroundPosition: '100% 50%' } } }
                 }
             }
         }
     </script>
+
     <style>
         body { background-color: #F8FAFC; overflow-x: hidden; }
         .mesh-bg {
@@ -26,11 +27,21 @@
             background: radial-gradient(at 0% 0%, rgba(254,226,226,0.8) 0, transparent 50%), 
                         radial-gradient(at 100% 0%, rgba(253,230,138,0.5) 0, transparent 50%), 
                         radial-gradient(at 100% 100%, rgba(224,231,255,0.5) 0, transparent 50%);
-            background-size: 150% 150%; animation: aurora 15s ease infinite;
+            background-size: 150% 150%;
         }
-        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); }
-        @media (min-width: 1024px) { .app-layout { display: grid; grid-template-columns: 260px 1fr 300px; gap: 24px; padding: 24px; height: 100vh; overflow: hidden; } .mobile-nav { display: none; } .main-content { overflow-y: auto; height: 100%; border-radius: 24px; scrollbar-width: none; } }
-        @media (max-width: 1023px) { .app-layout { display: block; padding: 16px; padding-bottom: 100px; } .mobile-nav { display: flex; } .desktop-sidebar, .desktop-widgets { display: none; } }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8); }
+        
+        @media (min-width: 1024px) { 
+            .app-layout { display: grid; grid-template-columns: 260px 1fr; gap: 24px; padding: 24px; height: 100vh; overflow: hidden; } 
+            .mobile-nav { display: none; } 
+            .main-content { overflow-y: auto; height: 100%; border-radius: 32px; scrollbar-width: none; } 
+        }
+        @media (max-width: 1023px) { 
+            .app-layout { display: block; padding: 16px; padding-bottom: 100px; } 
+            .mobile-nav { display: flex; } 
+            .desktop-sidebar { display: none; } 
+        }
+
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; color: #64748b; font-weight: 600; transition: 0.2s; }
         .nav-item:hover, .nav-item.active { background: #fff1f2; color: #9F1239; }
     </style>
@@ -54,66 +65,161 @@
                     <a href="suggestion.html" class="nav-item"><i class="fas fa-envelope-open-text w-6"></i> ร้องเรียน</a>
                 </nav>
             </div>
-            <a href="login.html" class="flex items-center gap-3 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition"><div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-shield-alt"></i></div><div><div class="text-xs font-bold text-gray-400">System</div><div class="text-sm font-bold text-gray-800">Admin Login</div></div></a>
+            <a href="login.html" class="flex items-center gap-3 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition">
+                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-shield-alt"></i></div>
+                <div><div class="text-xs font-bold text-gray-400">System</div><div class="text-sm font-bold text-gray-800">Admin Login</div></div>
+            </a>
         </aside>
 
         <main class="main-content">
+            
             <div class="lg:hidden flex justify-between items-center mb-6">
-                <div><h1 class="text-2xl font-black text-slate-800">หน้าแรก</h1><p class="text-xs text-gray-500">สภานักเรียน รุ่นที่ 26</p></div>
+                <div><h1 class="text-2xl font-black text-slate-800">หน้าแรก</h1><p class="text-xs text-gray-500">ยินดีต้อนรับสู่ระบบสภานักเรียน</p></div>
                 <a href="login.html" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow text-primary"><i class="fas fa-user"></i></a>
             </div>
 
-            <div class="relative w-full h-48 lg:h-64 rounded-[32px] overflow-hidden shadow-lg group cursor-pointer mb-6" onclick="location.href='weekly-report.html'">
-                <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070" class="w-full h-full object-cover transition duration-700 group-hover:scale-105 brightness-75">
-                <div class="absolute bottom-6 left-8 text-white">
-                    <div class="bg-gold text-black text-[10px] font-bold px-3 py-1 rounded-full inline-block mb-2">WEEKLY HIGHLIGHT</div>
-                    <h2 class="text-2xl font-extrabold leading-tight">สรุปคะแนนประจำสัปดาห์</h2>
-                </div>
-            </div>
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                
+                <div class="xl:col-span-2 space-y-6">
+                    
+                    <div class="bg-slate-900 rounded-[32px] p-8 text-white relative overflow-hidden shadow-xl">
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-primary rounded-full blur-[100px] opacity-40"></div>
+                        <div class="relative z-10">
+                            <h2 class="text-3xl font-black mb-2">ยินดีต้อนรับ, ชาวราชประชานุเคราะห์ 26</h2>
+                            <p class="text-gray-400 mb-6">ติดตามข่าวสาร ตรวจสอบคะแนน และร่วมพัฒนาโรงเรียนไปด้วยกัน</p>
+                            <a href="weekly-report.html" class="inline-flex items-center px-6 py-3 bg-white text-slate-900 rounded-xl font-bold hover:bg-gray-100 transition"><i class="fas fa-chart-line mr-2"></i> ดูคะแนนวันนี้</a>
+                        </div>
+                    </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div class="glass p-5 rounded-[24px] border-l-4 border-blue-500 relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-4"><div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fas fa-running"></i></div><span class="text-xs font-bold text-gray-400">EXERCISE</span></div>
-                    <div id="podium-exercise" class="h-20 flex items-end justify-center gap-2">Loading...</div>
-                </div>
-                <div class="glass p-5 rounded-[24px] border-l-4 border-purple-500 relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-4"><div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-lg"><i class="fas fa-bed"></i></div><span class="text-xs font-bold text-gray-400">DORM</span></div>
-                    <div id="podium-dorm" class="h-20 flex items-end justify-center gap-2">Loading...</div>
-                </div>
-                <div class="glass p-5 rounded-[24px] border-l-4 border-green-500 relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-4"><div class="w-10 h-10 rounded-xl bg-green-100 text-green-600 flex items-center justify-center text-lg"><i class="fas fa-chalkboard"></i></div><span class="text-xs font-bold text-gray-400">CLASS</span></div>
-                    <div id="podium-classroom" class="h-20 flex items-end justify-center gap-2">Loading...</div>
-                </div>
-            </div>
+                    <div class="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 text-xl"><i class="far fa-calendar-alt"></i></div>
+                                <h3 class="text-xl font-bold text-slate-800">ปฏิทินกิจกรรม</h3>
+                            </div>
+                            <span class="text-sm font-bold text-gray-400 bg-gray-100 px-3 py-1 rounded-full">มกราคม 2569</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-7 gap-2 text-center text-sm mb-2">
+                            <div class="text-gray-400 font-bold py-2">อา</div>
+                            <div class="text-gray-400 font-bold py-2">จ</div>
+                            <div class="text-gray-400 font-bold py-2">อ</div>
+                            <div class="text-gray-400 font-bold py-2">พ</div>
+                            <div class="text-gray-400 font-bold py-2">พฤ</div>
+                            <div class="text-gray-400 font-bold py-2">ศ</div>
+                            <div class="text-gray-400 font-bold py-2">ส</div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-2 text-center text-sm font-medium text-gray-700">
+                            <div class="p-2 text-gray-300">28</div><div class="p-2 text-gray-300">29</div><div class="p-2 text-gray-300">30</div><div class="p-2 text-gray-300">31</div>
+                            <div class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer">1</div>
+                            <div class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer">2</div>
+                            <div class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer">3</div>
+                            <div class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer">4</div>
+                            <div class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer">5</div>
+                            <div class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer">6</div>
+                            <div class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer">7</div>
+                            <div class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer">8</div>
+                            <div class="p-2 bg-primary text-white rounded-lg shadow-md shadow-red-500/30 font-bold">9</div> <div class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer relative">
+                                10 <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-500 rounded-full"></span> </div>
+                            <div class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer">11</div>
+                            <div class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer">12</div>
+                            <div class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer relative">
+                                13 <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-green-500 rounded-full"></span>
+                            </div>
+                            <div class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer">14</div>
+                            <div class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer">15</div>
+                            <div class="p-2 hover:bg-gray-50 rounded-lg cursor-pointer text-red-500">16</div> </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100 flex gap-4 text-xs text-gray-500">
+                            <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> ประชุมสภา</div>
+                            <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> กิจกรรม Big Cleaning</div>
+                        </div>
+                    </div>
 
-            <h3 class="text-lg font-bold text-gray-800 mb-4 px-1">ข่าวประชาสัมพันธ์</h3>
-            <div id="news-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-white p-4 rounded-2xl animate-pulse h-32"></div>
-                <div class="bg-white p-4 rounded-2xl animate-pulse h-32"></div>
+                    <div class="mt-8 bg-white rounded-[32px] p-8 shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition duration-300">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full blur-3xl opacity-50 pointer-events-none -mr-10 -mt-10"></div>
+                        
+                        <div class="flex items-center gap-4 mb-8 relative z-10">
+                            <div class="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-700 text-2xl shadow-sm">
+                                <i class="fas fa-book-reader"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-black text-slate-800">คู่มือการใช้งาน</h2>
+                                <p class="text-sm text-gray-500 font-medium">ขั้นตอนง่ายๆ สำหรับการใช้งานระบบสภานักเรียน</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+                            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:border-red-200 transition group/card">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-red-600 font-bold text-lg border border-red-50">1</div>
+                                    <i class="fas fa-chart-pie text-gray-300 text-4xl group-hover/card:text-red-200 transition"></i>
+                                </div>
+                                <h3 class="font-bold text-lg text-slate-800 mb-2">ตรวจสอบคะแนน</h3>
+                                <p class="text-sm text-gray-500 leading-relaxed mb-4">ดูคะแนนความประพฤติหอพักและห้องเรียนแบบ Real-time</p>
+                                <a href="weekly-report.html" class="text-xs font-bold text-red-600 hover:underline">ไปที่หน้ารายงาน →</a>
+                            </div>
+                            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:border-gold transition group/card">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-yellow-600 font-bold text-lg border border-yellow-50">2</div>
+                                    <i class="fas fa-envelope-open-text text-gray-300 text-4xl group-hover/card:text-yellow-200 transition"></i>
+                                </div>
+                                <h3 class="font-bold text-lg text-slate-800 mb-2">แจ้งเรื่องร้องเรียน</h3>
+                                <p class="text-sm text-gray-500 leading-relaxed mb-4">พบปัญหาหรือมีข้อเสนอแนะ ส่งเรื่องถึงสภาฯ ได้โดยตรง</p>
+                                <a href="suggestion.html" class="text-xs font-bold text-yellow-600 hover:underline">ส่งเรื่องทันที →</a>
+                            </div>
+                            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:border-blue-200 transition group/card">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-blue-600 font-bold text-lg border border-blue-50">3</div>
+                                    <i class="fas fa-user-shield text-gray-300 text-4xl group-hover/card:text-blue-200 transition"></i>
+                                </div>
+                                <h3 class="font-bold text-lg text-slate-800 mb-2">สำหรับคณะกรรมการ</h3>
+                                <p class="text-sm text-gray-500 leading-relaxed mb-4">เข้าสู่ระบบเพื่อบันทึกคะแนนและจัดการข่าวสาร</p>
+                                <a href="login.html" class="text-xs font-bold text-blue-600 hover:underline">เข้าสู่ระบบ →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="space-y-6">
+                    
+                    <div class="glass p-6 rounded-[32px] border border-white/50">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-slate-800">ประกาศล่าสุด</h3>
+                            <span class="text-xs font-bold text-primary cursor-pointer hover:underline">ดูทั้งหมด</span>
+                        </div>
+                        <div id="news-container" class="space-y-4">
+                            <div class="animate-pulse flex space-x-4">
+                                <div class="flex-1 space-y-2 py-1">
+                                    <div class="h-2 bg-slate-200 rounded"></div>
+                                    <div class="space-y-2">
+                                        <div class="grid grid-cols-3 gap-4"><div class="h-2 bg-slate-200 rounded col-span-2"></div></div>
+                                        <div class="h-2 bg-slate-200 rounded"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-[32px] shadow-sm border border-gray-100">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="fas fa-trophy text-yellow-400 text-xl"></i>
+                            <h3 class="font-bold text-slate-800">หอพักดีเด่น</h3>
+                        </div>
+                        <div id="top-dorms" class="space-y-3">
+                            <div class="text-center text-gray-400 text-sm py-4">กำลังโหลดข้อมูล...</div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </main>
-
-        <aside class="desktop-widgets h-full sticky top-6 space-y-6">
-            <div class="glass rounded-[32px] p-6">
-                <h3 class="font-bold text-gray-800 mb-4">ปฏิทิน</h3>
-                <div class="bg-white rounded-2xl p-4 shadow-sm text-center border border-gray-100">
-                    <div id="cal-month" class="text-primary font-black text-xl mb-1">...</div>
-                    <div id="cal-year" class="text-xs text-gray-400 font-bold mb-4">...</div>
-                    
-                    <div class="grid grid-cols-7 gap-2 text-xs font-bold text-gray-400 mb-2">
-                        <span>อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span>
-                    </div>
-                    <div id="cal-days" class="grid grid-cols-7 gap-2 text-sm font-semibold text-gray-600"></div>
-                </div>
-            </div>
-        </aside>
-
     </div>
 
     <nav class="mobile-nav fixed bottom-6 left-4 right-4 bg-gray-900/90 backdrop-blur-xl text-white p-3 rounded-[24px] shadow-2xl z-50 justify-between items-center px-10 border border-white/10">
-        <a href="index.html" class="flex flex-col items-center text-primary"><i class="fas fa-home text-xl"></i></a>
-        <a href="weekly-report.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-chart-bar text-xl"></i></a>
-        <a href="suggestion.html" class="flex flex-col items-center justify-center -mt-10"><div class="w-14 h-14 rounded-full bg-gradient-to-r from-primary to-red-600 text-white flex items-center justify-center text-2xl shadow-lg border-4 border-gray-100"><i class="fas fa-plus"></i></div></a>
+        <a href="index.html" class="flex flex-col items-center justify-center -mt-10"><div class="w-14 h-14 rounded-full bg-gradient-to-r from-primary to-red-600 text-white flex items-center justify-center text-2xl shadow-lg border-4 border-gray-100"><i class="fas fa-home"></i></div></a>
+        <a href="weekly-report.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-chart-pie text-xl"></i></a>
+        <a href="suggestion.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-envelope text-xl"></i></a>
         <a href="team.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-users text-xl"></i></a>
     </nav>
 
@@ -121,76 +227,49 @@
         const API_URL = '/studentcouncil/api/scores';
         const NEWS_API = '/studentcouncil/api/news';
 
-        async function init() {
-            renderCalendar(); // เรียกฟังก์ชันสร้างปฏิทิน
+        async function initData() {
             try {
-                const [s, n] = await Promise.all([fetch(API_URL), fetch(NEWS_API)]);
-                const scores = await s.json();
+                // 1. Load Scores for Leaderboard
+                const res = await fetch(API_URL);
+                const scores = await res.json();
                 
-                const dormData = scores.filter(d => d.type === 'dorm');
-                const classData = scores.filter(d => d.type === 'classroom');
+                // Top Dorms Logic
+                const dorms = scores.filter(d => d.type === 'dorm')
+                    .map(d => ({ 
+                        name: d.name, 
+                        total: (d.accumulated_score || 0) + [1,2,3,4,5].reduce((a,b)=>a+(parseInt(d[`points_exercise_${b}`])||0)+(parseInt(d[`points_dorm_${b}`])||0),0) 
+                    }))
+                    .sort((a,b) => b.total - a.total).slice(0, 3);
 
-                renderPodium('exercise', dormData, 'bg-blue-500', 'text-blue-600');
-                renderPodium('dorm', dormData, 'bg-purple-500', 'text-purple-600');
-                renderPodium('classroom', classData, 'bg-green-500', 'text-green-600');
-                
-                renderNews(await n.json());
-            } catch(e) { console.error(e); }
-        }
+                const topDormHTML = dorms.map((d, i) => `
+                    <div class="flex items-center justify-between p-3 rounded-2xl ${i===0 ? 'bg-yellow-50 border border-yellow-100' : 'bg-gray-50'}">
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold ${i===0?'text-yellow-600':'text-gray-500'}">#${i+1}</span>
+                            <span class="font-bold text-sm text-slate-700">${d.name}</span>
+                        </div>
+                        <span class="font-black text-slate-800">${d.total}</span>
+                    </div>
+                `).join('');
+                document.getElementById('top-dorms').innerHTML = topDormHTML || '<p class="text-center text-sm text-gray-400">ยังไม่มีข้อมูลคะแนน</p>';
 
-        // 🔥 ฟังก์ชันสร้างปฏิทินอัตโนมัติ
-        function renderCalendar() {
-            const date = new Date();
-            const year = date.getFullYear();
-            const month = date.getMonth();
-            const today = date.getDate();
+                // 2. Load News
+                const newsRes = await fetch(NEWS_API);
+                const news = await newsRes.json();
+                const newsHTML = news.length ? news.slice(0, 3).map(n => `
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:-translate-y-1 transition">
+                        <div class="text-[10px] font-bold text-primary mb-1 uppercase tracking-wider">${new Date(n.date).toLocaleDateString('th-TH')}</div>
+                        <h4 class="font-bold text-slate-800 text-sm mb-1">${n.topic}</h4>
+                        <p class="text-xs text-gray-500 line-clamp-2">${n.detail}</p>
+                    </div>
+                `).join('') : '<p class="text-center text-xs text-gray-400 py-4">ยังไม่มีประกาศใหม่</p>';
+                document.getElementById('news-container').innerHTML = newsHTML;
 
-            const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-                                "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-            
-            document.getElementById('cal-month').innerText = monthNames[month];
-            document.getElementById('cal-year').innerText = (year + 543); // พ.ศ.
-
-            const firstDay = new Date(year, month, 1).getDay();
-            const lastDate = new Date(year, month + 1, 0).getDate();
-            const daysContainer = document.getElementById('cal-days');
-            daysContainer.innerHTML = "";
-
-            // ช่องว่างก่อนวันที่ 1
-            for (let i = 0; i < firstDay; i++) {
-                daysContainer.innerHTML += `<span></span>`;
-            }
-
-            // รันวันที่ 1 ถึงสิ้นเดือน
-            for (let i = 1; i <= lastDate; i++) {
-                if (i === today) {
-                    daysContainer.innerHTML += `<span class="bg-primary text-white rounded-lg shadow-md flex items-center justify-center w-7 h-7 mx-auto cursor-pointer">${i}</span>`;
-                } else {
-                    daysContainer.innerHTML += `<span class="flex items-center justify-center w-7 h-7 mx-auto hover:bg-gray-100 rounded-full cursor-pointer transition">${i}</span>`;
-                }
+            } catch (err) {
+                console.error(err);
             }
         }
 
-        function renderPodium(id, data, color, txt) {
-            const el = document.getElementById(`podium-${id}`);
-            const scoreKey = id === 'exercise' ? 'points_exercise' : (id === 'dorm' ? 'points_dorm' : 'points_class');
-            data.sort((a,b) => (b[scoreKey]||0) - (a[scoreKey]||0));
-            
-            if(!data.length) return el.innerHTML = '<span class="text-xs text-gray-400">ไม่มีข้อมูล</span>';
-            
-            let html = '';
-            if(data[1]) html += `<div class="w-1/3 flex flex-col items-center"><div class="w-full ${color} opacity-30 h-8 rounded-t-lg"></div><span class="text-[9px] mt-1 text-gray-400 truncate w-full text-center">${data[1].name}</span></div>`; 
-            if(data[0]) html += `<div class="w-1/3 flex flex-col items-center z-10"><div class="w-full ${color} h-16 rounded-t-lg shadow-lg flex items-center justify-center text-white font-bold">${data[0][scoreKey]||0}</div><span class="text-xs font-bold mt-1 ${txt} truncate w-full text-center">${data[0].name}</span></div>`;
-            if(data[2]) html += `<div class="w-1/3 flex flex-col items-center"><div class="w-full ${color} opacity-20 h-5 rounded-t-lg"></div><span class="text-[9px] mt-1 text-gray-400 truncate w-full text-center">${data[2].name}</span></div>`; 
-            el.innerHTML = html;
-        }
-
-        function renderNews(data) {
-            const el = document.getElementById('news-container');
-            if(!data.length) return el.innerHTML = '<div class="col-span-full text-center text-xs text-gray-400 py-4">ยังไม่มีข่าว</div>';
-            el.innerHTML = data.map(n => `<div class="bg-white p-4 rounded-2xl flex gap-4 items-center shadow-sm"><div class="w-16 h-16 rounded-xl bg-gray-100 flex-shrink-0"></div><div><h4 class="font-bold text-sm text-gray-800 line-clamp-1">${n.title}</h4><p class="text-[10px] text-gray-400 line-clamp-2">${n.content||''}</p></div></div>`).join('');
-        }
-        init();
+        document.addEventListener('DOMContentLoaded', initData);
     </script>
 </body>
 </html>

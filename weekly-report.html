@@ -167,36 +167,30 @@
     </div>
 
     <script>
-        const API_URL = '/studentcouncil/api/scores'; // 
-    const today = new Date().getDay();
-    let globalData = [];
-        async function fetchAndRender() {
-            try {
-                const res = await fetch(API_URL);
-                globalData = await res.json();
-                
-                const dormData = globalData.filter(d => d.type === 'dorm');
-                
-                dormData.sort((a, b) => {
-                     const typeA = a.name.includes('ชาย') ? 1 : 2;
-                     const typeB = b.name.includes('ชาย') ? 1 : 2;
-                     if(typeA !== typeB) return typeA - typeB;
-                     const numA = parseInt(a.name.match(/\d+/)) || 0;
-                     const numB = parseInt(b.name.match(/\d+/)) || 0;
-                     return numA - numB;
-                });
+        const API_URL = '/studentcouncil/api/scores'; 
+const today = new Date().getDay();
+let globalData = [];
 
-                renderTable('tbody-exercise', dormData, 'points_exercise', 'blue');
-                renderTable('tbody-dorm', dormData, 'points_dorm', 'purple');
+async function fetchAndRender() {
+    try {
+        const res = await fetch(API_URL);
+        globalData = await res.json();
+        
+        // กรองข้อมูลเฉพาะประเภท 'dorm'
+        const dormData = globalData.filter(d => d.type === 'dorm');
+        
+        // เรียงลำดับชื่อหอพัก
+        dormData.sort((a, b) => {
+             const typeA = a.name.includes('ชาย') ? 1 : 2;
+             const typeB = b.name.includes('ชาย') ? 1 : 2;
+             if(typeA !== typeB) return typeA - typeB;
+             return (parseInt(a.name.match(/\d+/)) || 0) - (parseInt(b.name.match(/\d+/)) || 0);
+        });
 
-                if(today >= 1 && today <= 5) {
-                    document.querySelectorAll(`.day-col-${today}`).forEach(el => {
-                        el.classList.add('bg-yellow-100', 'text-yellow-700');
-                        el.innerHTML += ' <i class="fas fa-caret-down ml-1"></i>';
-                    });
-                }
-            } catch (error) { console.error('Error:', error); }
-        }
+        renderTable('tbody-exercise', dormData, 'points_exercise', 'blue');
+        renderTable('tbody-dorm', dormData, 'points_dorm', 'purple');
+    } catch (error) { console.error('Fetch error:', error); }
+}
 
         function renderTable(elementId, data, keyPrefix, colorTheme) {
             const tbody = document.getElementById(elementId);

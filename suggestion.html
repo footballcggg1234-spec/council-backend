@@ -2,84 +2,163 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Suggestion Box</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Box | แจ้งเรื่องร้องเรียน RPK26</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#9F1239', gold: '#F59E0B', dark: '#0F172A' },
+                    fontFamily: { sans: ['Sarabun', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
     <style>
-        body { font-family: 'Sarabun', sans-serif; background: #f0f2f5; }
+        body { background-color: #F8FAFC; overflow-x: hidden; }
         .mesh-bg {
-            position: fixed; inset: 0; z-index: -1;
-            background: radial-gradient(at 100% 100%, #fee2e2 0, transparent 50%), radial-gradient(at 0% 0%, #fff7ed 0, transparent 50%);
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            background: radial-gradient(at 0% 0%, rgba(254,226,226,0.8) 0, transparent 50%), 
+                        radial-gradient(at 100% 0%, rgba(253,230,138,0.5) 0, transparent 50%), 
+                        radial-gradient(at 100% 100%, rgba(224,231,255,0.5) 0, transparent 50%);
+            background-size: 150% 150%;
         }
-        .input-glass {
-            background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.5);
-            transition: 0.3s;
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); }
+        
+        @media (min-width: 1024px) { 
+            .app-layout { display: grid; grid-template-columns: 260px 1fr; gap: 24px; padding: 24px; height: 100vh; overflow: hidden; } 
+            .mobile-nav { display: none; } 
+            .main-content { overflow-y: auto; height: 100%; border-radius: 32px; scrollbar-width: none; } 
         }
-        .input-glass:focus { background: white; border-color: #9F1239; box-shadow: 0 0 0 4px rgba(159, 18, 57, 0.1); }
+        @media (max-width: 1023px) { 
+            .app-layout { display: block; padding: 16px; padding-bottom: 100px; } 
+            .mobile-nav { display: flex; } 
+            .desktop-sidebar { display: none; } 
+        }
+
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; color: #64748b; font-weight: 600; transition: 0.2s; }
+        .nav-item:hover, .nav-item.active { background: #fff1f2; color: #9F1239; }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="text-slate-800">
 
     <div class="mesh-bg"></div>
 
-    <div class="max-w-4xl w-full bg-white/80 backdrop-blur-2xl rounded-[40px] shadow-2xl overflow-hidden flex flex-col md:flex-row border border-white">
+    <div class="app-layout max-w-[1920px] mx-auto">
         
-        <div class="md:w-5/12 bg-gray-900 text-white p-10 flex flex-col justify-between relative overflow-hidden">
-            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
-            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-primary rounded-full blur-[100px] opacity-50"></div>
-            
-            <a href="index.html" class="relative z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-black transition"><i class="fas fa-arrow-left"></i></a>
-            
-            <div class="relative z-10 mt-10">
-                <div class="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-3xl mb-6 shadow-lg shadow-red-900/50">
-                    <i class="fas fa-comment-dots"></i>
+        <aside class="desktop-sidebar glass rounded-[32px] p-6 flex-col justify-between h-full sticky top-6">
+            <div>
+                <div class="flex items-center gap-3 mb-10 px-2">
+                    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white text-xl shadow-lg shadow-red-500/30"><i class="fas fa-university"></i></div>
+                    <div><h1 class="font-black text-xl tracking-tight text-slate-800">RPK<span class="text-primary">26</span></h1><p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Student Council</p></div>
                 </div>
-                <h1 class="text-4xl font-bold mb-2">Voice Box</h1>
-                <p class="text-gray-400 leading-relaxed">พื้นที่ปลอดภัยสำหรับทุกความคิดเห็น เพื่อโรงเรียนของเรา</p>
+                <nav class="space-y-1">
+                    <a href="index.html" class="nav-item"><i class="fas fa-home w-6"></i> หน้าแรก</a>
+                    <a href="weekly-report.html" class="nav-item"><i class="fas fa-chart-pie w-6"></i> รายงานคะแนน</a>
+                    <a href="team.html" class="nav-item"><i class="fas fa-users w-6"></i> คณะกรรมการ</a>
+                    <a href="suggestion.html" class="nav-item active"><i class="fas fa-envelope-open-text w-6"></i> ร้องเรียน</a>
+                </nav>
+            </div>
+            <a href="login.html" class="flex items-center gap-3 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition">
+                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-shield-alt"></i></div>
+                <div><div class="text-xs font-bold text-gray-400">System</div><div class="text-sm font-bold text-gray-800">Admin Login</div></div>
+            </a>
+        </aside>
+
+        <main class="main-content">
+            
+            <div class="lg:hidden flex justify-between items-center mb-6">
+                <div><h1 class="text-2xl font-black text-slate-800">ร้องเรียน</h1><p class="text-xs text-gray-500">RPK26 Voice Box</p></div>
+                <a href="login.html" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow text-primary"><i class="fas fa-user"></i></a>
             </div>
 
-            <div class="relative z-10 text-xs text-gray-600 mt-10">© RPK26 Student Council</div>
-        </div>
+            <div class="w-full bg-slate-900 rounded-[32px] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl mb-8">
+                <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-primary rounded-full blur-[120px] opacity-30 pointer-events-none"></div>
+                <div class="relative z-10">
+                    <div class="inline-block px-3 py-1 border border-white/30 rounded-full text-[10px] font-bold mb-4 backdrop-blur tracking-widest uppercase">Student Voice</div>
+                    <h1 class="text-4xl md:text-5xl font-black mb-4 tracking-tight">กล่องรับเรื่องร้องเรียน</h1>
+                    <p class="text-lg text-gray-400 max-w-lg">พื้นที่ปลอดภัยสำหรับทุกความคิดเห็น เพื่อโรงเรียนที่ดียิ่งขึ้น ทุกเรื่องราวของคุณจะถูกนำไปพัฒนาและแก้ไข</p>
+                </div>
+            </div>
 
-        <div class="flex-1 p-8 md:p-12">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">แจ้งเรื่องร้องเรียน</h2>
-            
-            <form id="sugForm" class="space-y-5">
-                <div>
-                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">หัวข้อ</label>
-                    <input type="text" id="topic" class="w-full input-glass rounded-xl px-4 py-3 outline-none text-gray-800 font-medium mt-1" placeholder="ระบุหัวข้อ..." required>
+            <div class="glass p-6 md:p-10 rounded-[32px] border border-white/50 mb-10 max-w-3xl mx-auto lg:mx-0">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-red-500/20"><i class="fas fa-comment-dots"></i></div>
+                    <div><h2 class="text-2xl font-bold text-slate-800">แจ้งเรื่อง/ข้อเสนอแนะ</h2><p class="text-sm text-gray-500">ระบุรายละเอียดเรื่องที่คุณต้องการให้เราทราบ</p></div>
                 </div>
-                <div>
-                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">หมวดหมู่</label>
-                    <select id="category" class="w-full input-glass rounded-xl px-4 py-3 outline-none text-gray-800 font-medium mt-1 cursor-pointer">
-                        <option>ทั่วไป</option><option>การเรียน</option><option>อาคารสถานที่</option><option>กิจกรรม</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">รายละเอียด</label>
-                    <textarea id="detail" class="w-full input-glass rounded-xl px-4 py-3 outline-none text-gray-800 font-medium mt-1 h-32 resize-none" placeholder="อธิบายเพิ่มเติม..." required></textarea>
-                </div>
-                <button type="submit" class="w-full py-4 bg-primary text-white rounded-xl font-bold hover:bg-red-900 transition shadow-lg shadow-red-900/20 active:scale-[0.98]">
-                    ส่งเรื่องทันที
-                </button>
-            </form>
-        </div>
+
+                <form id="sugForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">หัวข้อ</label>
+                            <input type="text" id="topic" class="w-full bg-white border border-gray-100 rounded-2xl px-5 py-4 outline-none focus:border-primary focus:ring-4 focus:ring-red-50 transition shadow-sm font-medium" placeholder="เช่น ปัญหาที่จอดรถ, ถังขยะ..." required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">หมวดหมู่</label>
+                            <select id="category" class="w-full bg-white border border-gray-100 rounded-2xl px-5 py-4 outline-none focus:border-primary focus:ring-4 focus:ring-red-50 transition shadow-sm font-medium cursor-pointer">
+                                <option>ทั่วไป</option>
+                                <option>การเรียน</option>
+                                <option>อาคารสถานที่</option>
+                                <option>กิจกรรม</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">รายละเอียด</label>
+                        <textarea id="detail" class="w-full bg-white border border-gray-100 rounded-2xl px-5 py-4 outline-none focus:border-primary focus:ring-4 focus:ring-red-50 transition shadow-sm font-medium h-40 resize-none" placeholder="อธิบายปัญหาหรือข้อเสนอแนะของคุณที่นี่..." required></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-slate-900 transition shadow-xl shadow-red-900/20 active:scale-[0.98]">
+                        <i class="fas fa-paper-plane mr-2"></i> ส่งข้อความถึงเรา
+                    </button>
+                </form>
+            </div>
+
+        </main>
 
     </div>
+
+    <nav class="mobile-nav fixed bottom-6 left-4 right-4 bg-gray-900/90 backdrop-blur-xl text-white p-3 rounded-[24px] shadow-2xl z-50 justify-between items-center px-10 border border-white/10">
+        <a href="index.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-home text-xl"></i></a>
+        <a href="weekly-report.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-chart-pie text-xl"></i></a>
+        <a href="suggestion.html" class="flex flex-col items-center justify-center -mt-10"><div class="w-14 h-14 rounded-full bg-gradient-to-r from-primary to-red-600 text-white flex items-center justify-center text-2xl shadow-lg border-4 border-gray-100"><i class="fas fa-plus"></i></div></a>
+        <a href="team.html" class="flex flex-col items-center text-gray-400 hover:text-white"><i class="fas fa-users text-xl"></i></a>
+    </nav>
 
     <script>
         const API = '/studentcouncil/api/suggestions';
         document.getElementById('sugForm').addEventListener('submit', async(e)=>{
             e.preventDefault();
-            const btn = document.querySelector('button');
+            const btn = document.querySelector('button[type="submit"]');
             const old = btn.innerHTML;
-            btn.innerHTML = 'Sending...';
+            btn.innerHTML = '<i class="fas fa-circle-notch animate-spin mr-2"></i> กำลังส่งข้อมูล...';
+            btn.disabled = true;
+
             try {
-                await fetch(API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({topic:document.getElementById('topic').value, category:document.getElementById('category').value, detail:document.getElementById('detail').value})});
-                alert('Success'); e.target.reset();
-            } catch { alert('Error'); } finally { btn.innerHTML = old; }
+                const response = await fetch(API, {
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({
+                        topic: document.getElementById('topic').value, 
+                        category: document.getElementById('category').value, 
+                        detail: document.getElementById('detail').value
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('ส่งข้อมูลเรียบร้อยแล้ว ขอบคุณสำหรับความคิดเห็นครับ ✅'); 
+                    e.target.reset();
+                } else {
+                    throw new Error('Server Error');
+                }
+            } catch (err) { 
+                alert('เกิดข้อผิดพลาด ไม่สามารถส่งข้อมูลได้ในขณะนี้ ❌'); 
+            } finally { 
+                btn.innerHTML = old; 
+                btn.disabled = false;
+            }
         });
     </script>
 </body>

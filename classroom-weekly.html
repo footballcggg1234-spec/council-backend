@@ -99,31 +99,25 @@
     </div>
 
     <script>
-        const API_URL = '/studentcouncil/api/scores'; // ???????????
-    const today = new Date().getDay();
-    let classData = [];
-        let currentFilter = 'All'; // ตัวแปรเก็บสถานะการกรองปัจจุบัน
+        // ค้นหาและแก้ไขบรรทัดที่ 124 ในไฟล์เดิม
+const API_URL = '/studentcouncil/api/scores'; 
+const today = new Date().getDay();
+let classData = [];
 
-        async function fetchAndRender() {
-            try {
-                const res = await fetch(API_URL);
-                const allData = await res.json();
-                classData = allData.filter(d => d.type === 'classroom');
-                
-                // เรียงลำดับตามชื่อห้อง
-                classData.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
+async function fetchAndRender() {
+    try {
+        const res = await fetch(API_URL);
+        const allData = await res.json();
+        
+        // กรองข้อมูลเฉพาะประเภท 'classroom'
+        classData = allData.filter(d => d.type === 'classroom');
+        
+        // เรียงลำดับตามชื่อห้อง
+        classData.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
 
-                renderTable();
-
-                if(today >= 1 && today <= 5) {
-                    document.querySelectorAll(`.day-col-${today}`).forEach(el => {
-                        el.classList.add('current-day-col');
-                        el.innerHTML += ' <i class="fas fa-caret-down ml-1"></i>';
-                    });
-                }
-            } catch (err) { console.error(err); }
-        }
-
+        renderTable();
+    } catch (err) { console.error('Fetch error:', err); }
+}
         // 🔥 ฟังก์ชันกรอง
         function setFilter(grade) {
             currentFilter = grade;
